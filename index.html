@@ -252,6 +252,128 @@
   input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:17px; height:17px; border-radius:50%; background:var(--green-main); cursor:pointer; }
   ::-webkit-scrollbar { width:4px; }
   ::-webkit-scrollbar-thumb { background:#e0e4ea; border-radius:10px; }
+
+  /* ===== 모바일 반응형 ===== */
+  @media (max-width: 768px) {
+
+    /* 사이드바 숨기기 */
+    .sidebar { display: none !important; }
+
+    /* 앱 레이아웃 전체 높이 조정 (하단탭 높이 만큼) */
+    .app-shell { flex-direction: column; height: 100vh; }
+    .main { height: calc(100vh - 60px); overflow-y: auto; }
+
+    /* 상단바 모바일 최적화 */
+    .topbar { padding: 0 14px; height: 52px; }
+    .topbar-price-chips { display: none; }
+    .page-title { font-size: 14px; }
+    .topbar-right .btn-outline { display: none; }
+    .topbar-right .btn-primary { padding: 7px 12px; font-size: 11px; }
+
+    /* 대시보드 */
+    .dashboard-grid { padding: 14px 14px 80px; gap: 12px; }
+    .stat-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-value { font-size: 24px; }
+    .two-col { grid-template-columns: 1fr; }
+    .quick-actions { grid-template-columns: 1fr 1fr; }
+
+    /* 지도 레이아웃 */
+    .map-layout { flex-direction: column; height: calc(100vh - 112px); }
+    .map-sidebar { width: 100%; min-width: unset; height: 200px; border-right: none; border-bottom: 1px solid var(--gray-light); }
+    .map-wrap { flex: 1; }
+    .business-list { max-height: 120px; }
+
+    /* 패널 여백 */
+    .waste-layout, .history-layout { padding: 14px 14px 80px; }
+    .order-layout { grid-template-columns: 1fr; padding: 14px 14px 80px; }
+    .order-summary { position: static; }
+
+    /* ESG, 시세 */
+    #panel-price > div, #panel-esg > div { padding: 14px 14px 80px; max-width: 100%; }
+
+    /* 업주/QR/등록 패널 */
+    #panel-owner > div, #panel-qr > div > div, #panel-register > div,
+    #panel-admin > div, #panel-hq > div { padding: 14px 14px 80px; max-width: 100%; }
+
+    /* HQ 그리드 모바일 */
+    #panel-hq .stat-row { grid-template-columns: 1fr 1fr; }
+    #panel-hq > div > div:nth-child(2) { grid-template-columns: 1fr; }
+
+    /* 히스토리 테이블 스크롤 */
+    .history-table-wrap { overflow-x: auto; }
+    .history-table { min-width: 600px; }
+
+    /* 알림 배너 */
+    .alert-banner { font-size: 10px; padding: 7px 14px; gap: 6px; }
+  }
+
+  /* ===== 하단 탭바 ===== */
+  .bottom-tab-bar {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .bottom-tab-bar {
+      display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: #0D0D0D;
+      border-top: 1px solid #222;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      transition: all 0.15s;
+      padding: 6px 4px;
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tab-item:active { opacity: 0.7; transform: scale(0.95); }
+
+    .tab-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .tab-label {
+      font-size: 9px;
+      font-weight: 600;
+      color: #666;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .tab-item.active .tab-label { color: var(--green-main); }
+    .tab-item.active .tab-icon { filter: drop-shadow(0 0 4px rgba(5,196,107,0.5)); }
+
+    /* 탭 알림 뱃지 */
+    .tab-badge {
+      position: absolute;
+      top: 4px;
+      right: calc(50% - 18px);
+      background: var(--red-accent);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 20px;
+      min-width: 16px;
+      text-align: center;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -1363,6 +1485,37 @@
       </div>
     </div>
 
+
+  <!-- 모바일 하단 탭바 -->
+  <nav class="bottom-tab-bar">
+    <button class="tab-item active" id="tab-dashboard" onclick="showPanelMobile('dashboard', this)">
+      <div style="position:relative">
+        <span class="tab-icon">📊</span>
+      </div>
+      <span class="tab-label">대시보드</span>
+    </button>
+    <button class="tab-item" id="tab-map" onclick="showPanelMobile('map', this)">
+      <div style="position:relative">
+        <span class="tab-icon">🗺️</span>
+        <span class="tab-badge" id="tabBadgeMap">3</span>
+      </div>
+      <span class="tab-label">지도</span>
+    </button>
+    <button class="tab-item" id="tab-waste" onclick="showPanelMobile('waste', this)">
+      <div style="position:relative">
+        <span class="tab-icon">🗑️</span>
+        <span class="tab-badge" id="tabBadgeWaste">5</span>
+      </div>
+      <span class="tab-label">폐유수거</span>
+    </button>
+    <button class="tab-item" id="tab-qr" onclick="showPanelMobile('qr', this)">
+      <div style="position:relative">
+        <span class="tab-icon">📱</span>
+      </div>
+      <span class="tab-label">QR입력</span>
+    </button>
+  </nav>
+
   </div>
 </div>
 
@@ -1574,7 +1727,7 @@ function toggleFilter(el, filter) {
 function filterBizList(q) { renderBizList(currentFilter, q); }
 
 // ===== PANEL NAV =====
-function showPanel(id, navEl) {
+function showPanel(id, navEl, pushState=true) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('panel-' + id);
   if (!target) return;
@@ -1582,21 +1735,42 @@ function showPanel(id, navEl) {
   if (navEl && navEl.classList) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     navEl.classList.add('active');
+  } else {
+    const navMatch = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
+    if (navMatch) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      navMatch.classList.add('active');
+    }
   }
-  const titles = { dashboard:'📊 대시보드', map:'🗺️ 원주 지도 현황 — 네이버 지도', waste:'🗑️ 폐식용유 수거', order:'🫙 식용유 발주', history:'📋 진행 이력', price:'💹 주간 시세', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용 — 재고 직접 입력', hq:'🏢 본사 통합 대시보드', admin:'⚙️ 시세 관리 — 관리자 전용', register:'➕ 업체 등록', qr:'📱 QR 재고 입력' };
-  document.getElementById('page-title-text').textContent = titles[id] || '';
+  const titles = { dashboard:'📊 대시보드', map:'🗺️ 원주 지도 현황', waste:'🗑️ 폐식용유 수거', order:'🫙 식용유 발주', history:'📋 진행 이력', price:'💹 주간 시세', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', qr:'📱 QR 재고 입력' };
+  const title = titles[id] || '';
+  document.getElementById('page-title-text').textContent = title;
+  document.title = '식용유니버스 HIVE — ' + title;
+  if (pushState) history.pushState({ panel: id }, title, '#' + id);
   if (id === 'map') {
-    setTimeout(() => {
-      initNaverMap();
-      if (kakaoMap) kakaoMap.relayout();
-    }, 80);
+    setTimeout(() => { initNaverMap(); if (kakaoMap) kakaoMap.relayout(); }, 80);
   }
   if (id === 'waste')   renderWasteTable();
   if (id === 'history') renderHistory();
   if (id === 'hq')      { renderHqTable(); initHqBars(); }
-  if (id === 'qr')       { initQRPanel(); }
-  if (id === 'admin')    { renderAdminPrices(); }
+  if (id === 'qr')      { initQRPanel(); }
+  if (id === 'admin')   { renderAdminPrices(); }
 }
+
+// 뒤로가기 / 앞으로가기 처리
+window.addEventListener('popstate', (e) => {
+  const panel = (e.state && e.state.panel) ? e.state.panel : 'dashboard';
+  showPanel(panel, null, false);
+});
+
+// 첫 로드 시 URL 해시로 패널 결정
+(function() {
+  const validPanels = ['dashboard','map','waste','order','history','price','esg','owner','hq','admin','register','qr'];
+  const hash = location.hash.replace('#','');
+  const startPanel = (hash && validPanels.includes(hash)) ? hash : 'dashboard';
+  history.replaceState({ panel: startPanel }, '', '#' + startPanel);
+  if (startPanel !== 'dashboard') showPanel(startPanel, null, false);
+})();
 
 // ===== WASTE =====
 function renderWasteTable() {
@@ -2403,6 +2577,47 @@ function updateDashboardStats() {
 
 // 초기 등록 목록 렌더링
 renderRegBizList();
+
+
+// ===== 모바일 하단 탭 =====
+const TAB_PANELS = ['dashboard','map','waste','qr'];
+
+function showPanelMobile(id, tabEl) {
+  // 탭 활성화
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  // 패널 전환
+  showPanel(id, null, true);
+}
+
+// showPanel 호출 시 탭바도 동기화
+const _origShowPanel2 = showPanel;
+showPanel = function(id, navEl, pushState=true) {
+  _origShowPanel2(id, navEl, pushState);
+  // 탭바 동기화
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  const activeTab = document.getElementById('tab-' + id);
+  if (activeTab) activeTab.classList.add('active');
+};
+
+// 뱃지 업데이트 함수
+function updateTabBadges() {
+  const wasteCount = businesses.filter(b => b.wasteOil >= 1).length;
+  const wBadge = document.getElementById('tabBadgeWaste');
+  if (wBadge) {
+    wBadge.textContent = wasteCount;
+    wBadge.style.display = wasteCount > 0 ? 'block' : 'none';
+  }
+  const mapBadge = document.getElementById('tabBadgeMap');
+  if (mapBadge) {
+    const alertCount = businesses.filter(b => b.newOil <= 2 || b.wasteOil >= 5).length;
+    mapBadge.textContent = alertCount;
+    mapBadge.style.display = alertCount > 0 ? 'block' : 'none';
+  }
+}
+
+// 초기 뱃지 세팅
+setTimeout(updateTabBadges, 500);
 
 </script>
 </body>
