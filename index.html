@@ -385,6 +385,7 @@
   }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -2685,6 +2686,7 @@ function saveQRStock() {
   biz.wasteOil = qrWasteVal;
   biz.lastUpdate = '방금 전 ('+timeStr+')';
   saveBusinesses();
+  updateBizStockInDB(biz.id, biz.newOil, biz.wasteOil, biz.lastUpdate);
 
   document.getElementById('qrLastTime').textContent = biz.lastUpdate;
 
@@ -2837,10 +2839,16 @@ function registerBiz() {
     lastUpdate: '방금 등록',
   };
 
-  businesses.push(newBiz);
-  saveBusinesses();
-  renderRegBizList();
-  updateDashboardStats();
+  // DB에 먼저 저장 (ID를 받아야 함)
+  saveBizToDB(newBiz).then(ok => {
+    businesses.push(newBiz);
+    saveBusinesses();
+    renderRegBizList();
+    updateDashboardStats();
+    updateDashboard();
+    updateTabBadges();
+    if (kakaoMap && mapInitialized) addMarker(newBiz);
+  });
 
   // 지도가 열려 있으면 마커 추가
   if (naverMap && mapInitialized) addMarker(newBiz);
@@ -2895,10 +2903,12 @@ function deleteBiz(id) {
   const idx = businesses.findIndex(b => b.id === id);
   if (idx === -1) return;
   const name = businesses[idx].name;
+  deleteBizFromDB(businesses[idx].id);
   businesses.splice(idx, 1);
   saveBusinesses();
   renderRegBizList();
   updateDashboardStats();
+  updateDashboard();
   showToast('t1','🗑️ 업체 삭제됨', name + ' — 목록에서 제거됐어요');
   // 지도 마커도 제거
   markers.forEach(({overlay}) => overlay.setMap(null));
@@ -3143,6 +3153,161 @@ function renderDbRecentList() {
 }
 
 // showPanel에 dashboard 진입 시 업데이트
+
+
+// ===== SUPABASE DB 연결 =====
+const SUPABASE_URL = 'https://ucryeuylztknvogg1d1x.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjcnlldXlsenRrbnZvZ2dpZGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzYzMDgsImV4cCI6MjA5MDUxMjMwOH0.yx-jOKTkeRSh5JIMP0JClMEBJGY16mbQ6uw4Eb_PVyw';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ─── 업체 데이터 로드 (DB 우선, 실패 시 localStorage) ───
+async function loadBusinessesFromDB() {
+  try {
+    const { data, error } = await db.from('businesses').select('*').order('id');
+    if (error) throw error;
+    businesses.length = 0;
+    data.forEach(row => businesses.push(dbRowToBiz(row)));
+    saveBusinesses(); // localStorage 백업
+    renderBizList && renderBizList();
+    updateDashboard && updateDashboard();
+    updateTabBadges && updateTabBadges();
+    renderRegBizList && renderRegBizList();
+    console.log('✅ DB에서 업체', businesses.length, '개 로드');
+  } catch(e) {
+    console.warn('DB 로드 실패, localStorage 사용:', e.message);
+  }
+}
+
+// ─── 이력 데이터 로드 ───
+async function loadHistoryFromDB() {
+  try {
+    const { data, error } = await db.from('history').select('*').order('created_at', {ascending: false}).limit(100);
+    if (error) throw error;
+    historyData.length = 0;
+    data.forEach(row => historyData.push(dbRowToHistory(row)));
+    saveHistory();
+    updateDashboard && updateDashboard();
+    console.log('✅ DB에서 이력', historyData.length, '건 로드');
+  } catch(e) {
+    console.warn('이력 DB 로드 실패:', e.message);
+  }
+}
+
+// ─── DB row → 앱 객체 변환 ───
+function dbRowToBiz(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    type: row.type || '기타',
+    owner: row.owner || '',
+    phone: row.phone || '',
+    addr: row.addr || '',
+    lat: row.lat || 37.3450,
+    lng: row.lng || 127.9280,
+    newOil: row.new_oil || 5,
+    maxNew: row.max_new || 10,
+    wasteOil: row.waste_oil || 0,
+    oiltype: row.oil_type || '대두유',
+    auto: row.auto_order !== false,
+    lastUpdate: row.last_update || '—',
+  };
+}
+
+function dbRowToHistory(row) {
+  return {
+    date: row.created_at ? row.created_at.slice(0,10).replaceAll('-','.') : '—',
+    rawDate: row.created_at,
+    biz: row.biz_name || '—',
+    bizId: row.biz_id,
+    type: row.type || '—',
+    content: row.content || '—',
+    qty: row.qty || 0,
+    amount: row.amount || '0원',
+    method: row.method || '수동',
+    status: row.status || 'pending',
+    dbId: row.id,
+  };
+}
+
+// ─── 업체 저장 (DB) ───
+async function saveBizToDB(biz) {
+  const row = {
+    name: biz.name,
+    type: biz.type,
+    owner: biz.owner || '',
+    phone: biz.phone || '',
+    addr: biz.addr || '',
+    lat: biz.lat,
+    lng: biz.lng,
+    new_oil: biz.newOil,
+    max_new: biz.maxNew || 10,
+    waste_oil: biz.wasteOil,
+    oil_type: biz.oiltype || '대두유',
+    auto_order: biz.auto !== false,
+    last_update: biz.lastUpdate || '방금 등록',
+  };
+  try {
+    const { data, error } = await db.from('businesses').insert([row]).select().single();
+    if (error) throw error;
+    biz.id = data.id; // DB에서 받은 실제 ID로 교체
+    console.log('✅ 업체 DB 저장:', biz.name);
+    return true;
+  } catch(e) {
+    console.error('업체 저장 실패:', e.message);
+    return false;
+  }
+}
+
+// ─── 업체 재고 업데이트 (DB) ───
+async function updateBizStockInDB(bizId, newOil, wasteOil, lastUpdate) {
+  try {
+    const { error } = await db.from('businesses').update({
+      new_oil: newOil,
+      waste_oil: wasteOil,
+      last_update: lastUpdate,
+    }).eq('id', bizId);
+    if (error) throw error;
+  } catch(e) {
+    console.warn('재고 업데이트 실패:', e.message);
+  }
+}
+
+// ─── 이력 저장 (DB) ───
+async function saveHistoryToDB(item) {
+  try {
+    const { error } = await db.from('history').insert([{
+      biz_id: item.bizId || null,
+      biz_name: item.biz,
+      type: item.type,
+      content: item.content,
+      qty: item.qty || 0,
+      amount: item.amount || '',
+      method: item.method || '수동',
+      status: item.status || 'pending',
+    }]);
+    if (error) throw error;
+  } catch(e) {
+    console.warn('이력 저장 실패:', e.message);
+  }
+}
+
+// ─── 업체 삭제 (DB) ───
+async function deleteBizFromDB(bizId) {
+  try {
+    const { error } = await db.from('businesses').delete().eq('id', bizId);
+    if (error) throw error;
+  } catch(e) {
+    console.warn('업체 삭제 실패:', e.message);
+  }
+}
+
+// ─── 앱 시작 시 DB 로드 ───
+window.addEventListener('load', async () => {
+  await loadBusinessesFromDB();
+  await loadHistoryFromDB();
+  updateDashboard();
+  updateTabBadges();
+});
 
 </script>
 </body>
