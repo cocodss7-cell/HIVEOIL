@@ -816,8 +816,17 @@
             <div class="card-header" style="background:var(--green-main);border-bottom:none;padding:13px 20px"><div class="card-title" style="color:var(--black);font-size:14px">🫙 식용유 우선 구매</div></div>
             <div class="form-body">
               <div class="form-row">
-                <div class="form-group"><label class="form-label">업체명</label><input class="form-input" id="orderBizName" value="직접 입력" placeholder="업체명 입력..."></div>
-                <div class="form-group"><label class="form-label">담당자 코드</label><input class="form-input" id="orderBizCode" value="" placeholder="예: WJ-001"></div>
+                <div class="form-group">
+                  <label class="form-label">업체 선택</label>
+                  <select class="form-select" id="orderBizSelect" onchange="onOrderBizChange()">
+                    <option value="">— 업체 선택 —</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">담당자 코드</label>
+                  <input class="form-input" id="orderBizCode" value="" placeholder="자동 입력" readonly style="background:var(--cream);">
+                </div>
+                <input type="hidden" id="orderBizName">
               </div>
               <div class="form-group"><label class="form-label">구매 유종</label>
                 <select class="form-select" id="oilType" onchange="calcOrderPrice()">
@@ -2034,7 +2043,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'qr')      { initQRPanel(); }
   if (id === 'admin')   { renderAdminPrices(); }
   if (id === 'price')   { renderPricePage(); }
-  if (id === 'order')   { updateOrderMonthStats(); }
+  if (id === 'order')   { updateOrderMonthStats(); populateOrderBizSelect(); }
   if (id === 'dashboard') { updateDashboard(); }
 
 }
@@ -2134,8 +2143,13 @@ function submitMainOrder() {
   const key      = oilKeys[sel ? sel.selectedIndex : 0] || 'soy';
   const oilName  = PRICES.oils[key].label;
   const unitPrice= PRICES.oils[key].price;
-  const bizName  = document.getElementById('orderBizName')?.value || 'HIVE 원주';
-  const bizCode  = document.getElementById('orderBizCode')?.value || '';
+  const sel2    = document.getElementById('orderBizSelect');
+  const selBiz  = businesses.find(b => String(b.id) === String(sel2?.value));
+  const bizName = selBiz ? selBiz.name : (document.getElementById('orderBizName')?.value || 'HIVE 원주');
+  const bizCode = document.getElementById('orderBizCode')?.value || '';
+  if (!selBiz && businesses.length > 0) {
+    showToast('t1','⚠️ 업체를 선택해주세요','업체 선택 후 발주해주세요'); return;
+  }
   const reqDate  = document.getElementById('orderReqDate')?.value || '';
 
   const now = new Date();
@@ -3352,6 +3366,35 @@ window.addEventListener('load', async () => {
   updateTabBadges();
 });
 
+
+
+function populateOrderBizSelect() {
+  const sel = document.getElementById('orderBizSelect');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— 업체 선택 —</option>';
+  businesses.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = b.name + ' (' + b.type + ')';
+    sel.appendChild(opt);
+  });
+  if (current) sel.value = current;
+}
+
+function onOrderBizChange() {
+  const sel  = document.getElementById('orderBizSelect');
+  const biz  = businesses.find(b => String(b.id) === String(sel?.value));
+  const codeEl = document.getElementById('orderBizCode');
+  const nameEl = document.getElementById('orderBizName');
+  if (biz) {
+    if (codeEl) codeEl.value = 'WJ-' + String(biz.id).padStart(3,'0');
+    if (nameEl) nameEl.value = biz.name;
+  } else {
+    if (codeEl) codeEl.value = '';
+    if (nameEl) nameEl.value = '';
+  }
+}
 
 function updateOrderMonthStats() {
   const thisMonth = new Date().getMonth();
