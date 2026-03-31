@@ -471,9 +471,9 @@
     <nav>
       <div class="nav-label">메인</div>
       <div class="nav-item active" onclick="showPanel('dashboard',this)"><span class="icon">📊</span>대시보드</div>
-      <div class="nav-item" onclick="showPanel('map',this)"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green">3</span></div>
+      <div class="nav-item" onclick="showPanel('map',this)"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
       <div class="nav-label">업무</div>
-      <div class="nav-item" onclick="showPanel('waste',this)"><span class="icon">🗑️</span>폐유 수거<span class="nav-badge">5</span></div>
+      <div class="nav-item" onclick="showPanel('waste',this)"><span class="icon">🗑️</span>폐유 수거<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
       <div class="nav-item" onclick="showPanel('order',this)"><span class="icon">🫙</span>식용유 발주</div>
       <div class="nav-item" onclick="showPanel('history',this)"><span class="icon">📋</span>진행 이력</div>
       <div class="nav-label">정보</div>
@@ -2943,18 +2943,20 @@ showPanel = function(id, navEl, pushState=true) {
 
 // 뱃지 업데이트 함수
 function updateTabBadges() {
-  const wasteCount = businesses.filter(b => b.wasteOil >= 1).length;
+  const wasteCount  = businesses.filter(b => b.wasteOil >= 1).length;
+  const alertCount  = businesses.filter(b => b.newOil <= 2 || b.wasteOil >= 5).length;
+
+  // 하단 탭 뱃지
   const wBadge = document.getElementById('tabBadgeWaste');
-  if (wBadge) {
-    wBadge.textContent = wasteCount;
-    wBadge.style.display = wasteCount > 0 ? 'block' : 'none';
-  }
+  if (wBadge) { wBadge.textContent = wasteCount; wBadge.style.display = wasteCount > 0 ? 'block' : 'none'; }
   const mapBadge = document.getElementById('tabBadgeMap');
-  if (mapBadge) {
-    const alertCount = businesses.filter(b => b.newOil <= 2 || b.wasteOil >= 5).length;
-    mapBadge.textContent = alertCount;
-    mapBadge.style.display = alertCount > 0 ? 'block' : 'none';
-  }
+  if (mapBadge) { mapBadge.textContent = alertCount; mapBadge.style.display = alertCount > 0 ? 'block' : 'none'; }
+
+  // 사이드바 뱃지
+  const sideWaste = document.getElementById('sideWasteBadge');
+  if (sideWaste) { sideWaste.textContent = wasteCount; sideWaste.style.display = wasteCount > 0 ? 'inline-block' : 'none'; }
+  const sideMap = document.getElementById('sideMapBadge');
+  if (sideMap) { sideMap.textContent = alertCount; sideMap.style.display = alertCount > 0 ? 'inline-block' : 'none'; }
 }
 
 // 초기 뱃지 세팅
