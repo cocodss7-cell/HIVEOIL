@@ -2443,13 +2443,14 @@ renderHistory();
 
 // ===== OWNER LOGIN =====
 // ownerAccounts는 businesses 기반으로 동적 생성
-// 형식: { 'WJ-001': { pw:'전화뒤4자리', bizId:1 } }
 function buildOwnerAccounts() {
-  const accounts = {};
-  businesses.forEach((b, i) => {
-    const code = 'WJ-' + String(b.id).padStart(3,'0');
-    const phone = (b.phone || '').replace(/[^0-9]/g,'');
-    const pw    = phone.length >= 4 ? phone.slice(-4) : '1234';
+  const overrides = JSON.parse(localStorage.getItem('hiveoil_biz_pw') || '{}');
+  const accounts  = {};
+  businesses.forEach(b => {
+    const code    = 'WJ-' + String(b.id).padStart(3,'0');
+    const phone   = (b.phone || '').replace(/[^0-9]/g, '');
+    const defPw   = phone.length >= 4 ? phone.slice(-4) : '1234';
+    const pw      = overrides[String(b.id)] || defPw;
     accounts[code] = { pw, bizId: b.id, name: b.name };
   });
   return accounts;
@@ -2465,9 +2466,9 @@ let ownerNewVal = 2, ownerWasteVal = 4;
 const alertStates = { 1:true, 2:false, 3:false };
 
 function ownerLogin() {
-  const id = document.getElementById('ownerIdInput').value.trim();
-  const pw = document.getElementById('ownerPwInput').value.trim();
-  const acct = ownerAccounts[id];
+  const id   = document.getElementById('ownerIdInput').value.trim().toUpperCase();
+  const pw   = document.getElementById('ownerPwInput').value.trim();
+  const acct = buildOwnerAccounts()[id];
   if (!acct || acct.pw !== pw) {
     showToast('t1','❌ 로그인 실패','아이디 또는 비밀번호를 확인해주세요');
     document.getElementById('ownerPwInput').style.borderColor = 'var(--red-accent)';
@@ -4166,12 +4167,11 @@ function saveBizPwOverrides() {
 }
 
 function getBizCredentials(bizId) {
-  const b    = businesses.find(x => x.id === bizId);
+  const b = businesses.find(x => x.id === bizId);
   if (!b) return null;
-  const code = 'WJ-' + String(bizId).padStart(3,'0');
-  const phone = (b.phone || '').replace(/[^0-9]/g,'');
-  const defaultPw = phone.length >= 4 ? phone.slice(-4) : '1234';
-  const pw   = bizPwOverrides[bizId] || defaultPw;
+  const code  = 'WJ-' + String(bizId).padStart(3,'0');
+  const accts = buildOwnerAccounts();
+  const pw    = accts[code]?.pw || '1234';
   return { code, pw, name: b.name, phone: b.phone || '—' };
 }
 
@@ -4189,25 +4189,13 @@ PW: ${cred.pw}
 (취소하면 현재 비밀번호 유지)`
   );
   if (newPw !== null && newPw.trim() !== '') {
-    bizPwOverrides[bizId] = newPw.trim();
+    bizPwOverrides[String(bizId)] = newPw.trim();
     saveBizPwOverrides();
     showToast('t1','🔑 비밀번호 변경됨', cred.name + ' — PW: ' + newPw.trim());
   }
 }
 
-// buildOwnerAccounts에 bizPwOverrides 반영
-const _origBuildOwnerAccounts = buildOwnerAccounts;
-buildOwnerAccounts = function() {
-  const accounts = {};
-  businesses.forEach(b => {
-    const code = 'WJ-' + String(b.id).padStart(3,'0');
-    const phone = (b.phone || '').replace(/[^0-9]/g,'');
-    const defaultPw = phone.length >= 4 ? phone.slice(-4) : '1234';
-    const pw = bizPwOverrides[b.id] || defaultPw;
-    accounts[code] = { pw, bizId: b.id, name: b.name };
-  });
-  return accounts;
-};
+// buildOwnerAccounts는 위에서 통합 정의됨
 
 </script>
 </body>
