@@ -1977,8 +1977,16 @@ function addMarkerToMap(biz) {
   setTimeout(() => {
     const collectBtn = document.getElementById('iw-collect-' + biz.id);
     const orderBtn   = document.getElementById('iw-order-'   + biz.id);
-    if (collectBtn) collectBtn.addEventListener('click', (e) => { e.stopPropagation(); openCollectFromMap(biz.id); });
-    if (orderBtn)   orderBtn.addEventListener('click',   (e) => { e.stopPropagation(); openOrderFromMap(biz.id); });
+    if (collectBtn) collectBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      openCollectFromMap(biz.id);
+    });
+    if (orderBtn) orderBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      openOrderFromMap(biz.id);
+    });
   }, 100);
 
   const infoOverlay = new kakao.maps.CustomOverlay({
@@ -2026,20 +2034,32 @@ function openCollectFromMap(id) {
     return;
   }
   // 수거 신청 즉시 처리
-  requestCollect(id);
+  requestCollect(Number(id) || id);
   // 폐유 수거 패널로 이동
   showPanel('waste', null);
 }
 
 function openOrderFromMap(id) {
   infoWindows.forEach(iw => iw.setMap(null));
-  // 발주 패널로 이동 + 업체 자동 선택
   showPanel('order', null);
+  // 패널 전환 + DB 로드 후 업체 선택
   setTimeout(() => {
     populateOrderBizSelect();
+    updateOrderMonthStats();
+    renderOrderPendingList();
     const sel = document.getElementById('orderBizSelect');
-    if (sel) { sel.value = id; onOrderBizChange(); }
-  }, 150);
+    if (sel) {
+      // String으로 통일해서 비교
+      sel.value = String(id);
+      if (!sel.value || sel.value !== String(id)) {
+        // option이 아직 없으면 다시 시도
+        Array.from(sel.options).forEach(opt => {
+          if (String(opt.value) === String(id)) opt.selected = true;
+        });
+      }
+      onOrderBizChange();
+    }
+  }, 300);
 }
 
 function renderBizList(filter = currentFilter, query = '') {
