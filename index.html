@@ -302,7 +302,7 @@
     #panel-price > div, #panel-esg > div { padding: 14px 14px 80px; max-width: 100%; }
 
     /* 업주/QR/등록 패널 */
-    #panel-owner > div, #panel-qr > div > div, #panel-register > div,
+    #panel-owner .owner-inner, #panel-qr > div > div, #panel-register > div,
     #panel-admin > div, #panel-hq > div { padding: 14px 14px 80px; max-width: 100%; }
 
     /* HQ 그리드 모바일 */
@@ -1040,9 +1040,10 @@
       </div>
 
       <div id="ownerDashState" style="display:none;">
+        <!-- 상단 헤더 -->
         <div style="background:var(--green-main);padding:13px 26px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
           <div>
-            <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:#0D0D0D;letter-spacing:-0.03em;" id="ownerBizName">로버트치킨 원주점</div>
+            <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:#0D0D0D;letter-spacing:-0.03em;" id="ownerBizName">업체명</div>
             <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-top:1px;">업주 전용 재고 관리</div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;">
@@ -1051,183 +1052,89 @@
           </div>
         </div>
 
-        <div style="padding:22px 26px;max-width:860px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+        <!-- 전체화면 레이아웃 -->
+        <div style="padding:22px 28px;max-width:1100px;margin:0 auto;">
 
-            <div class="card">
-              <div class="card-header" style="background:var(--green-pale);border-bottom:none;">
-                <div class="card-title">🫙 새식용유 현재 재고</div>
-                <div style="font-size:11px;color:var(--green-dark);font-weight:600;">직접 입력</div>
+          <!-- 재고 입력 + 자동계산 통합 카드 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+
+            <!-- 새식용유 재고 -->
+            <div style="background:var(--white);border-radius:16px;padding:22px;box-shadow:var(--shadow);border:1.5px solid var(--green-light);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="font-size:14px;font-weight:800;color:var(--green-dark);">🫙 새식용유 현재 재고</div>
+                <div style="font-size:10px;color:var(--green-dark);font-weight:600;background:var(--green-pale);padding:3px 9px;border-radius:6px;">직접 입력</div>
               </div>
-              <div style="padding:18px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;">
-                  <div class="tc-btn" style="width:38px;height:38px;font-size:20px;border-radius:10px;" onclick="changeOwnerStock('new',-1)">−</div>
-                  <div style="text-align:center;">
-                    <div style="font-family:var(--font-display);font-size:52px;font-weight:800;color:var(--green-dark);letter-spacing:-0.05em;line-height:1;" id="ownerNewOilVal">2</div>
-                    <div style="font-size:11px;color:var(--gray);margin-top:1px;">캔 / 10캔</div>
-                  </div>
-                  <div class="tc-btn" style="width:38px;height:38px;font-size:20px;border-radius:10px;" onclick="changeOwnerStock('new',1)">+</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:14px;">
+                <button onclick="changeOwnerStock('new',-1)" style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:22px;font-weight:700;cursor:pointer;">−</button>
+                <div style="text-align:center;">
+                  <div style="font-family:var(--font-display);font-size:64px;font-weight:800;color:var(--green-dark);letter-spacing:-0.05em;line-height:1;" id="ownerNewOilVal">5</div>
+                  <div style="font-size:12px;color:var(--gray);margin-top:4px;">캔 / 10캔</div>
                 </div>
-                <div id="ownerNewOilAlert" style="border-radius:8px;padding:8px 11px;font-size:11px;font-weight:600;text-align:center;margin-bottom:10px;"></div>
-                <div style="font-size:10px;color:var(--gray);background:var(--cream);border-radius:8px;padding:7px 11px;">
-                  자동발주 기준: <strong style="color:var(--black);">2캔 이하</strong> 시 콩식용유 5캔 자동 주문
-                </div>
+                <button onclick="changeOwnerStock('new',1)" style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:22px;font-weight:700;cursor:pointer;">+</button>
+              </div>
+              <div id="ownerNewOilAlert" style="border-radius:8px;padding:8px 11px;font-size:11px;font-weight:600;text-align:center;margin-bottom:10px;"></div>
+              <div style="font-size:10px;color:var(--gray);background:var(--cream);border-radius:8px;padding:8px 12px;text-align:center;">
+                자동발주 기준: <strong style="color:var(--black);">2캔 이하</strong> 시 5캔 자동 주문
               </div>
             </div>
 
-            <div class="card">
-              <div class="card-header" style="background:#FFF8F0;border-bottom:none;">
-                <div class="card-title">🗑️ 폐식용유 현재 보유량</div>
-                <div style="font-size:11px;color:#D4621A;font-weight:600;">수거 대기</div>
+            <!-- 폐식용유 재고 -->
+            <div style="background:var(--white);border-radius:16px;padding:22px;box-shadow:var(--shadow);border:1.5px solid #FFD8A8;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="font-size:14px;font-weight:800;color:#D4621A;">🗑️ 폐식용유 현재 보유량</div>
+                <div style="font-size:10px;color:#D4621A;font-weight:600;background:#FFF8F0;padding:3px 9px;border-radius:6px;">수거 대기</div>
               </div>
-              <div style="padding:18px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;">
-                  <div class="tc-btn" style="width:38px;height:38px;font-size:20px;border-radius:10px;" onclick="changeOwnerStock('waste',-1)">−</div>
-                  <div style="text-align:center;">
-                    <div style="font-family:var(--font-display);font-size:52px;font-weight:800;color:#D4621A;letter-spacing:-0.05em;line-height:1;" id="ownerWasteOilVal">4</div>
-                    <div style="font-size:11px;color:var(--gray);margin-top:1px;">캔 보유 중</div>
-                  </div>
-                  <div class="tc-btn" style="width:38px;height:38px;font-size:20px;border-radius:10px;" onclick="changeOwnerStock('waste',1)">+</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:14px;">
+                <button onclick="changeOwnerStock('waste',-1)" style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:22px;font-weight:700;cursor:pointer;">−</button>
+                <div style="text-align:center;">
+                  <div style="font-family:var(--font-display);font-size:64px;font-weight:800;color:#D4621A;letter-spacing:-0.05em;line-height:1;" id="ownerWasteOilVal">0</div>
+                  <div style="font-size:12px;color:var(--gray);margin-top:4px;">캔 보유 중</div>
                 </div>
-                <div id="ownerWasteAlert" style="border-radius:8px;padding:8px 11px;font-size:11px;font-weight:600;text-align:center;margin-bottom:10px;"></div>
-                <button class="btn btn-danger" style="width:100%;justify-content:center;padding:10px;font-size:12px;" onclick="ownerRequestCollect()">🚛 수거 신청하기</button>
+                <button onclick="changeOwnerStock('waste',1)" style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:22px;font-weight:700;cursor:pointer;">+</button>
               </div>
-            </div>
-          </div>
-
-          <!-- 배출량 실측 기록 카드 -->
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header" style="background:#0D0D0D;border-bottom:none;">
-              <div class="card-title" style="color:var(--white);">⚖️ 배출량 실측 기록</div>
-              <div style="font-size:10px;color:#555;font-weight:600;">올수 방식 · kg 단위</div>
-            </div>
-            <div style="padding:18px 20px;">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-                <div>
-                  <label class="form-label">🗑️ 폐유 배출량 (캔 수)</label>
-                  <div style="display:flex;align-items:center;gap:6px;">
-                    <input class="form-input" id="wasteKgInput" type="number" value="2" min="0" step="1" style="font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:-0.03em;text-align:center;" oninput="calcWastePrice()">
-                    <span style="font-size:13px;color:var(--gray);font-weight:600;flex-shrink:0;">캔</span>
-                  </div>
-                </div>
-                <div>
-                  <label class="form-label">🫙 새식용유 사용량 (캔 수)</label>
-                  <div style="display:flex;align-items:center;gap:6px;">
-                    <input class="form-input" id="newOilLInput" type="number" value="1" min="0" step="1" style="font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:-0.03em;text-align:center;">
-                    <span style="font-size:13px;color:var(--gray);font-weight:600;flex-shrink:0;">캔</span>
-                  </div>
-                </div>
-              </div>
-
-              <div style="font-size:10px;color:var(--gray);margin-bottom:8px;background:var(--cream);border-radius:7px;padding:6px 10px;">📦 1캔 = 16.5kg = 19,000원 기준으로 자동 계산돼요</div>
-              <!-- 자동 계산 결과 -->
-              <div style="background:var(--cream);border-radius:10px;padding:13px 16px;margin-bottom:12px;">
-                <div style="font-size:10px;color:var(--gray);font-weight:600;margin-bottom:8px;letter-spacing:0.03em;">⚡ 자동 계산 결과</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-                  <div style="text-align:center;background:var(--white);border-radius:8px;padding:10px 6px;">
-                    <div style="font-size:9px;color:var(--gray);margin-bottom:3px;">예상 수거금액</div>
-                    <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--green-dark);" id="calcPrice">10,000원</div>
-                  </div>
-                  <div style="text-align:center;background:var(--white);border-radius:8px;padding:10px 6px;">
-                    <div style="font-size:9px;color:var(--gray);margin-bottom:3px;">탄소감축 기여</div>
-                    <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:#4A90E2;" id="calcCarbon">22.4 kg</div>
-                  </div>
-                  <div style="text-align:center;background:var(--white);border-radius:8px;padding:10px 6px;">
-                    <div style="font-size:9px;color:var(--gray);margin-bottom:3px;">ESG 적립</div>
-                    <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--gold);" id="calcESG">+280 pts</div>
-                  </div>
-                </div>
-              </div>
-
-              <div style="margin-bottom:12px;">
-                <label class="form-label">수거 날짜</label>
-                <input class="form-input" type="date" id="wasteDate">
-              </div>
-              <div style="margin-bottom:14px;">
-                <label class="form-label">특이사항 (선택)</label>
-                <input class="form-input" placeholder="예: 닭기름 혼합, 이물질 없음..." id="wasteNote">
-              </div>
-              <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px;font-size:13px;" onclick="saveWeightRecord()">
-                📋 실측 기록 저장
-              </button>
-
-              <!-- 최근 기록 -->
-              <div style="margin-top:14px;">
-                <div style="font-size:10px;font-weight:700;color:var(--gray);letter-spacing:0.04em;margin-bottom:8px;">최근 실측 기록</div>
-                <div id="weightRecordList">
-                  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-light);font-size:11px;">
-                    <span style="color:var(--gray)">2026.03.22</span>
-                    <span style="font-weight:700;">폐유 <strong style="color:var(--green-dark)">40 kg</strong></span>
-                    <span style="color:var(--green-dark);font-weight:700;">10,000원</span>
-                    <span style="font-size:9px;background:#E8F5E9;color:#2E7D32;padding:2px 7px;border-radius:6px;font-weight:700;">완료</span>
-                  </div>
-                  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-light);font-size:11px;">
-                    <span style="color:var(--gray)">2026.03.15</span>
-                    <span style="font-weight:700;">폐유 <strong style="color:var(--green-dark)">76 kg</strong></span>
-                    <span style="color:var(--green-dark);font-weight:700;">11,000원</span>
-                    <span style="font-size:9px;background:#E8F5E9;color:#2E7D32;padding:2px 7px;border-radius:6px;font-weight:700;">완료</span>
-                  </div>
-                  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:11px;">
-                    <span style="color:var(--gray)">2026.03.08</span>
-                    <span style="font-weight:700;">폐유 <strong style="color:var(--green-dark)">55 kg</strong></span>
-                    <span style="color:var(--green-dark);font-weight:700;">10,000원</span>
-                    <span style="font-size:9px;background:#E8F5E9;color:#2E7D32;padding:2px 7px;border-radius:6px;font-weight:700;">완료</span>
-                  </div>
-                </div>
-              </div>
+              <div id="ownerWasteAlert" style="border-radius:8px;padding:8px 11px;font-size:11px;font-weight:600;text-align:center;margin-bottom:10px;"></div>
+              <button class="btn btn-danger" style="width:100%;justify-content:center;padding:11px;font-size:13px;" onclick="ownerRequestCollect()">🚛 수거 신청하기</button>
             </div>
           </div>
 
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header">
-              <div class="card-title">🔔 재입고 / 수거 알림 신청</div>
-              <div style="font-size:10px;color:var(--gray);">카카오 알림톡 발송</div>
-            </div>
-            <div style="padding:16px 18px;">
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
-                <div id="alertCard1" onclick="toggleAlert(1)" style="border:2px solid var(--green-main);border-radius:var(--radius-sm);padding:13px;text-align:center;cursor:pointer;background:var(--green-pale);transition:all 0.16s;">
-                  <div style="font-size:20px;margin-bottom:4px;">🫙</div>
-                  <div style="font-size:11px;font-weight:700;color:var(--black);margin-bottom:2px;">새식용유 입고</div>
-                  <div style="font-size:9px;color:var(--green-dark);font-weight:700;">✅ 신청됨</div>
-                </div>
-                <div id="alertCard2" onclick="toggleAlert(2)" style="border:2px solid var(--gray-light);border-radius:var(--radius-sm);padding:13px;text-align:center;cursor:pointer;background:var(--white);transition:all 0.16s;">
-                  <div style="font-size:20px;margin-bottom:4px;">🗑️</div>
-                  <div style="font-size:11px;font-weight:700;color:var(--black);margin-bottom:2px;">폐유 수거 완료</div>
-                  <div style="font-size:9px;color:var(--gray);">+ 신청하기</div>
-                </div>
-                <div id="alertCard3" onclick="toggleAlert(3)" style="border:2px solid var(--gray-light);border-radius:var(--radius-sm);padding:13px;text-align:center;cursor:pointer;background:var(--white);transition:all 0.16s;">
-                  <div style="font-size:20px;margin-bottom:4px;">📦</div>
-                  <div style="font-size:11px;font-weight:700;color:var(--black);margin-bottom:2px;">자동발주 처리</div>
-                  <div style="font-size:9px;color:var(--gray);">+ 신청하기</div>
-                </div>
+          <!-- 자동 계산 결과 + 저장 버튼 통합 -->
+          <div style="background:var(--white);border-radius:16px;padding:22px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:20px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:14px;">⚡ 오늘 사용 현황 — 자동 계산</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+              <div style="background:var(--cream);border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">폐유 예상 수거금액</div>
+                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-dark);" id="calcPrice">0원</div>
               </div>
-              <div style="font-size:10px;color:var(--gray);background:var(--cream);border-radius:8px;padding:8px 12px;">
-                📱 알림은 가입 시 등록한 <strong>핸드폰 번호(카카오 알림톡)</strong>으로 발송됩니다.
+              <div style="background:var(--cream);border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">총 무게 (폐유+식용유)</div>
+                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#4A90E2;" id="calcCarbon">0 kg</div>
+              </div>
+              <div style="background:var(--cream);border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">탄소 감축 기여</div>
+                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-dark);" id="calcCO2">0 kg</div>
+              </div>
+              <div style="background:var(--cream);border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">ESG 포인트 적립</div>
+                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#D4621A;" id="calcESG">+0 pts</div>
               </div>
             </div>
-          </div>
-
-          <div style="display:flex;align-items:center;gap:12px;">
-            <button class="btn btn-primary" style="padding:12px 26px;font-size:13px;flex:1;justify-content:center;" onclick="ownerSaveStock()">
-              💾 재고 현황 저장 &amp; 지도 업데이트
+            <div style="font-size:11px;color:var(--gray);background:var(--cream);border-radius:8px;padding:8px 12px;margin-bottom:14px;text-align:center;">
+              📦 폐유·식용유 모두 <strong>1캔 = 16.5kg</strong> 기준 · 재고 변경 시 자동으로 계산돼요
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:15px;font-weight:800;border-radius:12px;" onclick="ownerSaveStock()">
+              💾 재고 저장 &amp; 지도 업데이트
             </button>
-            <div style="text-align:right;flex-shrink:0;">
-              <div style="font-size:9px;color:var(--gray);">마지막 저장</div>
-              <div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--black);" id="ownerSaveTime">오늘 14:32</div>
+            <div style="text-align:center;font-size:11px;color:var(--gray);margin-top:8px;" id="ownerSaveTime">저장하면 지도 핀이 즉시 반영돼요</div>
+          </div>
+
+          <!-- 최근 이력 -->
+          <div style="background:var(--white);border-radius:16px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+            <div style="font-size:13px;font-weight:800;margin-bottom:14px;">📋 최근 이력</div>
+            <div id="ownerRecentHistory">
+              <div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">아직 이력이 없어요</div>
             </div>
           </div>
 
-          <div class="card" style="margin-top:16px;">
-            <div class="card-header"><div class="card-title">📋 내 업체 최근 이력</div></div>
-            <table class="history-table">
-              <thead><tr><th>날짜</th><th>구분</th><th>내용</th><th>상태</th></tr></thead>
-              <tbody>
-                <tr><td>2026.03.27</td><td><span class="tag tag-alert">폐유수거</span></td><td>폐유 40kg 수거 신청</td><td><span class="status-pill status-pending">대기중</span></td></tr>
-                <tr><td>2026.03.22</td><td><span class="tag tag-collect">자동발주</span></td><td>콩식용유 5캔 자동발주</td><td><span class="status-pill status-done">완료</span></td></tr>
-                <tr><td>2026.03.18</td><td><span class="tag tag-alert">폐유수거</span></td><td>폐유 80kg 수거 완료</td><td><span class="status-pill status-done">완료</span></td></tr>
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
     </div>
@@ -2482,6 +2389,7 @@ function ownerLogin() {
 
   document.getElementById('ownerLoginState').style.display = 'none';
   document.getElementById('ownerDashState').style.display  = 'block';
+  renderOwnerRecentHistory();
   document.getElementById('ownerBizName').textContent      = biz.name;
   document.getElementById('ownerLastUpdate').textContent   = biz.lastUpdate || '—';
   document.getElementById('sidebarName').textContent       = biz.name;
@@ -2557,6 +2465,13 @@ function ownerSaveStock() {
 
   b.newOil   = ownerNewVal;
   b.wasteOil = ownerWasteVal;
+
+  // 자동 계산 업데이트
+  const wKgEl = document.getElementById('wasteKgInput');
+  const nKgEl = document.getElementById('newOilLInput');
+  if (wKgEl) wKgEl.value = ownerWasteVal;
+  if (nKgEl) nKgEl.value = ownerNewVal;
+  calcWastePrice();
   b.lastUpdate = timeStr;
 
   // localStorage + DB 저장
@@ -2571,6 +2486,8 @@ function ownerSaveStock() {
   updateDashboard();
 
   document.getElementById('ownerSaveTime').textContent   = timeStr;
+  // 최근 이력 렌더링
+  renderOwnerRecentHistory();
   document.getElementById('ownerLastUpdate').textContent = '방금 전';
   showToast('t1','💾 저장 완료!', b.name + ' — 새유 ' + b.newOil + '캔 / 폐유 ' + b.wasteOil + '캔 지도에 반영됐어요');
 }
@@ -2720,11 +2637,13 @@ function calcWastePrice() {
   const totalKg  = kg + (oilCans * PRICES.waste.can.kg); // 폐유+식용유 모두 16.5kg/캔
   const carbon = (totalKg * PRICES.carbonRate).toFixed(1);
   const esg    = Math.round(kg * PRICES.esgRate);
-  const priceEl = document.getElementById('calcPrice');
+  const priceEl  = document.getElementById('calcPrice');
   const carbonEl = document.getElementById('calcCarbon');
+  const co2El    = document.getElementById('calcCO2');
   const esgEl    = document.getElementById('calcESG');
   if (priceEl)  priceEl.textContent  = price.toLocaleString() + '원';
-  if (carbonEl) carbonEl.textContent = carbon + ' kg';
+  if (carbonEl) carbonEl.textContent = ((cans + oilCans) * PRICES.waste.can.kg).toFixed(1) + ' kg';
+  if (co2El)    co2El.textContent    = carbon + ' kg';
   if (esgEl)    esgEl.textContent    = '+' + esg.toLocaleString() + ' pts';
 }
 
@@ -4196,6 +4115,30 @@ PW: ${cred.pw}
 }
 
 // buildOwnerAccounts는 위에서 통합 정의됨
+
+
+function renderOwnerRecentHistory() {
+  const el = document.getElementById('ownerRecentHistory');
+  if (!el) return;
+  const bizId = ownerBizId;
+  const items = historyData.filter(h => h.bizId === bizId).slice(0, 10);
+  if (items.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">아직 이력이 없어요</div>';
+    return;
+  }
+  const statusColor = { pending:'#E65100', done:'#2E7D32', inprogress:'#185FA5' };
+  const statusLabel = { pending:'대기중', done:'완료', inprogress:'처리중' };
+  el.innerHTML = items.map(h => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-light);">
+      <div style="width:8px;height:8px;border-radius:50%;background:${statusColor[h.status]||'#ccc'};flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;">${h.content}</div>
+        <div style="font-size:10px;color:var(--gray);margin-top:1px;">${h.date}</div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--green-dark);">${h.amount}</div>
+      <span style="font-size:10px;font-weight:700;color:${statusColor[h.status]||'#ccc'};">${statusLabel[h.status]||''}</span>
+    </div>`).join('');
+}
 
 </script>
 </body>
