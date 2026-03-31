@@ -909,6 +909,13 @@
           <div class="summary-row"><span class="s-label">배송비</span><span class="s-val" style="color:var(--green-main)">무료</span></div>
           <div class="summary-row total"><span class="s-label">합계</span><span class="s-val" id="summary-total">250,000원</span></div>
           <div style="margin-top:16px"><button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:13px" onclick="submitMainOrder()">📦 발주 확정하기</button><p style="text-align:center;font-size:9px;color:#666;margin-top:7px">발주 후 담당자 확인 → 익일 배송</p></div>
+          <!-- 발주 대기 현황 -->
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid #222;">
+            <div style="font-size:10px;color:#666;margin-bottom:8px;font-weight:700;">📋 발주 대기 현황</div>
+            <div id="orderPendingList" style="display:flex;flex-direction:column;gap:6px;">
+              <div style="font-size:11px;color:#555;text-align:center;padding:8px;">발주 이력 없음</div>
+            </div>
+          </div>
           <div style="margin-top:16px;padding-top:16px;border-top:1px solid #222"><div style="font-size:9px;color:#666;margin-bottom:5px">이번 달 발주</div><div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--white)" id="orderMonthTotal">0 <span style="font-size:11px;color:#888">캔</span></div><div style="font-size:9px;color:#666;margin-top:3px" id="orderMonthSub">이번 달 발주 이력 없음</div></div>
         </div>
       </div>
@@ -925,7 +932,7 @@
         </div>
         <div class="history-table-wrap">
           <table class="history-table">
-            <thead><tr><th>날짜</th><th>업체명</th><th>구분</th><th>내용</th><th>금액</th><th>처리</th><th>상태</th></tr></thead>
+            <thead><tr><th>날짜</th><th>업체명</th><th>구분</th><th>내용</th><th>금액</th><th>처리</th><th>상태</th><th>액션</th></tr></thead>
             <tbody id="historyBody"></tbody>
           </table>
         </div>
@@ -2086,7 +2093,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'qr')      { initQRPanel(); }
   if (id === 'admin')   { renderAdminPrices(); }
   if (id === 'price')   { renderPricePage(); }
-  if (id === 'order')   { updateOrderMonthStats(); populateOrderBizSelect(); }
+  if (id === 'order')   { updateOrderMonthStats(); populateOrderBizSelect(); renderOrderPendingList(); }
   if (id === 'dashboard') { updateDashboard(); }
 
 }
@@ -2168,6 +2175,15 @@ function renderHistory(filter = 'all') {
   if (filter === 'order') data = data.filter(d => d.type === '식용유발주');
   if (filter === 'auto')  data = data.filter(d => d.type === '자동발주');
   const sm = { pending:'<span class="status-pill status-pending">대기중</span>', inprogress:'<span class="status-pill status-inprogress">처리중</span>', done:'<span class="status-pill status-done">완료</span>' };
+  const actionBtn = (h, i) => {
+    if (h.type === '식용유발주' && h.status === 'pending')
+      return `<button class="btn" style="padding:3px 8px;font-size:10px;background:#E8F5E9;color:#2E7D32;border:none;border-radius:6px;cursor:pointer;"
+        onclick="completeOrder(${i})">✅ 납품완료</button>`;
+    if (h.type === '폐유수거' && h.status === 'pending')
+      return `<button class="btn btn-danger" style="padding:3px 8px;font-size:10px;"
+        onclick="completeCollect(${h.bizId})">✅ 수거완료</button>`;
+    return '';
+  };
   document.getElementById('historyBody').innerHTML = data.map(d => `
     <tr><td>${d.date}</td><td><strong>${d.biz}</strong></td>
     <td><span class="tag ${d.type==='자동발주'?'tag-collect':d.type==='폐유수거'?'tag-alert':'tag-pending'}">${d.type}</span></td>
@@ -2260,6 +2276,7 @@ function submitMainOrder() {
   updateDashboard();
   renderHistory();
 
+  renderOrderPendingList();
   showToast('t1','📦 발주 접수 완료!', oilName + ' ' + qty + '캔 · ' + (qty * unitPrice).toLocaleString() + '원 — 익일 배송 예정');
 }
 
@@ -3627,6 +3644,47 @@ function completeCollect(bizId) {
   updateDashboard();
   updateTabBadges();
   showToast('t1','✅ 수거 완료 처리!', b.name + ' — 폐유 ' + prevWaste + '캔 수거 완료 · 재고 0으로 초기화');
+}
+
+
+function completeOrder(idx) {
+  const item = historyData[idx];
+  if (!item || item.type !== '식용유발주') return;
+  item.status = 'done';
+  item.content = item.content.replace('발주', '납품 완료');
+  // DB 업데이트
+  if (item.dbId) {
+    db.from('history').update({ status: 'done', content: item.content }).eq('id', item.dbId).then(({error}) => {
+      if (error) console.warn('납품완료 처리 실패:', error.message);
+    });
+  }
+  saveHistory();
+  renderHistory();
+  updateDashboard();
+  renderOrderPendingList();
+  showToast('t1','✅ 납품 완료 처리!', item.biz + ' — ' + item.content);
+}
+
+function renderOrderPendingList() {
+  const el = document.getElementById('orderPendingList');
+  if (!el) return;
+  const pending = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending');
+  if (pending.length === 0) {
+    el.innerHTML = '<div style="font-size:11px;color:#555;text-align:center;padding:8px;">대기중인 발주 없음</div>';
+    return;
+  }
+  el.innerHTML = pending.map((h, i) => `
+    <div style="background:#1a1a1a;border-radius:8px;padding:9px 11px;display:flex;align-items:center;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;font-weight:700;color:#fff;">${h.biz}</div>
+        <div style="font-size:10px;color:#888;margin-top:1px;">${h.content} · ${h.date}</div>
+      </div>
+      <div style="font-size:11px;font-weight:800;color:var(--green-main);white-space:nowrap;">${h.amount}</div>
+      <button onclick="completeOrder(${historyData.indexOf(h)})" 
+        style="background:var(--green-main);border:none;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;color:#000;cursor:pointer;white-space:nowrap;">
+        ✅ 완료
+      </button>
+    </div>`).join('');
 }
 
 function updateOrderMonthStats() {
