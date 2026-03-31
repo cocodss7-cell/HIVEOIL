@@ -2180,7 +2180,9 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'admin')   { renderAdminPrices(); }
   if (id === 'price')   { renderPricePage(); }
   if (id === 'order')   { updateOrderMonthStats(); populateOrderBizSelect(); renderOrderPendingList(); }
-  if (id === 'delivery') { renderDeliveryPanel(); }
+  if (id === 'delivery') {
+    loadBusinessesFromDB().then(() => renderDeliveryPanel());
+  }
   if (id === 'dashboard') { updateDashboard(); }
 
 }
@@ -3104,6 +3106,7 @@ function renderDeliveryPanel() {
 function populateDelivBizSelect() {
   const sel = document.getElementById('delivBizSelect');
   if (!sel) return;
+  const current = sel.value;
   sel.innerHTML = '<option value="">— 업체 선택 —</option>';
   businesses.forEach(b => {
     const opt = document.createElement('option');
@@ -3111,6 +3114,7 @@ function populateDelivBizSelect() {
     opt.textContent = b.name + ' (현재 ' + b.newOil + '캔)';
     sel.appendChild(opt);
   });
+  if (current) { sel.value = current; onDelivBizChange(); }
 }
 
 function onDelivBizChange() {
@@ -3119,8 +3123,20 @@ function onDelivBizChange() {
   const stockEl   = document.getElementById('delivCurrentStock');
   const previewEl = document.getElementById('delivPreview');
   if (biz) {
-    if (stockEl) stockEl.textContent = biz.newOil + '캔';
-    stockEl.style.color = biz.newOil <= 2 ? 'var(--red-accent)' : 'var(--green-dark)';
+    // DB에서 최신 재고 동기화
+    db.from('businesses').select('new_oil').eq('id', biz.id).single().then(({data, error}) => {
+      if (!error && data) {
+        biz.newOil = data.new_oil; // 최신값으로 업데이트
+        if (stockEl) {
+          stockEl.textContent = biz.newOil + '캔';
+          stockEl.style.color = biz.newOil <= 2 ? 'var(--red-accent)' : 'var(--green-dark)';
+        }
+        updateDelivPreview();
+        // 드롭다운 텍스트도 갱신
+        const opt = sel.querySelector('option[value="' + biz.id + '"]');
+        if (opt) opt.textContent = biz.name + ' (현재 ' + biz.newOil + '캔)';
+      }
+    });
     if (previewEl) previewEl.style.display = 'flex';
     updateDelivPreview();
   } else {
