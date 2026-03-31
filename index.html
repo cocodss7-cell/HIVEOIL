@@ -816,8 +816,8 @@
             <div class="card-header" style="background:var(--green-main);border-bottom:none;padding:13px 20px"><div class="card-title" style="color:var(--black);font-size:14px">🫙 식용유 우선 구매</div></div>
             <div class="form-body">
               <div class="form-row">
-                <div class="form-group"><label class="form-label">업체명</label><input class="form-input" value="HIVE 원주 직영" readonly></div>
-                <div class="form-group"><label class="form-label">담당자 코드</label><input class="form-input" value="WJ-001" readonly></div>
+                <div class="form-group"><label class="form-label">업체명</label><input class="form-input" id="orderBizName" value="직접 입력" placeholder="업체명 입력..."></div>
+                <div class="form-group"><label class="form-label">담당자 코드</label><input class="form-input" id="orderBizCode" value="" placeholder="예: WJ-001"></div>
               </div>
               <div class="form-group"><label class="form-label">구매 유종</label>
                 <select class="form-select" id="oilType" onchange="calcOrderPrice()">
@@ -857,7 +857,7 @@
           <div class="summary-row"><span class="s-label">배송비</span><span class="s-val" style="color:var(--green-main)">무료</span></div>
           <div class="summary-row total"><span class="s-label">합계</span><span class="s-val" id="summary-total">250,000원</span></div>
           <div style="margin-top:16px"><button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:13px" onclick="submitMainOrder()">📦 발주 확정하기</button><p style="text-align:center;font-size:9px;color:#666;margin-top:7px">발주 후 담당자 확인 → 익일 배송</p></div>
-          <div style="margin-top:16px;padding-top:16px;border-top:1px solid #222"><div style="font-size:9px;color:#666;margin-bottom:5px">이번 달 누적 구매</div><div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--white)">184 <span style="font-size:11px;color:#888">L</span></div><div style="font-size:9px;color:#666;margin-top:3px">전월 대비 +12% 📈</div></div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid #222"><div style="font-size:9px;color:#666;margin-bottom:5px">이번 달 발주</div><div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--white)" id="orderMonthTotal">0 <span style="font-size:11px;color:#888">캔</span></div><div style="font-size:9px;color:#666;margin-top:3px" id="orderMonthSub">이번 달 발주 이력 없음</div></div>
         </div>
       </div>
     </div>
@@ -2034,6 +2034,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'qr')      { initQRPanel(); }
   if (id === 'admin')   { renderAdminPrices(); }
   if (id === 'price')   { renderPricePage(); }
+  if (id === 'order')   { updateOrderMonthStats(); }
   if (id === 'dashboard') { updateDashboard(); }
 
 }
@@ -2126,7 +2127,41 @@ function closeModal(id) { document.getElementById(id).classList.remove('show'); 
 function selectVol(el) { document.querySelectorAll('.volume-opt').forEach(v => v.classList.remove('selected')); el.classList.add('selected'); }
 function submitCollect() { closeModal('collectModal'); showToast('t1','♻️ 수거 신청 완료!', (currentBiz?currentBiz.name:'') + ' — 내일 오전 수거 예정'); }
 function submitOrder() { closeModal('orderModal'); showToast('t1','📦 발주 완료!','발주 접수됨. 익일 배송 예정'); }
-function submitMainOrder() { const q = document.getElementById('qtyInput').value; showToast('t1','📦 발주 확정!',`대두유 ${q}캔 — 익일 배송 예정`); }
+function submitMainOrder() {
+  const qty      = parseInt(document.getElementById('qtyInput')?.value) || 1;
+  const sel      = document.getElementById('oilType');
+  const oilKeys  = Object.keys(PRICES.oils);
+  const key      = oilKeys[sel ? sel.selectedIndex : 0] || 'soy';
+  const oilName  = PRICES.oils[key].label;
+  const unitPrice= PRICES.oils[key].price;
+  const bizName  = document.getElementById('orderBizName')?.value || 'HIVE 원주';
+  const bizCode  = document.getElementById('orderBizCode')?.value || '';
+  const reqDate  = document.getElementById('orderReqDate')?.value || '';
+
+  const now = new Date();
+  const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+
+  const item = {
+    date: dateStr,
+    rawDate: now.toISOString(),
+    biz: bizName + (bizCode ? ' (' + bizCode + ')' : ''),
+    bizId: null,
+    type: '식용유발주',
+    content: oilName + ' ' + qty + '캔 발주' + (reqDate ? ' · 희망일 ' + reqDate : ''),
+    qty: qty,
+    amount: (qty * unitPrice).toLocaleString() + '원',
+    method: '수동',
+    status: 'pending',
+  };
+
+  historyData.unshift(item);
+  saveHistory();
+  saveHistoryToDB(item);
+  updateDashboard();
+  renderHistory();
+
+  showToast('t1','📦 발주 접수 완료!', oilName + ' ' + qty + '캔 · ' + (qty * unitPrice).toLocaleString() + '원 — 익일 배송 예정');
+}
 
 // ===== ORDER =====
 function changeQty(d) { const i = document.getElementById('qtyInput'); i.value = Math.max(1, Math.min(50, parseInt(i.value)+d)); calcOrderPrice(); }
@@ -3316,6 +3351,17 @@ window.addEventListener('load', async () => {
   updateDashboard();
   updateTabBadges();
 });
+
+
+function updateOrderMonthStats() {
+  const thisMonth = new Date().getMonth();
+  const oilH = historyData.filter(h => h.type === '식용유발주' && new Date(h.rawDate||h.date).getMonth() === thisMonth);
+  const totalCans = oilH.reduce((s,h) => s + (h.qty||0), 0);
+  const el  = document.getElementById('orderMonthTotal');
+  const sub = document.getElementById('orderMonthSub');
+  if (el)  el.innerHTML = totalCans + ' <span style="font-size:11px;color:#888">캔</span>';
+  if (sub) sub.textContent = oilH.length > 0 ? '이번 달 ' + oilH.length + '건 발주' : '이번 달 발주 이력 없음';
+}
 
 </script>
 </body>
