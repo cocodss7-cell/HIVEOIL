@@ -14,7 +14,7 @@
     --green-dark: #00a857;
     --green-light: #b3f0d4;
     --green-pale: #edfbf4;
-    --cream: #F5F6F8;
+    --cream: #F7FAF7;
     --black: #0D0D0D;
     --gray: #7B8393;
     --gray-light: #ECEEF2;
@@ -29,33 +29,33 @@
     --font-body: 'Pretendard', 'Noto Sans KR', sans-serif;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: var(--font-body); background: var(--cream); color: var(--black); min-height: 100vh; overflow-x: hidden; letter-spacing: -0.01em; }
+  body { font-family: var(--font-body); background: #F7FAF7; color: var(--black); min-height: 100vh; overflow-x: hidden; letter-spacing: -0.01em; }
   .app-shell { display: flex; height: 100vh; }
 
   /* SIDEBAR */
-  .sidebar { width: 220px; min-width: 220px; background: #0D0D0D; display: flex; flex-direction: column; padding: 24px 0 20px; z-index: 10; flex-shrink: 0; border-right: 1px solid #1a1a1a; }
-  .logo-area { padding: 0 20px 22px; border-bottom: 1px solid #1e1e1e; }
+  .sidebar { width: 220px; min-width: 220px; background: #fff; display: flex; flex-direction: column; padding: 24px 0 20px; z-index: 10; flex-shrink: 0; border-right: 1px solid #e8ece8; }
+  .logo-area { padding: 0 20px 22px; border-bottom: 1px solid #e8ece8; }
   .logo-badge { display: inline-block; background: var(--green-main); color: #0D0D0D; font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; letter-spacing: 0.02em; }
-  .logo-title { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--white); line-height: 1.15; letter-spacing: -0.03em; }
+  .logo-title { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--black); line-height: 1.15; letter-spacing: -0.03em; }
   .logo-title span { color: var(--green-main); }
-  .logo-sub { font-size: 10px; font-weight: 400; color: #444; margin-top: 4px; letter-spacing: 0.01em; }
+  .logo-sub { font-size: 10px; font-weight: 400; color: #888; margin-top: 4px; letter-spacing: 0.01em; }
   nav { flex: 1; padding: 16px 0; overflow-y: auto; }
-  .nav-label { font-size: 9px; font-weight: 600; color: #333; letter-spacing: 0.12em; text-transform: uppercase; padding: 0 20px; margin: 12px 0 4px; font-family: var(--font-display); }
-  .nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 14px; margin: 1px 8px; border-radius: 10px; cursor: pointer; transition: all 0.16s; color: #666; font-size: 13px; font-weight: 500; letter-spacing: -0.01em; }
-  .nav-item:hover { background: #1a1a1a; color: #ccc; }
-  .nav-item.active { background: var(--green-main); color: #0D0D0D; font-weight: 700; }
+  .nav-label { font-size: 9px; font-weight: 600; color: #aaa; letter-spacing: 0.12em; text-transform: uppercase; padding: 0 20px; margin: 12px 0 4px; font-family: var(--font-display); }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 14px; margin: 1px 8px; border-radius: 10px; cursor: pointer; transition: all 0.16s; color: #555; font-size: 13px; font-weight: 500; letter-spacing: -0.01em; }
+  .nav-item:hover { background: var(--green-pale); color: var(--green-dark); }
+  .nav-item.active { background: var(--green-main); color: #fff; font-weight: 700; }
   .nav-item .icon { font-size: 15px; width: 19px; text-align: center; flex-shrink: 0; }
   .nav-badge { margin-left: auto; background: var(--red-accent); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 20px; font-family: var(--font-display); }
   .nav-badge.green { background: var(--green-main); color: #0D0D0D; }
-  .sidebar-footer { padding: 14px 20px 0; border-top: 1px solid #1e1e1e; }
+  .sidebar-footer { padding: 14px 20px 0; border-top: 1px solid #e8ece8; }
   .user-card { display: flex; align-items: center; gap: 9px; }
   .user-avatar { width: 32px; height: 32px; border-radius: 10px; background: var(--green-main); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; font-weight: 800; color: #0D0D0D; flex-shrink: 0; }
-  .user-name { font-size: 12px; font-weight: 700; color: var(--white); letter-spacing: -0.01em; }
-  .user-role { font-size: 10px; color: #444; font-weight: 400; }
+  .user-name { font-size: 12px; font-weight: 700; color: var(--black); letter-spacing: -0.01em; }
+  .user-role { font-size: 10px; color: #888; font-weight: 400; }
 
   /* MAIN */
   .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; }
-  .topbar { background: var(--white); border-bottom: 1px solid var(--gray-light); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 9; flex-shrink: 0; }
+  .topbar { background: var(--white); border-bottom: 1px solid #e8ece8; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 9; flex-shrink: 0; }
   .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
   .page-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; white-space: nowrap; letter-spacing: -0.02em; color: var(--black); }
   .topbar-price-chips { display: flex; gap: 5px; }
@@ -253,6 +253,16 @@
   ::-webkit-scrollbar { width:4px; }
   ::-webkit-scrollbar-thumb { background:#e0e4ea; border-radius:10px; }
 
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* 대시보드 모바일 */
+  @media (max-width: 768px) {
+    #dbKpiRow { grid-template-columns: 1fr 1fr !important; }
+  }
+
   /* ===== 모바일 반응형 ===== */
   @media (max-width: 768px) {
 
@@ -318,8 +328,8 @@
       position: fixed;
       bottom: 0; left: 0; right: 0;
       height: 60px;
-      background: #0D0D0D;
-      border-top: 1px solid #222;
+      background: #fff;
+      border-top: 1px solid #e8ece8;
       z-index: 100;
       padding-bottom: env(safe-area-inset-bottom);
     }
@@ -350,7 +360,7 @@
     .tab-label {
       font-size: 9px;
       font-weight: 600;
-      color: #666;
+      color: #aaa;
       letter-spacing: -0.01em;
       white-space: nowrap;
     }
@@ -401,9 +411,11 @@
       <div style="margin:13px 0">
         <div class="form-label">배출량 선택</div>
         <div class="volume-options">
-          <div class="volume-opt selected" onclick="selectVol(this)"><div class="vol">40KG</div><div class="vol-price">10,000원</div><div class="vol-sub">2.5캔</div></div>
-          <div class="volume-opt" onclick="selectVol(this)"><div class="vol">80KG</div><div class="vol-price">11,000원</div><div class="vol-sub">5캔</div></div>
-          <div class="volume-opt" onclick="selectVol(this)"><div class="vol">160KG</div><div class="vol-price">12,000원</div><div class="vol-sub">10캔+</div></div>
+          <div class="volume-opt selected" onclick="selectVol(this)"><div class="vol">1캔</div><div class="vol-price" id="vol1p">19,000원</div><div class="vol-sub">16.5kg</div></div>
+          <div class="volume-opt" onclick="selectVol(this)"><div class="vol">2캔</div><div class="vol-price" id="vol2p">38,000원</div><div class="vol-sub">33kg</div></div>
+          <div class="volume-opt" onclick="selectVol(this)"><div class="vol">3캔</div><div class="vol-price" id="vol3p">57,000원</div><div class="vol-sub">49.5kg</div></div>
+          <div class="volume-opt" onclick="selectVol(this)"><div class="vol">5캔</div><div class="vol-price" id="vol5p">95,000원</div><div class="vol-sub">82.5kg</div></div>
+          <div class="volume-opt" onclick="selectVol(this)"><div class="vol">10캔+</div><div class="vol-price" id="vol10p">190,000원~</div><div class="vol-sub">165kg+</div></div>
         </div>
       </div>
       <div class="modal-info-row"><span class="mi-label">예상 수거일</span><span class="mi-val" style="color:var(--green-dark)">내일 오전 중</span></div>
@@ -467,21 +479,22 @@
       <div class="nav-label">정보</div>
       <div class="nav-item" onclick="showPanel('price',this)"><span class="icon">💹</span>주간 시세</div>
       <div class="nav-item" onclick="showPanel('esg',this)"><span class="icon">🌿</span>ESG 포인트</div>
+
       <div class="nav-label">업주 전용</div>
-      <div class="nav-item" id="ownerNavItem" onclick="showPanel('owner',this)" style="border:1.5px solid #252525;margin-top:4px;">
+      <div class="nav-item" id="ownerNavItem" onclick="showPanel('owner',this)" style="border:1.5px solid #e0ece0;margin-top:4px;">
         <span class="icon">🏪</span>업주 로그인<span class="nav-badge green" style="font-size:8px;padding:1px 5px">업주</span>
       </div>
-      <div class="nav-item" onclick="showPanel('qr',this)" style="border:1.5px solid #252525;margin-top:3px;">
+      <div class="nav-item" onclick="showPanel('qr',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
         <span class="icon">📱</span>QR 재고입력
       </div>
       <div class="nav-label">본사 관리</div>
-      <div class="nav-item" onclick="showPanel('hq',this)" style="border:1.5px solid #252525;margin-top:4px;">
+      <div class="nav-item" onclick="showPanel('hq',this)" style="border:1.5px solid #e0ece0;margin-top:4px;">
         <span class="icon">🏢</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
       </div>
-      <div class="nav-item" onclick="showPanel('register',this)" style="border:1.5px solid #252525;margin-top:3px;">
+      <div class="nav-item" onclick="showPanel('register',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
         <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
       </div>
-      <div class="nav-item" onclick="showPanel('admin',this)" style="border:1.5px solid #252525;margin-top:3px;">
+      <div class="nav-item" onclick="showPanel('admin',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
         <span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span>
       </div>
     </nav>
@@ -515,43 +528,234 @@
         <span>⚡ 자동발주 알림:</span>
         <span id="alertBannerContent"></span>
       </div>
-      <div class="dashboard-grid">
-        <div class="stat-row">
-          <div class="stat-card green"><div class="stat-icon">🏪</div><div class="stat-label">📍 등록 업체</div><div class="stat-value">23</div><div class="stat-sub">원주시 · 이번 달 +3곳</div></div>
-          <div class="stat-card gold"><div class="stat-icon">🫙</div><div class="stat-label">🫘 이번 달 납품</div><div class="stat-value">184<span style="font-size:13px"> L</span></div><div class="stat-sub">전월 대비 +12%</div></div>
-          <div class="stat-card red"><div class="stat-icon">🗑️</div><div class="stat-label">♻️ 폐유 수거 대기</div><div class="stat-value" style="color:var(--red-accent)">5</div><div class="stat-sub">업체 · 총 약 360kg</div></div>
-          <div class="stat-card blue"><div class="stat-icon">🌿</div><div class="stat-label">⚡ 자동발주 처리</div><div class="stat-value">11</div><div class="stat-sub">이번 달 자동 처리 건수</div></div>
+
+      <div style="overflow-y:auto;">
+
+        <!-- ① 히어로 배너 -->
+        <div style="background:linear-gradient(135deg,#0a1a0f 0%,#0d2e17 60%,#05C46B22 100%);padding:32px 28px 28px;position:relative;overflow:hidden;">
+          <div style="position:absolute;right:-20px;top:-20px;width:200px;height:200px;background:radial-gradient(circle,#05C46B18,transparent 70%);pointer-events:none;"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(5,196,107,0.15);border:1px solid rgba(5,196,107,0.3);border-radius:20px;padding:4px 12px;margin-bottom:14px;">
+                <div style="width:6px;height:6px;background:var(--green-main);border-radius:50%;animation:pulse 2s infinite;"></div>
+                <span style="font-size:10px;color:var(--green-main);font-weight:700;letter-spacing:0.05em;">LIVE · 원주 베타</span>
+              </div>
+              <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.04em;line-height:1.15;margin-bottom:6px;">
+                식용유 납품 &amp;<br>폐유 수거 플랫폼
+              </div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;">원주시 외식업 사장님들을 위한<br>HIVE의 올인원 식용유 관리 서비스</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;min-width:160px;">
+              <button onclick="showPanel('waste',null)" style="background:var(--green-main);border:none;border-radius:10px;padding:11px 16px;font-family:var(--font-display);font-size:12px;font-weight:800;color:#0D0D0D;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap;">
+                ♻️ 폐유 수거 신청
+              </button>
+              <button onclick="showPanel('order',null)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px 16px;font-family:var(--font-display);font-size:12px;font-weight:800;color:#fff;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap;">
+                🫙 식용유 발주
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="esg-strip">
-          <div><div style="font-size:10px;color:rgba(255,255,255,0.7)">누적 ESG 포인트</div><div class="esg-points">12,450</div><div style="font-size:10px;color:rgba(255,255,255,0.7)">pts · 배민 B마트 / 지역화폐 전환 가능</div></div>
-          <div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:4px">현재 등급</div><div class="esg-tier-badge">🥇 골드</div><div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:4px">다음 등급까지 2,550pts</div></div>
+
+        <!-- ② 이번 주 시세 바 -->
+        <div style="background:#111;padding:14px 28px;display:flex;align-items:center;gap:0;overflow-x:auto;border-bottom:1px solid #1a1a1a;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:10px;color:#555;font-weight:700;letter-spacing:0.05em;white-space:nowrap;margin-right:12px;">이번 주 시세</div>
+          <div style="display:flex;align-items:center;gap:6px;background:#1a1a1a;border-radius:8px;padding:7px 13px;white-space:nowrap;">
+            <span style="font-size:13px;">🫘</span>
+            <span style="font-size:11px;color:#888;">대두유</span>
+            <span style="font-family:var(--font-display);font-size:14px;font-weight:800;color:#fff;" id="db_soy_price">50,000원</span>
+            <span style="font-size:9px;color:#555;">VAT포함</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;background:#1a1a1a;border-radius:8px;padding:7px 13px;white-space:nowrap;">
+            <span style="font-size:13px;">🌿</span>
+            <span style="font-size:11px;color:#888;">카놀라유</span>
+            <span style="font-family:var(--font-display);font-size:14px;font-weight:800;color:#fff;" id="db_canola_price">50,000원</span>
+            <span style="font-size:9px;color:#555;">VAT포함</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;background:#1a1a1a;border-radius:8px;padding:7px 13px;white-space:nowrap;">
+            <span style="font-size:13px;">🌽</span>
+            <span style="font-size:11px;color:#888;">옥수수유</span>
+            <span style="font-family:var(--font-display);font-size:14px;font-weight:800;color:#fff;" id="db_corn_price">50,000원</span>
+            <span style="font-size:9px;color:#555;">VAT포함</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;background:#1a1a1a;border-radius:8px;padding:7px 13px;white-space:nowrap;">
+            <span style="font-size:13px;">🗑️</span>
+            <span style="font-size:11px;color:#888;">폐유 수거</span>
+            <span style="font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--green-main);" id="db_waste_price">19,000원</span>
+            <span style="font-size:9px;color:#555;">/캔</span>
+          </div>
         </div>
-        <div class="two-col">
-          <div class="card">
-            <div class="card-header"><div class="card-title">📋 최근 수거/발주 현황</div><button class="btn btn-outline" style="padding:4px 9px;font-size:10px" onclick="showPanel('history',null)">전체보기</button></div>
-            <div class="card-body">
-              <div class="req-list">
-                <div class="req-item"><div class="req-dot" style="background:var(--red-accent)"></div><div class="req-info"><div class="req-name">로버트치킨 원주점</div><div class="req-detail">폐유 40kg 수거 신청 · 오늘 14:32</div></div><div class="tag tag-pending">대기중</div></div>
-                <div class="req-item"><div class="req-dot" style="background:#4A90E2"></div><div class="req-info"><div class="req-name">치킨스쿨 원주혁신점</div><div class="req-detail">콩식용유 80kg 자동발주 · 어제 09:15</div></div><div class="tag tag-collect">수거중</div></div>
-                <div class="req-item"><div class="req-dot" style="background:var(--green-main)"></div><div class="req-info"><div class="req-name">원주닭갈비 본점</div><div class="req-detail">카놀라유 160kg 납품 완료 · 3일 전</div></div><div class="tag tag-done">완료</div></div>
-                <div class="req-item"><div class="req-dot" style="background:var(--red-accent)"></div><div class="req-info"><div class="req-name">만두짱 원주행구점</div><div class="req-detail">폐유 80kg 수거 · 4일 전</div></div><div class="tag tag-done">완료</div></div>
-                <div class="req-item"><div class="req-dot" style="background:var(--gold)"></div><div class="req-info"><div class="req-name">BBQ 원주무실점</div><div class="req-detail">옥수수유 10캔 자동발주 · 5일 전</div></div><div class="tag tag-done">완료</div></div>
+
+        <div style="padding:22px 28px 28px;">
+
+          <!-- ③ KPI 카드 4개 (토스 스타일) -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;" id="dbKpiRow">
+            <div style="background:var(--white);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+              <div style="font-size:11px;color:var(--gray);font-weight:600;margin-bottom:10px;">📍 등록 업체</div>
+              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--black);line-height:1;" id="db_biz_count">0</div>
+              <div style="font-size:10px;color:var(--green-dark);margin-top:6px;font-weight:600;">원주시 전체</div>
+            </div>
+            <div style="background:var(--white);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+              <div style="font-size:11px;color:var(--gray);font-weight:600;margin-bottom:10px;">🫙 이번달 납품</div>
+              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--black);line-height:1;" id="db_oil_delivery">184<span style="font-size:14px;font-weight:500"> L</span></div>
+              <div style="font-size:10px;color:var(--green-dark);margin-top:6px;font-weight:600;">전월 대비 +12%</div>
+            </div>
+            <div style="background:var(--white);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+              <div style="font-size:11px;color:var(--gray);font-weight:600;margin-bottom:10px;">♻️ 폐유 수거</div>
+              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--black);line-height:1;" id="db_waste_total">1,440<span style="font-size:14px;font-weight:500"> kg</span></div>
+              <div style="font-size:10px;color:var(--green-dark);margin-top:6px;font-weight:600;">이번 달 누적</div>
+            </div>
+            <div style="background:linear-gradient(135deg,#0a2e1a,#063d1f);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);">
+              <div style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;margin-bottom:10px;">🌿 CO₂ 절감</div>
+              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--green-main);line-height:1;" id="db_co2">1,008<span style="font-size:14px;font-weight:500"> kg</span></div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:6px;font-weight:600;">월간 탄소 감축</div>
+            </div>
+          </div>
+
+          <!-- ④ ESG + 빠른 실행 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+
+            <!-- ESG 포인트 -->
+            <div style="background:linear-gradient(135deg,#0a2e1a,#05C46B);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);">
+              <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:600;">누적 ESG 포인트</div>
+              <div style="font-family:var(--font-display);font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.05em;line-height:1;" id="db_esg_pts">52,300</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:4px;">pts · 원주 전체 업체 합산</div>
+              <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+                <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 9px;font-size:9px;color:rgba(255,255,255,0.8);font-weight:600;">🛵 배민 B마트 전환</div>
+                <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 9px;font-size:9px;color:rgba(255,255,255,0.8);font-weight:600;">💳 강원페이 전환</div>
+              </div>
+            </div>
+
+            <!-- 빠른 실행 -->
+            <div style="background:var(--white);border-radius:16px;padding:16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+              <div style="font-size:11px;color:var(--gray);font-weight:700;margin-bottom:12px;letter-spacing:0.03em;">빠른 실행</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button onclick="showPanel('waste',null)" style="background:var(--cream);border:none;border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all 0.15s;" onmouseover="this.style.background='var(--green-pale)'" onmouseout="this.style.background='var(--cream)'">
+                  <div style="font-size:20px;margin-bottom:4px;">♻️</div>
+                  <div style="font-size:10px;font-weight:700;color:var(--black);">폐유 수거</div>
+                </button>
+                <button onclick="showPanel('order',null)" style="background:var(--cream);border:none;border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all 0.15s;" onmouseover="this.style.background='var(--green-pale)'" onmouseout="this.style.background='var(--cream)'">
+                  <div style="font-size:20px;margin-bottom:4px;">🫙</div>
+                  <div style="font-size:10px;font-weight:700;color:var(--black);">식용유 발주</div>
+                </button>
+                <button onclick="showPanel('map',null)" style="background:var(--cream);border:none;border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all 0.15s;" onmouseover="this.style.background='var(--green-pale)'" onmouseout="this.style.background='var(--cream)'">
+                  <div style="font-size:20px;margin-bottom:4px;">🗺️</div>
+                  <div style="font-size:10px;font-weight:700;color:var(--black);">지도 현황</div>
+                </button>
+                <button onclick="showPanel('qr',null)" style="background:var(--cream);border:none;border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all 0.15s;" onmouseover="this.style.background='var(--green-pale)'" onmouseout="this.style.background='var(--cream)'">
+                  <div style="font-size:20px;margin-bottom:4px;">📱</div>
+                  <div style="font-size:10px;font-weight:700;color:var(--black);">QR 입력</div>
+                </button>
               </div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">⚡ 빠른 실행</div></div>
-            <div class="card-body">
-              <div class="quick-actions">
-                <button class="qa-btn" onclick="showPanel('waste',null)"><div class="qa-icon">🗑️</div><div><div class="qa-label">폐유 수거 신청</div><div class="qa-desc">수거 예약 및 이력</div></div></button>
-                <button class="qa-btn" onclick="showPanel('order',null)"><div class="qa-icon">🫙</div><div><div class="qa-label">식용유 발주</div><div class="qa-desc">유종 선택 및 주문</div></div></button>
-                <button class="qa-btn" onclick="showPanel('map',null)"><div class="qa-icon">🗺️</div><div><div class="qa-label">지도 현황 보기</div><div class="qa-desc">네이버 지도 실시간</div></div></button>
-                <button class="qa-btn" onclick="showPanel('esg',null)"><div class="qa-icon">🌿</div><div><div class="qa-label">ESG 포인트</div><div class="qa-desc">포인트 조회 및 전환</div></div></button>
-                <button class="qa-btn" onclick="showPanel('price',null)"><div class="qa-icon">💹</div><div><div class="qa-label">주간 시세 확인</div><div class="qa-desc">식용유 / 폐유 시세</div></div></button>
-                <button class="qa-btn" onclick="showPanel('history',null)"><div class="qa-icon">📋</div><div><div class="qa-label">전체 이력 조회</div><div class="qa-desc">납품·수거 기록</div></div></button>
+
+          <!-- ⑤ 서비스 소개 (올수 참고) -->
+          <div style="background:var(--white);border-radius:16px;padding:22px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:20px;">
+            <div style="font-family:var(--font-display);font-size:16px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;">🌿 식용유니버스가 뭔가요?</div>
+            <div style="font-size:12px;color:var(--gray);margin-bottom:18px;">원주시 외식업 사장님들의 식용유 구매부터 폐유 수거까지 한 번에</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+              <div style="background:var(--green-pale);border-radius:12px;padding:16px 12px;text-align:center;border:1.5px solid var(--green-light);">
+                <div style="font-size:28px;margin-bottom:8px;">🫙</div>
+                <div style="font-size:12px;font-weight:800;color:var(--green-dark);margin-bottom:4px;">식용유 납품</div>
+                <div style="font-size:10px;color:var(--gray);line-height:1.5;">대두유·카놀라유·옥수수유<br>당일·익일 배송</div>
+              </div>
+              <div style="background:#FFF8F0;border-radius:12px;padding:16px 12px;text-align:center;border:1.5px solid #FFD8A8;">
+                <div style="font-size:28px;margin-bottom:8px;">♻️</div>
+                <div style="font-size:12px;font-weight:800;color:#D4621A;margin-bottom:4px;">폐유 수거</div>
+                <div style="font-size:10px;color:var(--gray);line-height:1.5;">1캔(16.5kg) 19,000원<br>ESG 포인트 적립</div>
+              </div>
+              <div style="background:#EEF4FF;border-radius:12px;padding:16px 12px;text-align:center;border:1.5px solid #C5D8F5;">
+                <div style="font-size:28px;margin-bottom:8px;">🌍</div>
+                <div style="font-size:12px;font-weight:800;color:#185FA5;margin-bottom:4px;">ESG 인증</div>
+                <div style="font-size:10px;color:var(--gray);line-height:1.5;">탄소감축 데이터<br>바이오디젤 SAF 원료</div>
               </div>
             </div>
           </div>
+
+          <!-- ⑥ 수거 플로우 -->
+          <div style="background:#0D0D0D;border-radius:16px;padding:20px;margin-bottom:20px;">
+            <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--green-main);margin-bottom:4px;">♻️ 폐유 수거 후 어디로 가나요?</div>
+            <div style="font-size:11px;color:#555;margin-bottom:16px;">ISCC EU CP 인증 기반 투명한 자원 순환</div>
+            <div style="display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:4px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+                <div style="width:44px;height:44px;background:#1a1a1a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid #333;">🏪</div>
+                <div style="font-size:9px;color:#aaa;text-align:center;font-weight:600;">배출처<br>(음식점)</div>
+              </div>
+              <div style="color:#333;font-size:18px;margin:0 4px;flex-shrink:0;">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+                <div style="width:44px;height:44px;background:#1a1a1a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid #333;">🚛</div>
+                <div style="font-size:9px;color:#aaa;text-align:center;font-weight:600;">HIVE<br>수거</div>
+              </div>
+              <div style="color:#333;font-size:18px;margin:0 4px;flex-shrink:0;">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+                <div style="width:44px;height:44px;background:rgba(5,196,107,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(5,196,107,0.3);">🏭</div>
+                <div style="font-size:9px;color:var(--green-main);text-align:center;font-weight:700;">DS단석<br>정제</div>
+              </div>
+              <div style="color:#333;font-size:18px;margin:0 4px;flex-shrink:0;">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+                <div style="width:44px;height:44px;background:#1a1a1a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid #333;">⛽</div>
+                <div style="font-size:9px;color:#aaa;text-align:center;font-weight:600;">바이오<br>디젤</div>
+              </div>
+              <div style="color:#333;font-size:18px;margin:0 4px;flex-shrink:0;">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+                <div style="width:44px;height:44px;background:#1a1a1a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid #333;">✈️</div>
+                <div style="font-size:9px;color:#aaa;text-align:center;font-weight:600;">SAF<br>항공유</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑦ 제휴/소식 -->
+          <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div style="font-size:13px;font-weight:800;letter-spacing:-0.02em;">📢 HIVE 소식</div>
+              <div style="font-size:10px;color:var(--gray);">원주시 · 2026</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--green-pale);border-radius:10px;border:1px solid var(--green-light);">
+                <div style="width:36px;height:36px;background:var(--green-main);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🎉</div>
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:var(--green-dark);">원주푸드 학교급식 전격 계약 체결</div>
+                  <div style="font-size:10px;color:var(--gray);margin-top:2px;">월 3,000L 이상 납품 · 폐유 수거 협약</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--cream);border-radius:10px;">
+                <div style="width:36px;height:36px;background:#E8F0FE;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🏆</div>
+                <div>
+                  <div style="font-size:12px;font-weight:700;">원주시 ESG 우수 기업 선정</div>
+                  <div style="font-size:10px;color:var(--gray);margin-top:2px;">2026년 강원특별자치도 친환경 유통 인증</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--cream);border-radius:10px;">
+                <div style="width:36px;height:36px;background:#FFF8F0;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📱</div>
+                <div>
+                  <div style="font-size:12px;font-weight:700;">식용유니버스 베타 오픈</div>
+                  <div style="font-size:10px;color:var(--gray);margin-top:2px;">원주시 23개 업체 등록 · 서비스 확대 중</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑧ 최근 수거/발주 -->
+          <div style="background:var(--green-main);border-radius:16px;padding:22px 20px;margin-bottom:20px;text-align:center;">
+            <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;">🍳 식용유 납품 · 폐유 수거 신청</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-bottom:16px;">원주시 외식업 사장님이라면 누구나 신청 가능해요</div>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+              <button onclick="showToast('t1','📞 전화 문의','033-XXX-XXXX (HIVE 원주팀)')" style="background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.5);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;">📞 전화 문의</button>
+              <button onclick="showPanel('register',null)" style="background:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:800;color:var(--green-dark);cursor:pointer;">➕ 업체 등록</button>
+              <button onclick="showPanel('waste',null)" style="background:rgba(0,0,0,0.1);border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;">♻️ 수거 신청</button>
+            </div>
+          </div>
+
+          <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div style="font-size:13px;font-weight:800;letter-spacing:-0.02em;">📋 최근 수거 · 발주</div>
+              <button onclick="showPanel('history',null)" style="background:none;border:none;font-size:11px;color:var(--green-dark);font-weight:700;cursor:pointer;">전체보기 →</button>
+            </div>
+            <div id="dbRecentList">
+              <div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">등록된 이력이 없어요</div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -677,30 +881,39 @@
 
     <!-- PRICE PANEL -->
     <div class="panel" id="panel-price">
-      <div style="padding:22px 26px;max-width:760px">
-        <div class="card">
-          <div class="card-header" style="background:var(--black)"><div class="card-title" style="color:var(--white)">💹 이번 주 식용유 시세 <span style="font-size:10px;color:var(--green-main);font-weight:400;margin-left:5px">2026.03.27 기준</span></div></div>
-          <div class="card-body">
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
-              <div style="text-align:center;padding:16px;background:var(--green-pale);border-radius:var(--radius-sm);border:2px solid var(--green-light)"><div style="font-size:24px;margin-bottom:4px">🫘</div><div style="font-size:11px;color:var(--gray);margin-bottom:3px">대두유 18L</div><div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--green-dark)">50,000원</div></div>
-              <div style="text-align:center;padding:16px;background:var(--green-pale);border-radius:var(--radius-sm);border:2px solid var(--green-light)"><div style="font-size:24px;margin-bottom:4px">🌿</div><div style="font-size:11px;color:var(--gray);margin-bottom:3px">카놀라유 18L</div><div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--green-dark)">50,000원</div></div>
-              <div style="text-align:center;padding:16px;background:var(--green-pale);border-radius:var(--radius-sm);border:2px solid var(--green-light)"><div style="font-size:24px;margin-bottom:4px">🌽</div><div style="font-size:11px;color:var(--gray);margin-bottom:3px">옥수수유 18L</div><div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--green-dark)">50,000원</div></div>
-            </div>
-            <div style="padding:13px;background:#FFF3E0;border-radius:var(--radius-sm);border:1px solid #FFD580">
-              <div style="font-weight:700;margin-bottom:8px;font-size:13px">♻️ 폐식용유 수거 단가 <span style="font-size:10px;color:var(--gray);font-weight:400;">(캔 단위 · 1캔=16.5kg)</span></div>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;text-align:center">
-                <div><div style="font-size:10px;color:var(--gray)">40KG (2.5캔)</div><div style="font-family:var(--font-display);font-weight:800;font-size:17px;color:#B8620E">10,000원</div></div>
-                <div><div style="font-size:10px;color:var(--gray)">80KG (5캔)</div><div style="font-family:var(--font-display);font-weight:800;font-size:17px;color:#B8620E">11,000원</div></div>
-                <div><div style="font-size:10px;color:var(--gray)">160KG (10캔+)</div><div style="font-family:var(--font-display);font-weight:800;font-size:17px;color:#B8620E">12,000원</div></div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div style="padding:22px 26px;max-width:760px" id="pricePageContent">
+        <!-- JS로 동적 렌더링 -->
       </div>
     </div>
 
     <!-- ESG PANEL -->
     <div class="panel" id="panel-esg">
+
+        <!-- ESG 적립 기준 안내 -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header" style="background:#0D0D0D;border-bottom:none;">
+            <div class="card-title" style="color:var(--white);">🌿 ESG 포인트 적립 기준</div>
+          </div>
+          <div style="padding:16px 20px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+              <div style="background:var(--green-pale);border-radius:10px;padding:14px;border:1px solid var(--green-light);">
+                <div style="font-size:11px;color:var(--green-dark);font-weight:700;margin-bottom:6px;">🗑️ 폐유 수거 시</div>
+                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-dark);">+8.75 pts</div>
+                <div style="font-size:10px;color:var(--gray);margin-top:3px;">kg당 · 1캔(16.5kg) = +144pts</div>
+              </div>
+              <div style="background:#EEF4FF;border-radius:10px;padding:14px;border:1px solid #C5D8F5;">
+                <div style="font-size:11px;color:#185FA5;font-weight:700;margin-bottom:6px;">🫙 식용유 납품 시</div>
+                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#185FA5;">+5 pts</div>
+                <div style="font-size:10px;color:var(--gray);margin-top:3px;">캔당 · 식용유 구매 실적</div>
+              </div>
+            </div>
+            <div style="background:var(--cream);border-radius:9px;padding:12px 14px;font-size:11px;color:var(--gray);line-height:1.7;">
+              💡 <strong>탄소 감축 기여 계산:</strong> 폐유·식용유 모두 1캔 = 16.5kg 기준으로 CO₂ 절감량을 산출해요 (감축계수 0.7 적용)<br>
+              예시: 폐유 2캔 수거 → 16.5×2×0.7 = <strong style="color:var(--green-dark);">23.1 kg CO₂ 절감</strong>
+            </div>
+          </div>
+        </div>
+
       <div style="padding:22px 26px;max-width:760px">
         <div class="esg-strip" style="margin-bottom:16px">
           <div><div style="font-size:10px;color:rgba(255,255,255,0.7)">HIVE 원주 — 누적 ESG 포인트</div><div class="esg-points">12,450</div><div style="font-size:10px;color:rgba(255,255,255,0.7)">pts</div></div>
@@ -734,8 +947,8 @@
   </div>
 
     <!-- OWNER PANEL -->
-    <div class="panel" id="panel-owner">
-      <div id="ownerLoginState">
+    <div class="panel" id="panel-owner" style="overflow-y:auto;">
+      <div id="ownerLoginState" style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);">
         <div style="max-width:420px;margin:56px auto;padding:0 24px;">
           <div style="text-align:center;margin-bottom:28px;">
             <div style="font-size:44px;margin-bottom:10px;">🏪</div>
@@ -835,10 +1048,10 @@
                   </div>
                 </div>
                 <div>
-                  <label class="form-label">🫙 새식용유 사용량 (L)</label>
+                  <label class="form-label">🫙 새식용유 사용량 (캔 수)</label>
                   <div style="display:flex;align-items:center;gap:6px;">
-                    <input class="form-input" id="newOilLInput" type="number" value="18" min="0" step="0.5" style="font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:-0.03em;text-align:center;">
-                    <span style="font-size:13px;color:var(--gray);font-weight:600;flex-shrink:0;">L</span>
+                    <input class="form-input" id="newOilLInput" type="number" value="1" min="0" step="1" style="font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:-0.03em;text-align:center;">
+                    <span style="font-size:13px;color:var(--gray);font-weight:600;flex-shrink:0;">캔</span>
                   </div>
                 </div>
               </div>
@@ -1054,6 +1267,59 @@
               <div style="width:22px;height:22px;background:var(--green-main);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:12px;font-weight:800;color:#000;flex-shrink:0;">4</div>
               <div style="font-size:12px;color:#aaa;">재고 2캔 이하 → 자동발주 / 폐유 1캔 이상 → 수거 알림 자동 발송</div>
             </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- CONSUMER VIEW PANEL -->
+    <div class="panel" id="panel-consumer">
+      <div style="max-width:600px;margin:0 auto;padding:22px 16px 80px;">
+
+        <!-- 헤더 -->
+        <div style="text-align:center;margin-bottom:22px;">
+          <div style="font-size:40px;margin-bottom:8px;">🫙</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;">식용유니버스</div>
+          <div style="font-size:12px;color:var(--gray);">원주시 식용유 납품 · 폐유 수거 서비스</div>
+        </div>
+
+        <!-- 이번 주 시세 카드 -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-header" style="background:#0D0D0D;border-bottom:none;">
+            <div class="card-title" style="color:var(--white);">💹 이번 주 시세</div>
+            <div id="consumerPriceDate" style="font-size:10px;color:#555;"></div>
+          </div>
+          <div style="padding:16px;" id="consumerOilPrices"></div>
+        </div>
+
+        <!-- 폐유 수거 안내 -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-header">
+            <div class="card-title">♻️ 폐유 수거 안내</div>
+          </div>
+          <div style="padding:16px;" id="consumerWasteInfo"></div>
+        </div>
+
+        <!-- 등록 업체 목록 -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-header">
+            <div class="card-title">📍 원주시 등록 업체</div>
+            <div style="font-size:10px;color:var(--gray);" id="consumerBizCount">0개 업체</div>
+          </div>
+          <div style="padding:12px 16px;" id="consumerBizList">
+            <div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">등록된 업체가 없어요</div>
+          </div>
+        </div>
+
+        <!-- 서비스 문의 -->
+        <div style="background:linear-gradient(135deg,#0a2e1a,#05C46B);border-radius:var(--radius);padding:18px 20px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:#fff;margin-bottom:6px;">서비스 신청 · 문의</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:14px;">식용유 납품 또는 폐유 수거 신청</div>
+          <div style="display:flex;gap:8px;justify-content:center;">
+            <button class="btn" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:10px 20px;" onclick="showToast('t1','📞 전화 문의','033-XXX-XXXX (원주 HIVE)')">📞 전화 문의</button>
+            <button class="btn btn-primary" style="padding:10px 20px;" onclick="showToast('t1','✅ 신청 완료','담당자가 연락드릴게요!')">신청하기</button>
           </div>
         </div>
 
@@ -1521,18 +1787,35 @@
 
 <script>
 // ===== 전역 시세 데이터 (관리자 수정 가능) =====
-const PRICES = {
+const PRICES_DEFAULT = {
   oils: {
     soy:    { label:'대두유',   unit:'18L', price:50000, vat:true },
     canola: { label:'카놀라유', unit:'18L', price:50000, vat:true },
     corn:   { label:'옥수수유', unit:'18L', price:50000, vat:true },
   },
   waste: {
-    can: { label:'캔', kg:16.5, price:19000 }, // 1캔 = 16.5kg
+    can: { label:'캔', kg:16.5, price:19000 },
   },
-  esgRate: 8.75,   // pts per kg
-  carbonRate: 0.7, // CO2 kg per waste kg
+  esgRate: 8.75,
+  carbonRate: 0.7,
 };
+
+// localStorage에서 저장된 시세 불러오기
+function loadPrices() {
+  try {
+    const saved = localStorage.getItem('hiveoil_prices');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // 유효성 검사 후 병합
+      if (parsed.oils && parsed.waste) {
+        return parsed;
+      }
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(PRICES_DEFAULT));
+}
+
+const PRICES = loadPrices();
 
 function applyPrices() {
   // 상단 가격칩 업데이트
@@ -1542,6 +1825,10 @@ function applyPrices() {
   oilKeys.forEach((k,i) => {
     if (chips[i]) chips[i].innerHTML = `${emojis[i]} ${PRICES.oils[k].label} <strong>${PRICES.oils[k].price.toLocaleString()}원</strong> <span style="font-size:9px;opacity:0.7">VAT포함</span>`;
   });
+  // 주간 시세 페이지 업데이트
+  renderPricePage();
+  // 대시보드 시세 바 업데이트
+  updateDashboard();
   // 발주 select 옵션 텍스트 업데이트
   const optMap = { soy:'opt_soy', canola:'opt_canola', corn:'opt_corn' };
   Object.entries(PRICES.oils).forEach(([k,v]) => {
@@ -1568,11 +1855,30 @@ function applyPrices() {
 }
 
 // ===== 원주 실제 업체 데이터 =====
-const businesses = [
-  // 등록된 업체가 없습니다. 업체 등록 탭에서 추가해주세요.
-];
+// businesses localStorage 로드
+function loadBusinesses() {
+  try {
+    const saved = localStorage.getItem('hiveoil_businesses');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return [];
+}
+function saveBusinesses() {
+  try { localStorage.setItem('hiveoil_businesses', JSON.stringify(businesses)); } catch(e) {}
+}
+const businesses = loadBusinesses();
 
-const historyData = [];
+function loadHistory() {
+  try {
+    const saved = localStorage.getItem('hiveoil_history');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return [];
+}
+function saveHistory() {
+  try { localStorage.setItem('hiveoil_history', JSON.stringify(historyData)); } catch(e) {}
+}
+const historyData = loadHistory();
 
 // ===== 네이버 지도 =====
 let kakaoMap = null, markers = [], infoWindows = [], mapInitialized = false;
@@ -1755,6 +2061,9 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'hq')      { renderHqTable(); initHqBars(); }
   if (id === 'qr')      { initQRPanel(); }
   if (id === 'admin')   { renderAdminPrices(); }
+  if (id === 'price')   { renderPricePage(); }
+  if (id === 'dashboard') { updateDashboard(); }
+
 }
 
 // 뒤로가기 / 앞으로가기 처리
@@ -2074,7 +2383,9 @@ function calcWastePrice() {
   const cans  = parseFloat(document.getElementById('wasteKgInput')?.value) || 0; // 캔 수
   const kg    = cans * PRICES.waste.can.kg; // 실제 kg (16.5 * 캔수)
   const price = Math.round(cans * PRICES.waste.can.price);
-  const carbon = (kg * PRICES.carbonRate).toFixed(1);
+  const oilCans = parseFloat(document.getElementById('newOilLInput')?.value) || 0;
+  const totalKg  = kg + (oilCans * PRICES.waste.can.kg); // 폐유+식용유 모두 16.5kg/캔
+  const carbon = (totalKg * PRICES.carbonRate).toFixed(1);
   const esg    = Math.round(kg * PRICES.esgRate);
   const priceEl = document.getElementById('calcPrice');
   const carbonEl = document.getElementById('calcCarbon');
@@ -2098,6 +2409,16 @@ function saveWeightRecord() {
   }
   showToast('t1','⚖️ 실측 기록 저장됨','배출량 ' + kg + 'kg 기록이 저장됐어요');
 }
+
+// 페이지 로드 시 저장된 시세 UI 반영
+(function() {
+  try {
+    const saved = localStorage.getItem('hiveoil_prices');
+    if (saved) {
+      applyPrices();
+    }
+  } catch(e) {}
+})();
 
 // 초기 날짜 세팅
 (function() {
@@ -2241,6 +2562,8 @@ function adminSavePrices() {
   }
   applyPrices();
   renderAdminPrices();
+  // localStorage 영구 저장
+  try { localStorage.setItem('hiveoil_prices', JSON.stringify(PRICES)); } catch(e) {}
   if (changes.length > 0) {
     const log = document.getElementById('priceChangeLog');
     if (log) {
@@ -2253,15 +2576,19 @@ function adminSavePrices() {
         log.prepend(row);
       });
     }
-    showToast('t1','💾 시세 저장 완료', changes.length + '개 항목이 전체 화면에 반영됐어요');
+    showToast('t1','💾 시세 영구 저장 완료', changes.length + '개 항목 저장 — 새로고침해도 유지돼요');
   } else {
     showToast('t1','✅ 변경 없음','현재 시세와 동일합니다');
   }
 }
 
 function adminResetPrices() {
-  Object.keys(PRICES.oils).forEach(k => { PRICES.oils[k].price = DEFAULT_PRICES.oils[k].price; });
-  Object.keys(PRICES.waste).forEach(k => { PRICES.waste[k].price = DEFAULT_PRICES.waste[k].price; });
+  Object.keys(PRICES.oils).forEach(k => { PRICES.oils[k].price = PRICES_DEFAULT.oils[k].price; });
+  Object.keys(PRICES.waste).forEach(k => { PRICES.waste[k].price = PRICES_DEFAULT.waste[k].price; });
+  PRICES.esgRate = PRICES_DEFAULT.esgRate;
+  PRICES.carbonRate = PRICES_DEFAULT.carbonRate;
+  // localStorage도 초기화
+  try { localStorage.removeItem('hiveoil_prices'); } catch(e) {}
   applyPrices();
   renderAdminPrices();
   showToast('t1','🔄 초기화 완료','시세가 기본값으로 복원됐어요');
@@ -2346,6 +2673,7 @@ function saveQRStock() {
   biz.newOil   = qrNewVal;
   biz.wasteOil = qrWasteVal;
   biz.lastUpdate = '방금 전 ('+timeStr+')';
+  saveBusinesses();
 
   document.getElementById('qrLastTime').textContent = biz.lastUpdate;
 
@@ -2499,6 +2827,7 @@ function registerBiz() {
   };
 
   businesses.push(newBiz);
+  saveBusinesses();
   renderRegBizList();
   updateDashboardStats();
 
@@ -2556,6 +2885,7 @@ function deleteBiz(id) {
   if (idx === -1) return;
   const name = businesses[idx].name;
   businesses.splice(idx, 1);
+  saveBusinesses();
   renderRegBizList();
   updateDashboardStats();
   showToast('t1','🗑️ 업체 삭제됨', name + ' — 목록에서 제거됐어요');
@@ -2618,6 +2948,164 @@ function updateTabBadges() {
 
 // 초기 뱃지 세팅
 setTimeout(updateTabBadges, 500);
+
+
+// ===== 주간 시세 페이지 동적 렌더링 =====
+function renderPricePage() {
+  const container = document.getElementById('pricePageContent');
+  if (!container) return;
+  const today = new Date();
+  const dateStr = today.getFullYear() + '.' + String(today.getMonth()+1).padStart(2,'0') + '.' + String(today.getDate()).padStart(2,'0');
+  const emojis = { soy:'🫘', canola:'🌿', corn:'🌽' };
+
+  container.innerHTML = `
+    <div class="card">
+      <div class="card-header" style="background:#0D0D0D;">
+        <div class="card-title" style="color:var(--white);">💹 이번 주 식용유 시세
+          <span style="font-size:10px;color:var(--green-main);font-weight:400;margin-left:5px">${dateStr} 기준</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+          ${Object.entries(PRICES.oils).map(([k,v]) => `
+            <div style="text-align:center;padding:16px;background:var(--green-pale);border-radius:var(--radius-sm);border:2px solid var(--green-light)">
+              <div style="font-size:24px;margin-bottom:4px">${emojis[k]||'🫙'}</div>
+              <div style="font-size:11px;color:var(--gray);margin-bottom:3px">${v.label} 18L</div>
+              <div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--green-dark)">${v.price.toLocaleString()}원</div>
+              <div style="font-size:9px;color:var(--green-dark);opacity:0.7;margin-top:2px;">VAT 포함</div>
+            </div>`).join('')}
+        </div>
+        <div style="padding:13px;background:#FFF3E0;border-radius:var(--radius-sm);border:1px solid #FFD580">
+          <div style="font-weight:700;margin-bottom:10px;font-size:13px">♻️ 폐식용유 수거 단가 <span style="font-size:10px;color:var(--gray);font-weight:400;">(캔 단위 · 1캔=${PRICES.waste.can.kg}kg)</span></div>
+          <div style="text-align:center;background:var(--white);border-radius:9px;padding:14px;">
+            <div style="font-family:var(--font-display);font-size:30px;font-weight:800;color:#D4621A;letter-spacing:-0.04em;">${PRICES.waste.can.price.toLocaleString()}원 / 캔</div>
+            <div style="font-size:11px;color:var(--gray);margin-top:4px;">1캔 = ${PRICES.waste.can.kg}kg 기준</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ===== 소비자 뷰 렌더링 =====
+function renderConsumerView() {
+  const today = new Date();
+  const dateStr = today.getFullYear() + '.' + String(today.getMonth()+1).padStart(2,'0') + '.' + String(today.getDate()).padStart(2,'0');
+  const emojis = { soy:'🫘', canola:'🌿', corn:'🌽' };
+
+  // 날짜
+  const dateEl = document.getElementById('consumerPriceDate');
+  if (dateEl) dateEl.textContent = dateStr + ' 기준';
+
+  // 식용유 시세
+  const oilEl = document.getElementById('consumerOilPrices');
+  if (oilEl) {
+    oilEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+        ${Object.entries(PRICES.oils).map(([k,v]) => `
+          <div style="text-align:center;background:var(--green-pale);border-radius:10px;padding:12px 8px;border:1.5px solid var(--green-light);">
+            <div style="font-size:22px;margin-bottom:4px">${emojis[k]||'🫙'}</div>
+            <div style="font-size:10px;color:var(--gray);margin-bottom:3px">${v.label} 18L</div>
+            <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green-dark);">${v.price.toLocaleString()}원</div>
+            <div style="font-size:9px;color:var(--green-dark);opacity:0.7">VAT포함</div>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--gray);text-align:center;background:var(--cream);padding:8px;border-radius:8px;">
+        💡 시세는 매주 업데이트돼요. 대량 주문 시 별도 문의해주세요.
+      </div>`;
+  }
+
+  // 폐유 수거 안내
+  const wasteEl = document.getElementById('consumerWasteInfo');
+  if (wasteEl) {
+    wasteEl.innerHTML = `
+      <div style="text-align:center;background:#FFF8F0;border-radius:12px;padding:16px;border:1.5px solid #FFD8A8;margin-bottom:12px;">
+        <div style="font-size:28px;margin-bottom:6px;">🗑️</div>
+        <div style="font-family:var(--font-display);font-size:26px;font-weight:800;color:#D4621A;letter-spacing:-0.04em;">${PRICES.waste.can.price.toLocaleString()}원 / 캔</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:4px;">1캔 = ${PRICES.waste.can.kg}kg 기준</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--gray);">
+        <div style="display:flex;gap:8px;align-items:center;"><span style="color:var(--green-main);font-size:16px;">✓</span> 당일 또는 익일 수거</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="color:var(--green-main);font-size:16px;">✓</span> 폐유 종류 무관 (식물성·동물성)</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="color:var(--green-main);font-size:16px;">✓</span> ESG 포인트 적립 — 식자재 구매 전환 가능</div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="color:var(--green-main);font-size:16px;">✓</span> 원주시 전 지역 수거 가능</div>
+      </div>`;
+  }
+
+  // 업체 목록
+  const bizCountEl = document.getElementById('consumerBizCount');
+  const bizListEl  = document.getElementById('consumerBizList');
+  if (bizCountEl) bizCountEl.textContent = businesses.length + '개 업체';
+  if (bizListEl) {
+    if (businesses.length === 0) {
+      bizListEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">등록된 업체가 없어요</div>';
+    } else {
+      bizListEl.innerHTML = businesses.map(b => `
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--gray-light);">
+          <div style="width:36px;height:36px;background:var(--green-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🏪</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:13px;letter-spacing:-0.01em;">${b.name}</div>
+            <div style="font-size:10px;color:var(--gray);margin-top:1px;">${b.type} · ${b.addr || '원주시'}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:10px;font-weight:700;color:${b.newOil<=2?'var(--red-accent)':'var(--green-dark)'};">
+              ${b.newOil<=2?'⚠️ 재고부족':'✅ 재고있음'}
+            </div>
+            <div style="font-size:9px;color:var(--gray);margin-top:2px;">🕐 ${b.lastUpdate||'—'}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+}
+
+
+// ===== 대시보드 동적 업데이트 =====
+function updateDashboard() {
+  // 시세 바 업데이트
+  const soy   = document.getElementById('db_soy_price');
+  const canola= document.getElementById('db_canola_price');
+  const corn  = document.getElementById('db_corn_price');
+  const waste = document.getElementById('db_waste_price');
+  if (soy)    soy.textContent    = PRICES.oils.soy.price.toLocaleString() + '원';
+  if (canola) canola.textContent = PRICES.oils.canola.price.toLocaleString() + '원';
+  if (corn)   corn.textContent   = PRICES.oils.corn.price.toLocaleString() + '원';
+  if (waste)  waste.textContent  = PRICES.waste.can.price.toLocaleString() + '원';
+
+  // 업체 수
+  const bizCount = document.getElementById('db_biz_count');
+  if (bizCount) bizCount.innerHTML = businesses.length + '<span style="font-size:14px;font-weight:500"> 곳</span>';
+
+  // CO2 계산 (폐유 수거량 기반)
+  const totalWasteKg = businesses.reduce((s,b) => s + b.wasteOil * PRICES.waste.can.kg, 0);
+  const co2 = Math.round(totalWasteKg * PRICES.carbonRate);
+  const co2El = document.getElementById('db_co2');
+  if (co2El) co2El.innerHTML = co2.toLocaleString() + '<span style="font-size:14px;font-weight:500"> kg</span>';
+
+  // 최근 이력
+  renderDbRecentList();
+}
+
+function renderDbRecentList() {
+  const el = document.getElementById('dbRecentList');
+  if (!el) return;
+  if (historyData.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">등록된 이력이 없어요</div>';
+    return;
+  }
+  const recent = historyData.slice(0, 5);
+  const colors = { pending:'var(--red-accent)', inprogress:'#4A90E2', done:'var(--green-main)' };
+  const labels = { pending:'대기중', inprogress:'진행중', done:'완료' };
+  el.innerHTML = recent.map(h => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-light);">
+      <div style="width:8px;height:8px;border-radius:50%;background:${colors[h.status]||'#ccc'};flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:-0.01em;">${h.biz}</div>
+        <div style="font-size:10px;color:var(--gray);margin-top:1px;">${h.content} · ${h.date}</div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:${colors[h.status]||'#ccc'};flex-shrink:0;">${labels[h.status]||''}</div>
+    </div>`).join('');
+}
+
+// showPanel에 dashboard 진입 시 업데이트
 
 </script>
 </body>
