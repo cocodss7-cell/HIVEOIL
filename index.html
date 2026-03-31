@@ -494,7 +494,7 @@
       <div class="nav-item" onclick="showPanel('register',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
         <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
       </div>
-      <div class="nav-item" onclick="showPanel('admin',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
+      <div class="nav-item" onclick="showPanel('admin',this)" style="border:1.5px solid #e0ece0;margin-top:3px;display:none;">
         <span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span>
       </div>
     </nav>
@@ -1789,9 +1789,9 @@
 // ===== 전역 시세 데이터 (관리자 수정 가능) =====
 const PRICES_DEFAULT = {
   oils: {
-    soy:    { label:'대두유',   unit:'18L', price:50000, vat:true },
-    canola: { label:'카놀라유', unit:'18L', price:50000, vat:true },
-    corn:   { label:'옥수수유', unit:'18L', price:50000, vat:true },
+    soy:    { label:'대두유',   unit:'18L', price:41000, vat:true },
+    canola: { label:'카놀라유', unit:'18L', price:43000, vat:true },
+    corn:   { label:'옥수수유', unit:'18L', price:46000, vat:true },
   },
   waste: {
     can: { label:'캔', kg:16.5, price:19000 },
@@ -1800,22 +1800,8 @@ const PRICES_DEFAULT = {
   carbonRate: 0.7,
 };
 
-// localStorage에서 저장된 시세 불러오기
-function loadPrices() {
-  try {
-    const saved = localStorage.getItem('hiveoil_prices');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // 유효성 검사 후 병합
-      if (parsed.oils && parsed.waste) {
-        return parsed;
-      }
-    }
-  } catch(e) {}
-  return JSON.parse(JSON.stringify(PRICES_DEFAULT));
-}
-
-const PRICES = loadPrices();
+// 시세는 코드 기본값 사용 (서버 DB 연동 전까지)
+const PRICES = JSON.parse(JSON.stringify(PRICES_DEFAULT));
 
 function applyPrices() {
   // 상단 가격칩 업데이트
