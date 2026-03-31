@@ -491,6 +491,9 @@
       <div class="nav-label">업무</div>
       <div class="nav-item" onclick="showPanel('waste',this)"><span class="icon">🗑️</span>폐유 수거<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
       <div class="nav-item" onclick="showPanel('order',this)"><span class="icon">🫙</span>식용유 발주</div>
+      <div class="nav-item" onclick="showPanel('delivery',this)" style="border:1.5px solid #e0ece0;margin-top:2px;">
+        <span class="icon">🚛</span>납품 처리<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span>
+      </div>
       <div class="nav-item" onclick="showPanel('history',this)"><span class="icon">📋</span>진행 이력</div>
       <div class="nav-label">정보</div>
       <div class="nav-item" onclick="showPanel('price',this)"><span class="icon">💹</span>주간 시세</div>
@@ -1386,6 +1389,89 @@
       </div>
     </div>
 
+
+    <!-- DELIVERY PANEL -->
+    <div class="panel" id="panel-delivery">
+      <div style="max-width:800px;padding:24px 26px;">
+
+        <!-- 헤더 -->
+        <div style="background:linear-gradient(135deg,#05C46B,#00a857);border-radius:16px;padding:20px 22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.03em;">🚛 납품 처리</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:3px;">운반 관리자 전용 · 이명윤 (010-2015-8422)</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:rgba(255,255,255,0.7);">오늘 배송 대기</div>
+            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:#fff;" id="deliveryWaitCount">0</div>
+          </div>
+        </div>
+
+        <!-- 자동발주 필요 업체 목록 -->
+        <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:14px;font-weight:800;letter-spacing:-0.02em;">⚡ 자동발주 필요 업체</div>
+            <div style="font-size:11px;color:var(--gray);">재고 2캔 이하 · 자동발주 ON</div>
+          </div>
+          <div id="autoOrderList">
+            <div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">✅ 자동발주 필요 업체 없음</div>
+          </div>
+        </div>
+
+        <!-- 수동 납품 처리 -->
+        <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:16px;">
+          <div style="font-size:14px;font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;">📦 직접 납품 처리</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div>
+              <label class="form-label">업체 선택</label>
+              <select class="form-select" id="delivBizSelect" onchange="onDelivBizChange()">
+                <option value="">— 업체 선택 —</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">유종</label>
+              <select class="form-select" id="delivOilType">
+                <option value="soy">🫘 대두유</option>
+                <option value="canola">🌿 카놀라유</option>
+                <option value="corn">🌽 옥수수유</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div>
+              <label class="form-label">현재 재고 (캔)</label>
+              <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--red-accent);padding:10px;background:var(--cream);border-radius:9px;text-align:center;" id="delivCurrentStock">—</div>
+            </div>
+            <div>
+              <label class="form-label">납품 수량 (캔)</label>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button onclick="changeDelivQty(-1)" style="width:36px;height:36px;border-radius:9px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:18px;font-weight:700;cursor:pointer;">−</button>
+                <input type="number" id="delivQty" value="5" min="1" max="50"
+                  style="flex:1;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:800;border:1.5px solid var(--green-main);border-radius:9px;padding:8px;color:var(--green-dark);">
+                <button onclick="changeDelivQty(1)" style="width:36px;height:36px;border-radius:9px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:18px;font-weight:700;cursor:pointer;">+</button>
+              </div>
+            </div>
+          </div>
+          <!-- 납품 후 재고 미리보기 -->
+          <div id="delivPreview" style="display:none;background:var(--green-pale);border-radius:9px;padding:11px 14px;border:1px solid var(--green-light);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:12px;color:var(--gray);">납품 후 재고</span>
+            <span style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-dark);" id="delivAfterStock">—</span>
+          </div>
+          <button onclick="confirmDelivery()" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;font-weight:800;">
+            ✅ 납품 완료 처리
+          </button>
+        </div>
+
+        <!-- 오늘 납품 이력 -->
+        <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+          <div style="font-size:14px;font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;">📋 오늘 납품 이력</div>
+          <div id="todayDelivList">
+            <div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">오늘 납품 이력 없음</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- REGISTER PANEL -->
     <div class="panel" id="panel-register">
       <div style="max-width:680px;padding:28px 26px;">
@@ -2079,7 +2165,7 @@ function showPanel(id, navEl, pushState=true) {
       navMatch.classList.add('active');
     }
   }
-  const titles = { dashboard:'📊 대시보드', map:'🗺️ 원주 지도 현황', waste:'🗑️ 폐식용유 수거', order:'🫙 식용유 발주', history:'📋 진행 이력', price:'💹 주간 시세', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', qr:'📱 QR 재고 입력' };
+  const titles = { dashboard:'📊 대시보드', map:'🗺️ 원주 지도 현황', waste:'🗑️ 폐식용유 수거', order:'🫙 식용유 발주', history:'📋 진행 이력', price:'💹 주간 시세', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리 — 운반 관리자 전용', qr:'📱 QR 재고 입력' };
   const title = titles[id] || '';
   document.getElementById('page-title-text').textContent = title;
   document.title = '식용유니버스 HIVE — ' + title;
@@ -2094,6 +2180,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'admin')   { renderAdminPrices(); }
   if (id === 'price')   { renderPricePage(); }
   if (id === 'order')   { updateOrderMonthStats(); populateOrderBizSelect(); renderOrderPendingList(); }
+  if (id === 'delivery') { renderDeliveryPanel(); }
   if (id === 'dashboard') { updateDashboard(); }
 
 }
@@ -2847,6 +2934,7 @@ function saveQRStock() {
   biz.lastUpdate = '방금 전 ('+timeStr+')';
   saveBusinesses();
   updateBizStockInDB(biz.id, biz.newOil, biz.wasteOil, biz.lastUpdate);
+  checkAutoOrder(biz);
 
   document.getElementById('qrLastTime').textContent = biz.lastUpdate;
 
@@ -2966,6 +3054,263 @@ function selectKakaoPlace(idx) {
   document.getElementById('kakaoResults').innerHTML = '';
 
   showToast('t1', '✅ ' + place.place_name + ' 선택됨', place.road_address_name || place.address_name);
+}
+
+
+// ===== 납품 처리 =====
+function renderDeliveryPanel() {
+  // 자동발주 필요 업체 목록
+  const autoList = document.getElementById('autoOrderList');
+  const waitCount = document.getElementById('deliveryWaitCount');
+  const autoBiz = businesses.filter(b => b.auto && b.newOil <= 2);
+
+  if (waitCount) waitCount.textContent = autoBiz.length;
+
+  // 사이드바 뱃지
+  const sideBadge = document.getElementById('sideDeliveryBadge');
+  if (sideBadge) {
+    sideBadge.textContent = autoBiz.length;
+    sideBadge.style.display = autoBiz.length > 0 ? 'inline-block' : 'none';
+  }
+
+  if (autoList) {
+    if (autoBiz.length === 0) {
+      autoList.innerHTML = '<div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">✅ 자동발주 필요 업체 없음</div>';
+    } else {
+      autoList.innerHTML = autoBiz.map(b => `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:${b.newOil===0?'#FFF0F0':'#FFF8F0'};border-radius:10px;border:1px solid ${b.newOil===0?'#FFD0D0':'#FFD8A8'};margin-bottom:8px;">
+          <div style="width:40px;height:40px;background:${b.newOil===0?'var(--red-accent)':'#FF9500'};border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+            ${b.newOil===0?'🆘':'⚠️'}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:13px;">${b.name}</div>
+            <div style="font-size:11px;color:var(--gray);margin-top:1px;">${b.type} · 현재 재고 <strong style="color:${b.newOil===0?'var(--red-accent)':'#D4621A'};">${b.newOil}캔</strong> · ${b.addr||'주소 없음'}</div>
+          </div>
+          <button onclick="quickDeliver(${b.id})"
+            style="background:var(--green-main);border:none;border-radius:9px;padding:8px 14px;font-size:12px;font-weight:800;color:#000;cursor:pointer;white-space:nowrap;">
+            🚛 납품 처리
+          </button>
+        </div>`).join('');
+    }
+  }
+
+  // 업체 드롭다운 채우기
+  populateDelivBizSelect();
+
+  // 오늘 납품 이력
+  renderTodayDelivList();
+}
+
+function populateDelivBizSelect() {
+  const sel = document.getElementById('delivBizSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— 업체 선택 —</option>';
+  businesses.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = b.name + ' (현재 ' + b.newOil + '캔)';
+    sel.appendChild(opt);
+  });
+}
+
+function onDelivBizChange() {
+  const sel = document.getElementById('delivBizSelect');
+  const biz = businesses.find(b => String(b.id) === String(sel?.value));
+  const stockEl   = document.getElementById('delivCurrentStock');
+  const previewEl = document.getElementById('delivPreview');
+  if (biz) {
+    if (stockEl) stockEl.textContent = biz.newOil + '캔';
+    stockEl.style.color = biz.newOil <= 2 ? 'var(--red-accent)' : 'var(--green-dark)';
+    if (previewEl) previewEl.style.display = 'flex';
+    updateDelivPreview();
+  } else {
+    if (stockEl) { stockEl.textContent = '—'; stockEl.style.color = 'var(--gray)'; }
+    if (previewEl) previewEl.style.display = 'none';
+  }
+}
+
+function changeDelivQty(delta) {
+  const el = document.getElementById('delivQty');
+  if (!el) return;
+  el.value = Math.max(1, Math.min(50, parseInt(el.value||5) + delta));
+  updateDelivPreview();
+}
+
+function updateDelivPreview() {
+  const sel   = document.getElementById('delivBizSelect');
+  const biz   = businesses.find(b => String(b.id) === String(sel?.value));
+  const qty   = parseInt(document.getElementById('delivQty')?.value) || 5;
+  const afterEl = document.getElementById('delivAfterStock');
+  if (biz && afterEl) {
+    const after = biz.newOil + qty;
+    afterEl.textContent = after + '캔';
+    afterEl.style.color = after <= 2 ? 'var(--red-accent)' : 'var(--green-dark)';
+  }
+}
+
+function quickDeliver(bizId) {
+  // 자동발주 버튼 클릭 시 해당 업체 선택 + 기본값 5캔
+  const sel = document.getElementById('delivBizSelect');
+  if (sel) { sel.value = bizId; onDelivBizChange(); }
+  const qtyEl = document.getElementById('delivQty');
+  if (qtyEl) { qtyEl.value = 5; updateDelivPreview(); }
+  // 스크롤 납품 폼으로
+  document.getElementById('delivBizSelect')?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+async function confirmDelivery() {
+  const sel    = document.getElementById('delivBizSelect');
+  const biz    = businesses.find(b => String(b.id) === String(sel?.value));
+  const qty    = parseInt(document.getElementById('delivQty')?.value) || 5;
+  const oilKey = document.getElementById('delivOilType')?.value || 'soy';
+  const oilName = PRICES.oils[oilKey]?.label || '식용유';
+
+  if (!biz) { showToast('t1','⚠️ 업체를 선택해주세요',''); return; }
+
+  const prevStock = biz.newOil;
+  biz.newOil = prevStock + qty;
+  biz.lastUpdate = '방금 납품 완료';
+  saveBusinesses();
+  await updateBizStockInDB(biz.id, biz.newOil, biz.wasteOil, biz.lastUpdate);
+
+  // 이력 기록
+  const now = new Date();
+  const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+  const item = {
+    date: dateStr,
+    rawDate: now.toISOString(),
+    biz: biz.name,
+    bizId: biz.id,
+    type: '식용유발주',
+    content: oilName + ' ' + qty + '캔 납품 완료 (재고 ' + prevStock + '→' + biz.newOil + '캔)',
+    qty: qty,
+    amount: (qty * PRICES.oils[oilKey].price).toLocaleString() + '원',
+    method: '운반관리자',
+    status: 'done',
+  };
+  historyData.unshift(item);
+  saveHistory();
+  await saveHistoryToDB(item);
+
+  // 지도 마커 갱신
+  if (kakaoMap && mapInitialized) {
+    markers.forEach(m => m.overlay.setMap(null));
+    infoWindows.forEach(iw => iw.setMap(null));
+    markers = []; infoWindows = [];
+    businesses.forEach(b => addMarkerToMap(b));
+    renderBizList();
+  }
+
+  updateDashboard();
+  updateTabBadges();
+  renderDeliveryPanel();
+  renderHistory();
+
+  showToast('t1','✅ 납품 완료!', biz.name + ' — ' + oilName + ' ' + qty + '캔 (재고 ' + biz.newOil + '캔으로 갱신)');
+}
+
+function renderTodayDelivList() {
+  const el = document.getElementById('todayDelivList');
+  if (!el) return;
+  const today = new Date().toISOString().slice(0,10).replaceAll('-','.');
+  const todayList = historyData.filter(h =>
+    h.type === '식용유발주' && h.status === 'done' &&
+    h.date === today && h.method === '운반관리자'
+  );
+  if (todayList.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">오늘 납품 이력 없음</div>';
+    return;
+  }
+  el.innerHTML = todayList.map(h => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-light);">
+      <div style="width:36px;height:36px;background:var(--green-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🫙</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;">${h.biz}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:1px;">${h.content}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--green-dark);">${h.amount}</div>
+        <span class="status-pill status-done" style="font-size:9px;">완료</span>
+      </div>
+    </div>`).join('');
+}
+
+// 자동발주 뱃지 업데이트
+function updateDeliveryBadge() {
+  const autoBiz = businesses.filter(b => b.auto && b.newOil <= 2);
+  const badge = document.getElementById('sideDeliveryBadge');
+  if (badge) {
+    badge.textContent = autoBiz.length;
+    badge.style.display = autoBiz.length > 0 ? 'inline-block' : 'none';
+  }
+}
+
+
+function checkAutoOrder(biz) {
+  if (!biz.auto) return;
+  // 재고 2캔 이하이고 이미 대기중 발주 없을 때
+  if (biz.newOil <= 2) {
+    const alreadyPending = historyData.some(h =>
+      h.bizId === biz.id && h.type === '식용유발주' && h.status === 'pending'
+    );
+    if (!alreadyPending) {
+      const now = new Date();
+      const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+      const item = {
+        date: dateStr,
+        rawDate: now.toISOString(),
+        biz: biz.name,
+        bizId: biz.id,
+        type: '식용유발주',
+        content: '⚡ 자동발주 알림 — 재고 ' + biz.newOil + '캔 이하 감지',
+        qty: 5, // 기본 5캔
+        amount: (5 * PRICES.oils.soy.price).toLocaleString() + '원',
+        method: '자동⚡',
+        status: 'pending',
+      };
+      historyData.unshift(item);
+      saveHistory();
+      saveHistoryToDB(item);
+      updateDashboard();
+      renderOrderPendingList && renderOrderPendingList();
+      // 알림 배너
+      const banner = document.getElementById('alertBanner');
+      const content = document.getElementById('alertBannerContent');
+      if (banner && content) {
+        banner.style.display = 'flex';
+        content.textContent = biz.name + ' — 재고 ' + biz.newOil + '캔 · 자동발주 알림 생성됨';
+        setTimeout(() => { banner.style.display = 'none'; }, 5000);
+      }
+      showToast('t1', '⚡ 자동발주 알림!', biz.name + ' — 재고 ' + biz.newOil + '캔 이하, 발주 알림 생성됨');
+    }
+  }
+
+  // 폐유 1캔 이상이고 이미 대기중 수거 없을 때
+  if (biz.wasteOil >= 1) {
+    const alreadyWaste = historyData.some(h =>
+      h.bizId === biz.id && h.type === '폐유수거' && h.status === 'pending'
+    );
+    if (!alreadyWaste) {
+      const now = new Date();
+      const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+      const item = {
+        date: dateStr,
+        rawDate: now.toISOString(),
+        biz: biz.name,
+        bizId: biz.id,
+        type: '폐유수거',
+        content: '⚡ 자동수거 알림 — 폐유 ' + biz.wasteOil + '캔 대기',
+        qty: biz.wasteOil,
+        amount: (biz.wasteOil * PRICES.waste.can.price).toLocaleString() + '원',
+        method: '자동⚡',
+        status: 'pending',
+      };
+      historyData.unshift(item);
+      saveHistory();
+      saveHistoryToDB(item);
+      updateDashboard();
+    }
+  }
 }
 
 // ===== 업체 등록 =====
@@ -3122,6 +3467,8 @@ function updateTabBadges() {
   const mapBadge = document.getElementById('tabBadgeMap');
   if (mapBadge) { mapBadge.textContent = alertCount; mapBadge.style.display = alertCount > 0 ? 'block' : 'none'; }
 
+  // 납품 뱃지
+  updateDeliveryBadge();
   // 사이드바 뱃지
   const sideWaste = document.getElementById('sideWasteBadge');
   if (sideWaste) { sideWaste.textContent = wasteCount; sideWaste.style.display = wasteCount > 0 ? 'inline-block' : 'none'; }
@@ -3651,7 +3998,25 @@ function completeOrder(idx) {
   const item = historyData[idx];
   if (!item || item.type !== '식용유발주') return;
   item.status = 'done';
-  item.content = item.content.replace('발주', '납품 완료');
+  item.content = item.content.replace('발주', '납품 완료').replace('알림 — 재고', '납품 완료 — 재고');
+
+  // 업체 재고 증가
+  const biz = businesses.find(b => b.id === item.bizId);
+  if (biz && item.qty) {
+    biz.newOil = (biz.newOil || 0) + item.qty;
+    biz.lastUpdate = '방금 납품 완료';
+    saveBusinesses();
+    updateBizStockInDB(biz.id, biz.newOil, biz.wasteOil, biz.lastUpdate);
+    // 지도 마커 갱신
+    if (kakaoMap && mapInitialized) {
+      markers.forEach(m => m.overlay.setMap(null));
+      infoWindows.forEach(iw => iw.setMap(null));
+      markers = []; infoWindows = [];
+      businesses.forEach(b => addMarkerToMap(b));
+      renderBizList();
+    }
+    updateTabBadges();
+  }
   // DB 업데이트
   if (item.dbId) {
     db.from('history').update({ status: 'done', content: item.content }).eq('id', item.dbId).then(({error}) => {
