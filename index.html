@@ -2098,13 +2098,40 @@ function addMarkerToMap(biz) {
 }
 
 
-function openCollectFromMap(id) {
-  infoWindows.forEach(w => w.close());
-  openCollectModal(businesses.find(b => b.id === id));
+
+function refreshMapMarkers() {
+  if (!kakaoMap || !mapInitialized) return;
+  markers.forEach(m => m.overlay.setMap(null));
+  infoWindows.forEach(iw => iw.setMap(null));
+  markers = []; infoWindows = [];
+  businesses.forEach(b => addMarkerToMap(b));
+  renderBizList();
+  updateTabBadges();
 }
+
+function openCollectFromMap(id) {
+  infoWindows.forEach(iw => iw.setMap(null));
+  const biz = businesses.find(b => b.id === id);
+  if (!biz) return;
+  if (biz.wasteOil === 0) {
+    showToast('t1','⚠️ 폐유가 없어요', biz.name + ' — 폐유 0캔, 수거 신청 불가');
+    return;
+  }
+  // 수거 신청 즉시 처리
+  requestCollect(id);
+  // 폐유 수거 패널로 이동
+  showPanel('waste', null);
+}
+
 function openOrderFromMap(id) {
-  infoWindows.forEach(w => w.close());
-  openOrderModal(businesses.find(b => b.id === id));
+  infoWindows.forEach(iw => iw.setMap(null));
+  // 발주 패널로 이동 + 업체 자동 선택
+  showPanel('order', null);
+  setTimeout(() => {
+    populateOrderBizSelect();
+    const sel = document.getElementById('orderBizSelect');
+    if (sel) { sel.value = id; onOrderBizChange(); }
+  }, 150);
 }
 
 function renderBizList(filter = currentFilter, query = '') {
@@ -2509,11 +2536,29 @@ function updateOwnerUI() {
 }
 
 function ownerSaveStock() {
+  const b = businesses.find(b => b.id === ownerBizId);
+  if (!b) return;
   const now = new Date();
   const timeStr = `오늘 ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-  document.getElementById('ownerSaveTime').textContent    = timeStr;
-  document.getElementById('ownerLastUpdate').textContent  = '방금 전';
-  showToast('t1','💾 저장 완료!','재고 현황이 지도에 업데이트됐어요');
+
+  b.newOil   = ownerNewVal;
+  b.wasteOil = ownerWasteVal;
+  b.lastUpdate = timeStr;
+
+  // localStorage + DB 저장
+  saveBusinesses();
+  updateBizStockInDB(b.id, b.newOil, b.wasteOil, b.lastUpdate);
+
+  // 자동발주 체크
+  checkAutoOrder(b);
+
+  // 지도 즉시 갱신
+  refreshMapMarkers();
+  updateDashboard();
+
+  document.getElementById('ownerSaveTime').textContent   = timeStr;
+  document.getElementById('ownerLastUpdate').textContent = '방금 전';
+  showToast('t1','💾 저장 완료!', b.name + ' — 새유 ' + b.newOil + '캔 / 폐유 ' + b.wasteOil + '캔 지도에 반영됐어요');
 }
 
 function ownerRequestCollect() {
@@ -2521,7 +2566,20 @@ function ownerRequestCollect() {
     showToast('t1','⚠️ 폐유가 없어요','1캔 이상 있을 때 신청 가능합니다');
     return;
   }
-  showToast('t1','🚛 수거 신청 완료!','담당자에게 전달됐어요. 내일 오전 수거 예정');
+  const b = businesses.find(b => b.id === ownerBizId);
+  if (!b) return;
+
+  // 현재 업주 화면 값으로 재고 업데이트 후 신청
+  b.wasteOil = ownerWasteVal;
+  saveBusinesses();
+  updateBizStockInDB(b.id, b.newOil, b.wasteOil, b.lastUpdate);
+
+  // 수거 신청 이력 기록
+  requestCollect(ownerBizId);
+
+  // 지도 즉시 갱신
+  refreshMapMarkers();
+  renderWasteTable();
 }
 
 // ===== ALERT SUBSCRIPTION =====
