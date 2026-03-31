@@ -596,13 +596,13 @@
             </div>
             <div style="background:var(--white);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
               <div style="font-size:11px;color:var(--gray);font-weight:600;margin-bottom:10px;">🫙 이번달 납품</div>
-              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--black);line-height:1;" id="db_oil_delivery">184<span style="font-size:14px;font-weight:500"> L</span></div>
-              <div style="font-size:10px;color:var(--green-dark);margin-top:6px;font-weight:600;">전월 대비 +12%</div>
+              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--black);line-height:1;" id="db_oil_delivery">0<span style="font-size:14px;font-weight:500"> 캔</span></div>
+              <div style="font-size:10px;color:var(--gray);margin-top:6px;font-weight:600;" id="db_oil_sub">이번 달 납품 이력 없음</div>
             </div>
             <div style="background:var(--white);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
               <div style="font-size:11px;color:var(--gray);font-weight:600;margin-bottom:10px;">♻️ 폐유 수거</div>
-              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--black);line-height:1;" id="db_waste_total">1,440<span style="font-size:14px;font-weight:500"> kg</span></div>
-              <div style="font-size:10px;color:var(--green-dark);margin-top:6px;font-weight:600;">이번 달 누적</div>
+              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--black);line-height:1;" id="db_waste_total">0<span style="font-size:14px;font-weight:500"> 캔</span></div>
+              <div style="font-size:10px;color:var(--gray);margin-top:6px;font-weight:600;" id="db_waste_sub">이번 달 수거 이력 없음</div>
             </div>
             <div style="background:linear-gradient(135deg,#0a2e1a,#063d1f);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);">
               <div style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;margin-bottom:10px;">🌿 CO₂ 절감</div>
@@ -617,7 +617,7 @@
             <!-- ESG 포인트 -->
             <div style="background:linear-gradient(135deg,#0a2e1a,#05C46B);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);">
               <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:4px;font-weight:600;">누적 ESG 포인트</div>
-              <div style="font-family:var(--font-display);font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.05em;line-height:1;" id="db_esg_pts">52,300</div>
+              <div style="font-family:var(--font-display);font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.05em;line-height:1;" id="db_esg_pts">0</div>
               <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:4px;">pts · 원주 전체 업체 합산</div>
               <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
                 <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 9px;font-size:9px;color:rgba(255,255,255,0.8);font-weight:600;">🛵 배민 B마트 전환</div>
@@ -795,8 +795,8 @@
     <div class="panel" id="panel-waste">
       <div class="waste-layout">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-          <div class="stat-card red" style="background:var(--white);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow)"><div class="stat-label">♻️ 수거 대기 중</div><div class="stat-value" style="color:var(--red-accent)">5</div><div class="stat-sub">업체 · 총 약 360kg</div></div>
-          <div class="stat-card green" style="background:var(--white);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow)"><div class="stat-label">✅ 이번 달 완료</div><div class="stat-value" style="color:var(--green-main)">18</div><div class="stat-sub">건 · 총 1,440kg 수거</div></div>
+          <div class="stat-card red" style="background:var(--white);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow)"><div class="stat-label">♻️ 수거 대기 중</div><div class="stat-value" style="color:var(--red-accent)" id="wasteWaitCount">0</div><div class="stat-sub" id="wasteWaitSub">업체 · 폐유 대기 없음</div></div>
+          <div class="stat-card green" style="background:var(--white);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow)"><div class="stat-label">✅ 이번 달 완료</div><div class="stat-value" style="color:var(--green-main)" id="wasteDoneCount">0</div><div class="stat-sub" id="wasteDoneSub">건 · 이력 없음</div></div>
         </div>
         <div class="history-table-wrap">
           <table class="history-table">
@@ -1695,30 +1695,7 @@
                 <div style="font-size:10px;color:#E65100;font-weight:700;">즉시 확인</div>
               </div>
               <div style="padding:14px 16px;display:flex;flex-direction:column;gap:9px;">
-                <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#FFF3E0;border-radius:9px;border-left:3px solid #FF8C00;">
-                  <div style="font-size:16px;">🗑️</div>
-                  <div style="flex:1;">
-                    <div style="font-size:12px;font-weight:700;">치킨스쿨 원주혁신점</div>
-                    <div style="font-size:10px;color:#D4621A;">폐유 7캔 — 긴급 수거 필요</div>
-                  </div>
-                  <button class="btn btn-danger" style="padding:4px 9px;font-size:10px;">수거</button>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#FFEBEE;border-radius:9px;border-left:3px solid var(--red-accent);">
-                  <div style="font-size:16px;">⚠️</div>
-                  <div style="flex:1;">
-                    <div style="font-size:12px;font-weight:700;">로버트치킨 원주점</div>
-                    <div style="font-size:10px;color:var(--red-accent);">새식용유 2캔 — 자동발주 대기</div>
-                  </div>
-                  <button class="btn btn-primary" style="padding:4px 9px;font-size:10px;">발주</button>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#FFEBEE;border-radius:9px;border-left:3px solid var(--red-accent);">
-                  <div style="font-size:16px;">⚠️</div>
-                  <div style="flex:1;">
-                    <div style="font-size:12px;font-weight:700;">옛날통닭 중앙시장점</div>
-                    <div style="font-size:10px;color:var(--red-accent);">새식용유 1캔 — 재고 위험</div>
-                  </div>
-                  <button class="btn btn-primary" style="padding:4px 9px;font-size:10px;">발주</button>
-                </div>
+                <div id="hqAlertList"><div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">관리가 필요한 업체가 없어요 ✅</div></div>
               </div>
             </div>
 
@@ -1763,14 +1740,14 @@
     <button class="tab-item" id="tab-map" onclick="showPanelMobile('map', this)">
       <div style="position:relative">
         <span class="tab-icon">🗺️</span>
-        <span class="tab-badge" id="tabBadgeMap">3</span>
+        <span class="tab-badge" id="tabBadgeMap" style="display:none;">0</span>
       </div>
       <span class="tab-label">지도</span>
     </button>
     <button class="tab-item" id="tab-waste" onclick="showPanelMobile('waste', this)">
       <div style="position:relative">
         <span class="tab-icon">🗑️</span>
-        <span class="tab-badge" id="tabBadgeWaste">5</span>
+        <span class="tab-badge" id="tabBadgeWaste" style="display:none;">0</span>
       </div>
       <span class="tab-label">폐유수거</span>
     </button>
@@ -2044,7 +2021,7 @@ function showPanel(id, navEl, pushState=true) {
   }
   if (id === 'waste')   renderWasteTable();
   if (id === 'history') renderHistory();
-  if (id === 'hq')      { renderHqTable(); initHqBars(); }
+  if (id === 'hq')      { renderHqTable(); initHqBars(); renderHqAlerts(); }
   if (id === 'qr')      { initQRPanel(); }
   if (id === 'admin')   { renderAdminPrices(); }
   if (id === 'price')   { renderPricePage(); }
@@ -2069,6 +2046,22 @@ window.addEventListener('popstate', (e) => {
 
 // ===== WASTE =====
 function renderWasteTable() {
+  // 상단 KPI 업데이트
+  const waitBiz = businesses.filter(b => b.wasteOil >= 1);
+  const waitEl  = document.getElementById('wasteWaitCount');
+  const waitSub = document.getElementById('wasteWaitSub');
+  if (waitEl)  waitEl.textContent = waitBiz.length;
+  if (waitSub) waitSub.textContent = waitBiz.length > 0
+    ? '업체 · 총 ' + (waitBiz.reduce((s,b) => s + b.wasteOil, 0) * PRICES.waste.can.kg).toFixed(0) + 'kg 대기'
+    : '수거 대기 없음';
+  const doneHistory = historyData.filter(h => h.type === '폐유수거' && h.status === 'done');
+  const doneEl  = document.getElementById('wasteDoneCount');
+  const doneSub = document.getElementById('wasteDoneSub');
+  if (doneEl)  doneEl.textContent = doneHistory.length;
+  if (doneSub) doneSub.textContent = doneHistory.length > 0
+    ? '건 · 총 ' + doneHistory.reduce((s,h) => s + (h.qty||0), 0) + '캔 수거 완료'
+    : '완료된 수거 없음';
+
   document.getElementById('wasteTableBody').innerHTML = businesses
     .filter(b => b.wasteOil >= 1).sort((a,b) => b.wasteOil - a.wasteOil)
     .map(b => {
@@ -2308,37 +2301,69 @@ function subscribeAlert(bizId) {
 }
 
 // ===== HQ DASHBOARD =====
-const hqBizData = [
-  { name:'로버트치킨 원주점',   type:'치킨집',    newOil:2,  wasteOil:4,  wasteKg:32,  monthCollect:'40 kg',  esg:1820, status:'danger' },
-  { name:'치킨스쿨 원주혁신점', type:'치킨집',    newOil:7,  wasteOil:7,  wasteKg:56,  monthCollect:'80 kg',  esg:2400, status:'waste'  },
-  { name:'원주닭갈비 본점',     type:'닭갈비',    newOil:5,  wasteOil:1,  wasteKg:8,   monthCollect:'40 kg',  esg:980,  status:'ok'    },
-  { name:'BBQ 원주무실점',      type:'치킨집',    newOil:9,  wasteOil:0,  wasteKg:0,   monthCollect:'0 kg',   esg:3200, status:'ok'    },
-  { name:'만두짱 원주행구점',   type:'분식',      newOil:3,  wasteOil:3,  wasteKg:24,  monthCollect:'40 kg',  esg:1100, status:'ok'    },
-  { name:'황제족발 원주점',     type:'족발/보쌈', newOil:8,  wasteOil:2,  wasteKg:16,  monthCollect:'40 kg',  esg:2800, status:'ok'    },
-  { name:'옛날통닭 중앙시장점', type:'치킨집',    newOil:1,  wasteOil:5,  wasteKg:40,  monthCollect:'80 kg',  esg:4200, status:'danger'},
-];
+// HQ 데이터는 businesses 배열에서 실시간 계산
+
+function renderHqAlerts() {
+  const alertEl = document.getElementById('hqAlertList');
+  if (!alertEl) return;
+  const wasteBiz = businesses.filter(b => b.wasteOil >= 3);
+  const lowBiz   = businesses.filter(b => b.newOil <= 2);
+  const alerts   = [
+    ...wasteBiz.map(b => ({ type:'waste', b })),
+    ...lowBiz.map(b => ({ type:'low', b })),
+  ].slice(0, 5);
+  if (alerts.length === 0) {
+    alertEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">관리가 필요한 업체가 없어요 ✅</div>';
+    return;
+  }
+  alertEl.innerHTML = alerts.map(({type, b}) => type === 'waste'
+    ? `<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#FFF3E0;border-radius:9px;border-left:3px solid #FF8C00;margin-bottom:6px;">
+        <div style="font-size:16px;">🗑️</div>
+        <div style="flex:1;"><div style="font-size:12px;font-weight:700;">${b.name}</div>
+        <div style="font-size:10px;color:#D4621A;">폐유 ${b.wasteOil}캔 — 수거 필요</div></div>
+        <button class="btn btn-danger" style="padding:4px 9px;font-size:10px;" onclick="openCollectModal(businesses.find(x=>x.id===${b.id}))">수거</button>
+      </div>`
+    : `<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#FFEBEE;border-radius:9px;border-left:3px solid var(--red-accent);margin-bottom:6px;">
+        <div style="font-size:16px;">⚠️</div>
+        <div style="flex:1;"><div style="font-size:12px;font-weight:700;">${b.name}</div>
+        <div style="font-size:10px;color:var(--red-accent);">새식용유 ${b.newOil}캔 — 재고 위험</div></div>
+        <button class="btn btn-primary" style="padding:4px 9px;font-size:10px;" onclick="showPanel('order',null)">발주</button>
+      </div>`
+  ).join('');
+}
 
 function renderHqTable(filter='all') {
-  let data = hqBizData;
-  if (filter==='danger') data = data.filter(b => b.status==='danger');
+  let data = businesses;
+  if (filter==='danger') data = data.filter(b => b.newOil <= 2);
   if (filter==='waste')  data = data.filter(b => b.wasteOil >= 1);
   const tbody = document.getElementById('hqTableBody');
   if (!tbody) return;
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray);">등록된 업체가 없어요. 업체 등록 탭에서 추가해주세요.</td></tr>';
+    return;
+  }
   tbody.innerHTML = data.map(b => {
-    const newColor  = b.newOil<=2 ? 'color:var(--red-accent);font-weight:800' : b.newOil<=4 ? 'color:#E65100;font-weight:700' : 'color:var(--green-dark);font-weight:700';
-    const wstColor  = b.wasteOil>=5 ? 'color:#7A5000;font-weight:800;background:#FFD700;padding:2px 7px;border-radius:5px' : b.wasteOil>=1 ? 'color:#D4621A;font-weight:700' : 'color:var(--gray)';
-    const statusBadge = b.status==='danger'
-      ? '<span class="status-pill status-pending">위험</span>'
-      : b.status==='waste'
+    const isLow   = b.newOil <= 2;
+    const isWaste = b.wasteOil >= 1;
+    const newColor = isLow ? 'color:var(--red-accent);font-weight:800' : 'color:var(--green-dark);font-weight:700';
+    const wstColor = b.wasteOil >= 5 ? 'color:#7A5000;font-weight:800' : isWaste ? 'color:#D4621A;font-weight:700' : 'color:var(--gray)';
+    const esgPts   = Math.round(b.wasteOil * PRICES.waste.can.kg * PRICES.esgRate);
+    const wasteKg  = (b.wasteOil * PRICES.waste.can.kg).toFixed(1);
+    const status   = isLow ? 'danger' : isWaste ? 'waste' : 'ok';
+    const statusBadge = status==='danger'
+      ? '<span class="status-pill status-pending">재고위험</span>'
+      : status==='waste'
         ? '<span class="status-pill status-inprogress">폐유대기</span>'
         : '<span class="status-pill status-done">정상</span>';
+    // 이번달 수거 이력
+    const monthCollect = historyData.filter(h => h.bizId === b.id && h.type === '폐유수거').length;
     return `<tr>
       <td><strong style="font-size:12px">${b.name}</strong></td>
       <td style="color:var(--gray)">${b.type}</td>
       <td><span style="${newColor}">${b.newOil}캔</span></td>
-      <td><span style="${wstColor}">${b.wasteKg} kg</span></td>
-      <td style="font-weight:600">${b.monthCollect}</td>
-      <td style="font-family:var(--font-display);font-weight:700;color:var(--green-dark)">${b.esg.toLocaleString()}</td>
+      <td><span style="${wstColor}">${b.wasteOil}캔 (${wasteKg}kg)</span></td>
+      <td style="font-weight:600">${monthCollect}건</td>
+      <td style="font-family:var(--font-display);font-weight:700;color:var(--green-dark)">${esgPts.toLocaleString()}</td>
       <td>${statusBadge}</td>
     </tr>`;
   }).join('');
@@ -3060,11 +3085,35 @@ function updateDashboard() {
   const bizCount = document.getElementById('db_biz_count');
   if (bizCount) bizCount.innerHTML = businesses.length + '<span style="font-size:14px;font-weight:500"> 곳</span>';
 
-  // CO2 계산 (폐유 수거량 기반)
-  const totalWasteKg = businesses.reduce((s,b) => s + b.wasteOil * PRICES.waste.can.kg, 0);
-  const co2 = Math.round(totalWasteKg * PRICES.carbonRate);
+  // 이번달 납품 캔 수 (historyData 기반)
+  const thisMonth = new Date().getMonth();
+  const oilHistory = historyData.filter(h => h.type === '식용유발주' && new Date(h.rawDate||h.date).getMonth() === thisMonth);
+  const oilCans = oilHistory.reduce((s,h) => s + (h.qty||0), 0);
+  const oilEl = document.getElementById('db_oil_delivery');
+  const oilSub = document.getElementById('db_oil_sub');
+  if (oilEl) oilEl.innerHTML = oilCans + '<span style="font-size:14px;font-weight:500"> 캔</span>';
+  if (oilSub) oilSub.textContent = oilHistory.length > 0 ? '이번 달 ' + oilHistory.length + '건 납품' : '이번 달 납품 이력 없음';
+
+  // 이번달 폐유 수거 캔 수
+  const wasteHistory = historyData.filter(h => h.type === '폐유수거' && new Date(h.rawDate||h.date).getMonth() === thisMonth);
+  const wasteCans = wasteHistory.reduce((s,h) => s + (h.qty||0), 0);
+  const wasteEl = document.getElementById('db_waste_total');
+  const wasteSub = document.getElementById('db_waste_sub');
+  if (wasteEl) wasteEl.innerHTML = wasteCans + '<span style="font-size:14px;font-weight:500"> 캔</span>';
+  if (wasteSub) wasteSub.textContent = wasteHistory.length > 0 ? '이번 달 ' + wasteHistory.length + '건 수거' : '이번 달 수거 이력 없음';
+
+  // CO2 계산 (전체 폐유 수거 + 식용유 기준 16.5kg/캔)
+  const totalWasteCans = historyData.filter(h => h.type === '폐유수거').reduce((s,h) => s + (h.qty||0), 0);
+  const totalOilCans   = historyData.filter(h => h.type === '식용유발주').reduce((s,h) => s + (h.qty||0), 0);
+  const totalKg = (totalWasteCans + totalOilCans) * PRICES.waste.can.kg;
+  const co2 = Math.round(totalKg * PRICES.carbonRate);
   const co2El = document.getElementById('db_co2');
   if (co2El) co2El.innerHTML = co2.toLocaleString() + '<span style="font-size:14px;font-weight:500"> kg</span>';
+
+  // ESG 포인트 합계
+  const totalEsg = Math.round(totalWasteCans * PRICES.waste.can.kg * PRICES.esgRate) + (totalOilCans * 5);
+  const esgEl = document.getElementById('db_esg_pts');
+  if (esgEl) esgEl.textContent = totalEsg.toLocaleString();
 
   // 최근 이력
   renderDbRecentList();
