@@ -1010,8 +1010,8 @@
   </div>
 
     <!-- OWNER PANEL -->
-    <div class="panel" id="panel-owner" style="overflow-y:auto;width:100%;display:block;">
-      <div id="ownerLoginState" style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);width:100%;">
+    <div class="panel" id="panel-owner" style="overflow-y:auto;width:100%;">
+      <div id="ownerLoginState" style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);width:100%;background:var(--cream);">
         <div style="max-width:420px;margin:56px auto;padding:0 24px;">
           <div style="text-align:center;margin-bottom:28px;">
             <div style="font-size:44px;margin-bottom:10px;">🏪</div>
@@ -1053,7 +1053,7 @@
         </div>
 
         <!-- 전체화면 레이아웃 -->
-        <div style="padding:22px 28px;">
+        <div style="padding:22px 28px;width:100%;box-sizing:border-box;">
 
           <!-- 재고 입력 + 자동계산 통합 카드 -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
@@ -1094,33 +1094,41 @@
                 <button onclick="changeOwnerStock('waste',1)" style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:22px;font-weight:700;cursor:pointer;">+</button>
               </div>
               <div id="ownerWasteAlert" style="border-radius:8px;padding:8px 11px;font-size:11px;font-weight:600;text-align:center;margin-bottom:10px;"></div>
+              <div style="font-size:10px;color:var(--gray);background:var(--cream);border-radius:8px;padding:8px 12px;text-align:center;margin-bottom:10px;">
+                자동수거 기준: <strong style="color:var(--black);">2캔 이상</strong> 시 자동 수거 알림
+              </div>
               <button class="btn btn-danger" style="width:100%;justify-content:center;padding:11px;font-size:13px;" onclick="ownerRequestCollect()">♻️ 폐유 수거 신청</button>
             </div>
           </div>
 
-          <!-- 자동 계산 결과 + 저장 버튼 통합 -->
+          <!-- 이번 달 사용현황 + 저장 버튼 -->
           <div style="background:var(--white);border-radius:16px;padding:22px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:20px;">
-            <div style="font-size:13px;font-weight:800;margin-bottom:14px;">⚡ 오늘 사용 현황 — 자동 계산</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div style="font-size:13px;font-weight:800;" id="ownerMonthLabel">이번 달 사용현황</div>
+              <div style="font-size:10px;color:var(--gray);background:var(--cream);padding:3px 9px;border-radius:6px;">자동 집계</div>
+            </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
               <div style="background:var(--cream);border-radius:12px;padding:14px;text-align:center;">
-                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">폐유 예상 수거금액</div>
-                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-dark);" id="calcPrice">0원</div>
+                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">🫙 식용유 구매금액</div>
+                <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green-dark);" id="ownerOilBuyAmt">0원</div>
               </div>
               <div style="background:var(--cream);border-radius:12px;padding:14px;text-align:center;">
-                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">총 무게 (폐유+식용유)</div>
-                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#4A90E2;" id="calcCarbon">0 kg</div>
+                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">🗑️ 폐유 판매금액</div>
+                <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:#D4621A;" id="ownerWasteSellAmt">0원</div>
               </div>
               <div style="background:var(--cream);border-radius:12px;padding:14px;text-align:center;">
-                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">탄소 감축 기여</div>
-                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-dark);" id="calcCO2">0 kg</div>
+                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">🌿 탄소 감축 기여</div>
+                <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green-dark);" id="ownerCarbonAmt">0 kg</div>
+                <div style="font-size:9px;color:var(--gray);margin-top:3px;">폐유×16.5kg×0.7</div>
               </div>
               <div style="background:var(--cream);border-radius:12px;padding:14px;text-align:center;">
-                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">ESG 포인트 적립</div>
-                <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#D4621A;" id="calcESG">+0 pts</div>
+                <div style="font-size:10px;color:var(--gray);margin-bottom:6px;">⭐ ESG 포인트</div>
+                <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:#E65100;" id="ownerEsgAmt">+0 pts</div>
+                <div style="font-size:9px;color:var(--gray);margin-top:3px;">폐유판매금액 × 0.5%</div>
               </div>
             </div>
             <div style="font-size:11px;color:var(--gray);background:var(--cream);border-radius:8px;padding:8px 12px;margin-bottom:14px;text-align:center;">
-              📦 폐유·식용유 모두 <strong>1캔 = 16.5kg</strong> 기준 · 재고 변경 시 자동으로 계산돼요
+              💡 탄소 감축 = 폐유 수거량(kg) × 0.7 (온실가스 감축계수) · ESG = 폐유 판매금액 × 0.5%
             </div>
             <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:15px;font-weight:800;border-radius:12px;" onclick="ownerSaveStock()">
               💾 재고 저장 &amp; 지도 업데이트
@@ -2374,14 +2382,22 @@ renderHistory();
 function buildOwnerAccounts() {
   const overrides = JSON.parse(localStorage.getItem('hiveoil_biz_pw') || '{}');
   const accounts  = {};
-  businesses.forEach(b => {
-    const code    = 'WJ-' + String(b.id).padStart(3,'0');
-    const phone   = (b.phone || '').replace(/[^0-9]/g, '');
-    const defPw   = phone.length >= 4 ? phone.slice(-4) : '1234';
-    const pw      = overrides[String(b.id)] || defPw;
-    accounts[code] = { pw, bizId: b.id, name: b.name };
+  businesses.forEach((b, idx) => {
+    // DB id 대신 등록 순번(1,2,3...) 기반으로 코드 생성
+    const seq  = idx + 1;
+    const code = 'WJ-' + String(seq).padStart(3,'0');
+    const phone = (b.phone || '').replace(/[^0-9]/g, '');
+    const defPw = phone.length >= 4 ? phone.slice(-4) : '1234';
+    const pw    = overrides[String(b.id)] || defPw;
+    accounts[code] = { pw, bizId: b.id, name: b.name, seq };
   });
   return accounts;
+}
+
+// 업체 ID → WJ 코드 변환
+function getBizCode(bizId) {
+  const idx = businesses.findIndex(b => String(b.id) === String(bizId));
+  return idx >= 0 ? 'WJ-' + String(idx + 1).padStart(3,'0') : '—';
 }
 
 const ownerAccounts = {
@@ -2413,6 +2429,7 @@ function ownerLogin() {
   document.getElementById('ownerLoginState').style.display = 'none';
   document.getElementById('ownerDashState').style.display  = 'block';
   renderOwnerRecentHistory();
+  renderOwnerMonthlyStats();
   document.getElementById('ownerBizName').textContent      = biz.name;
   document.getElementById('ownerLastUpdate').textContent   = biz.lastUpdate || '—';
   document.getElementById('sidebarName').textContent       = biz.name;
@@ -2516,8 +2533,9 @@ function ownerSaveStock() {
   updateDashboard();
 
   document.getElementById('ownerSaveTime').textContent   = timeStr;
-  // 최근 이력 렌더링
+  // 최근 이력 + 월간 통계 렌더링
   renderOwnerRecentHistory();
+  renderOwnerMonthlyStats();
   document.getElementById('ownerLastUpdate').textContent = '방금 전';
   showToast('t1','💾 저장 완료!', b.name + ' — 새유 ' + b.newOil + '캔 / 폐유 ' + b.wasteOil + '캔 지도에 반영됐어요');
 }
@@ -2537,6 +2555,7 @@ function ownerRequestCollect() {
 
   // 수거 신청 이력 기록
   requestCollect(ownerBizId);
+  renderOwnerMonthlyStats();
 
   // 지도 즉시 갱신
   refreshMapMarkers();
@@ -4159,6 +4178,54 @@ function ownerRequestOrder() {
     if (sel) { sel.value = String(ownerBizId); onOrderBizChange(); }
   }, 150);
   showToast('t1','🫙 발주 패널로 이동','업체가 자동 선택됐어요');
+}
+
+
+function renderOwnerMonthlyStats() {
+  const now = new Date();
+  const month = now.getMonth();
+  const year  = now.getFullYear();
+  const label = year + '년 ' + (month + 1) + '월 사용현황';
+  const el = document.getElementById('ownerMonthLabel');
+  if (el) el.textContent = label;
+
+  // 이번달 이력 필터
+  const myHistory = historyData.filter(h => {
+    if (String(h.bizId) !== String(ownerBizId)) return false;
+    const d = new Date(h.rawDate || h.date);
+    return d.getMonth() === month && d.getFullYear() === year;
+  });
+
+  // 식용유 구매금액
+  const oilItems = myHistory.filter(h => h.type === '식용유발주' && h.status === 'done');
+  const oilAmt   = oilItems.reduce((s, h) => {
+    const n = parseInt((h.amount || '0').replace(/[^0-9]/g, '')) || 0;
+    return s + n;
+  }, 0);
+
+  // 폐유 판매금액
+  const wasteItems = myHistory.filter(h => h.type === '폐유수거' && h.status === 'done');
+  const wasteAmt   = wasteItems.reduce((s, h) => {
+    const n = parseInt((h.amount || '0').replace(/[^0-9]/g, '')) || 0;
+    return s + n;
+  }, 0);
+  const wasteCans  = wasteItems.reduce((s, h) => s + (h.qty || 0), 0);
+
+  // 탄소 감축 (폐유 수거량 × 0.7)
+  const carbonKg = (wasteCans * PRICES.waste.can.kg * 0.7).toFixed(1);
+
+  // ESG 포인트 (폐유 판매금액 × 0.5%)
+  const esgPts = Math.round(wasteAmt * 0.005);
+
+  const oilEl   = document.getElementById('ownerOilBuyAmt');
+  const wasteEl = document.getElementById('ownerWasteSellAmt');
+  const carbonEl= document.getElementById('ownerCarbonAmt');
+  const esgEl   = document.getElementById('ownerEsgAmt');
+
+  if (oilEl)    oilEl.textContent    = oilAmt.toLocaleString() + '원';
+  if (wasteEl)  wasteEl.textContent  = wasteAmt.toLocaleString() + '원';
+  if (carbonEl) carbonEl.textContent = carbonKg + ' kg';
+  if (esgEl)    esgEl.textContent    = '+' + esgPts.toLocaleString() + ' pts';
 }
 
 function renderOwnerRecentHistory() {
