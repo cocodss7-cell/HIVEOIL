@@ -3647,48 +3647,56 @@ function renderConsumerView() {
 function updateDashboard() {
   applyPrices();
 
-  // ① 등록 업체 수 (DB에서 로드된 실제 수)
+  // ① 등록 업체 수
   const bizCount = document.getElementById('db_biz_count');
   if (bizCount) bizCount.innerHTML = businesses.length + '<span style="font-size:14px;font-weight:500"> 곳</span>';
 
-  // ② 이번달 납품 실적 — done 완료건만
+  // ② 이번달 납품 실적 — done 완료건 + 현재 업체 재고 합산
   const thisMonth = new Date().getMonth();
   const thisYear  = new Date().getFullYear();
   const oilDone = historyData.filter(h =>
     h.type === '식용유발주' && h.status === 'done' &&
-    new Date(h.rawDate||h.date).getMonth() === thisMonth &&
-    new Date(h.rawDate||h.date).getFullYear() === thisYear
+    new Date(h.rawDate || h.date).getMonth() === thisMonth &&
+    new Date(h.rawDate || h.date).getFullYear() === thisYear
   );
   const oilCans = oilDone.reduce((s,h) => s + (h.qty||0), 0);
+  // 이력 없으면 업체 현재 재고 합산으로 표시
+  const totalNewOil = businesses.reduce((s,b) => s + (b.newOil||0), 0);
   const oilEl  = document.getElementById('db_oil_delivery');
   const oilSub = document.getElementById('db_oil_sub');
   if (oilEl) oilEl.innerHTML = oilCans + '<span style="font-size:14px;font-weight:500"> 캔</span>';
   if (oilSub) oilSub.textContent = oilDone.length > 0
     ? '이번 달 ' + oilDone.length + '건 납품 완료'
-    : '이번 달 납품 이력 없음';
+    : businesses.length > 0 ? '현재 전체 재고 ' + totalNewOil + '캔' : '이번 달 납품 이력 없음';
 
-  // ③ 이번달 폐유 수거 실적 — done 완료건만
+  // ③ 이번달 폐유 수거 실적
   const wasteDone = historyData.filter(h =>
     h.type === '폐유수거' && h.status === 'done' &&
-    new Date(h.rawDate||h.date).getMonth() === thisMonth &&
-    new Date(h.rawDate||h.date).getFullYear() === thisYear
+    new Date(h.rawDate || h.date).getMonth() === thisMonth &&
+    new Date(h.rawDate || h.date).getFullYear() === thisYear
   );
   const wasteCans = wasteDone.reduce((s,h) => s + (h.qty||0), 0);
+  // 이력 없으면 현재 폐유 대기량으로 표시
+  const totalWasteOil = businesses.reduce((s,b) => s + (b.wasteOil||0), 0);
   const wasteEl  = document.getElementById('db_waste_total');
   const wasteSub = document.getElementById('db_waste_sub');
   if (wasteEl) wasteEl.innerHTML = wasteCans + '<span style="font-size:14px;font-weight:500"> 캔</span>';
   if (wasteSub) wasteSub.textContent = wasteDone.length > 0
     ? '이번 달 ' + wasteDone.length + '건 수거 완료'
-    : '이번 달 수거 이력 없음';
+    : businesses.length > 0 ? '수거 대기 ' + totalWasteOil + '캔' : '이번 달 수거 이력 없음';
 
-  // ④ CO2 절감 — 전체 done 기준 누적
+  // ④ CO2 절감 — 완료 이력 기반, 없으면 현재 업체 재고 기반 추정
   const totalWasteDone = historyData.filter(h => h.type === '폐유수거'   && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
   const totalOilDone   = historyData.filter(h => h.type === '식용유발주' && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
-  const co2 = Math.round((totalWasteDone + totalOilDone) * PRICES.waste.can.kg * PRICES.carbonRate);
+  // 이력 없으면 현재 재고 기반
+  const co2Base = (totalWasteDone + totalOilDone) > 0
+    ? (totalWasteDone + totalOilDone)
+    : totalNewOil + totalWasteOil;
+  const co2 = Math.round(co2Base * PRICES.waste.can.kg * PRICES.carbonRate);
   const co2El = document.getElementById('db_co2');
   if (co2El) co2El.innerHTML = co2.toLocaleString() + '<span style="font-size:14px;font-weight:500"> kg</span>';
 
-  // ⑤ ESG 포인트 누적
+  // ⑤ ESG 포인트
   const totalEsg = Math.round(totalWasteDone * PRICES.waste.can.kg * PRICES.esgRate) + (totalOilDone * 5);
   const esgEl = document.getElementById('db_esg_pts');
   if (esgEl) esgEl.textContent = totalEsg.toLocaleString();
@@ -3882,15 +3890,20 @@ async function deleteBizFromDB(bizId) {
 
 // ─── 앱 시작 시 DB 로드 ───
 window.addEventListener('load', async () => {
+  // 먼저 localStorage 데이터로 즉시 렌더
+  updateDashboard();
+
+  // DB에서 최신 데이터 로드
   await loadBusinessesFromDB();
   await loadHistoryFromDB();
-  // DB 로드 완료 후 전체 UI 업데이트
+
+  // 로드 완료 후 전체 UI 재업데이트
   updateDashboard();
   updateTabBadges();
   renderWasteTable();
   renderHistory();
   renderRegBizList();
-  // 현재 활성 패널이 대시보드가 아니어도 데이터 반영
+
   const activePanel = location.hash.replace('#','') || 'dashboard';
   if (activePanel === 'order') renderDeliveryPanel();
   if (activePanel === 'hq') { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
