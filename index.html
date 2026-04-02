@@ -30,10 +30,24 @@
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: var(--font-body); background: #F7FAF7; color: var(--black); min-height: 100vh; overflow-x: hidden; letter-spacing: -0.01em; }
-  .app-shell { display: flex; height: 100vh; }
+  .app-shell { display: flex; height: 100vh; position: relative; }
 
-  /* SIDEBAR */
-  .sidebar { width: 220px; min-width: 220px; background: #fff; display: flex; flex-direction: column; padding: 24px 0 20px; z-index: 10; flex-shrink: 0; border-right: 1px solid #e8ece8; }
+  /* SIDEBAR — 오버레이 방식 */
+  .sidebar {
+    width: 240px; min-width: 240px; background: #fff;
+    display: flex; flex-direction: column; padding: 20px 0 16px;
+    z-index: 200; flex-shrink: 0; border-right: 1px solid var(--gray-light);
+    position: fixed; left: 0; top: 0; height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-backdrop {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.25);
+    z-index: 199; backdrop-filter: blur(2px);
+  }
+  .sidebar-backdrop.open { display: block; }
   .logo-area { padding: 0 20px 22px; border-bottom: 1px solid #e8ece8; }
   .logo-badge { display: inline-block; background: var(--green-main); color: #0D0D0D; font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; letter-spacing: 0.02em; }
   .logo-title { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--black); line-height: 1.15; letter-spacing: -0.03em; }
@@ -54,7 +68,7 @@
   .user-role { font-size: 10px; color: #888; font-weight: 400; }
 
   /* MAIN */
-  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; }
+  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; width: 100%; }
   .topbar { background: var(--white); border-bottom: 1px solid #e8ece8; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 9; flex-shrink: 0; }
   .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
   .page-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; white-space: nowrap; letter-spacing: -0.02em; color: var(--black); }
@@ -264,11 +278,25 @@
     #dbKpiRow { grid-template-columns: 1fr 1fr !important; }
   }
 
+
+  .hamburger-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--green-pale); border: 1.5px solid var(--green-light);
+    cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px;
+    flex-shrink: 0;
+  }
+  .hamburger-btn span {
+    display: block; width: 16px; height: 2px;
+    background: var(--green-dark); border-radius: 2px;
+    transition: all 0.2s;
+  }
+
   /* ===== 모바일 반응형 ===== */
   @media (max-width: 768px) {
 
     /* 사이드바 숨기기 */
-    .sidebar { display: none !important; }
+    .sidebar { display: flex !important; transform: translateX(-100%); }
 
     /* 앱 레이아웃 전체 높이 조정 (하단탭 높이 만큼) */
     .app-shell { flex-direction: column; height: 100vh; }
@@ -397,7 +425,7 @@
 </div>
 <div class="notify-toast red-toast" id="toast2" style="top:136px">
   <div class="toast-icon">⚠️</div>
-  <div><div class="toast-title" id="t2-title">폐유 수거 알림</div><div class="toast-desc" id="t2-desc">치킨스쿨 원주점 — 폐유 7캔 수거 필요</div></div>
+  <div><div class="toast-title" id="t2-title">폐유 수거 알림</div><div class="toast-desc" id="t2-desc"></div></div>
 </div>
 
 <!-- Modal 수거 -->
@@ -478,8 +506,9 @@
   </div>
 </div>
 
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 <div class="app-shell">
-  <aside class="sidebar">
+  <aside class="sidebar" id="mainSidebar">
     <div class="logo-area">
       <div class="logo-badge">🫒 원주 베타</div>
       <div class="logo-title">식용유<span>니버스</span></div>
@@ -529,6 +558,9 @@
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
+        <button class="hamburger-btn" onclick="toggleSidebar()" title="메뉴">
+          <span></span><span></span><span></span>
+        </button>
         <div class="page-title" id="page-title-text">📊 대시보드</div>
         <div class="topbar-price-chips">
           <div class="price-chip">🫘 대두유 <strong>50,000원</strong> <span style="font-size:9px;opacity:0.7">VAT포함</span></div>
@@ -1407,7 +1439,7 @@
             <div style="display:flex;gap:8px;margin-bottom:12px;">
               <div style="flex:1;position:relative;">
                 <input class="form-input" id="kakao_search_input"
-                  placeholder="예: 로버트치킨 원주, BBQ 원주무실점..."
+                  placeholder="예: 원주토토미닭강정, 진미통닭..."
                   style="padding-left:36px;"
                   onkeydown="if(event.key==='Enter') searchKakaoPlace()"
                   oninput="if(this.value==='') document.getElementById('kakaoResults').innerHTML=''">
@@ -2371,7 +2403,7 @@ function showToast(tId, title, desc) {
   setTimeout(() => t.classList.remove('show'), 4500);
 }
 function showToastDemo() {
-  setTimeout(() => showToast('t1','🫙 자동발주 완료!','로버트치킨 — 콩식용유 5캔 자동 발주됨'), 150);
+  setTimeout(() => showToast('t1','🫙 자동발주 완료!',''), 150);
   setTimeout(() => { document.getElementById('toast2').classList.add('show'); setTimeout(() => document.getElementById('toast2').classList.remove('show'), 4500); }, 800);
 }
 
@@ -4285,6 +4317,20 @@ function renderOwnerRecentHistory() {
       <span style="font-size:10px;font-weight:700;color:${statusColor[h.status]||'#ccc'};">${statusLabel[h.status]||''}</span>
     </div>`).join('');
 }
+
+
+function toggleSidebar() {
+  const sidebar  = document.getElementById('mainSidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('mainSidebar')?.classList.remove('open');
+  document.getElementById('sidebarBackdrop')?.classList.remove('open');
+}
+// 패널 이동 시 사이드바 닫기
+const _origShowPanel = showPanel;
 
 </script>
 </body>
