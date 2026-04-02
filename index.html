@@ -875,154 +875,65 @@
     <div class="panel" id="panel-order" style="width:100%;">
       <div style="padding:22px 26px;">
 
-        <!-- 탭 -->
-        <div style="display:flex;gap:4px;background:var(--white);border-radius:var(--radius-sm);padding:4px;box-shadow:var(--shadow);margin-bottom:20px;width:fit-content;">
-          <button id="orderTab1" onclick="switchOrderTab('order')" style="padding:8px 22px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:var(--green-main);color:#0D0D0D;font-family:var(--font-body);">🫙 발주 입력</button>
-          <button id="orderTab2" onclick="switchOrderTab('delivery')" style="padding:8px 22px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--gray);font-family:var(--font-body);">🚛 납품 완료 처리</button>
-        </div>
-
-        <!-- 발주 입력 탭 -->
-        <div id="orderTabContent1">
-          <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;">
-            <div>
-              <div class="form-section" style="margin-bottom:16px">
-                <div class="card-header" style="background:var(--green-main);border-bottom:none;padding:13px 20px"><div class="card-title" style="color:var(--black);font-size:14px">🫙 식용유 발주</div></div>
-                <div class="form-body">
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label class="form-label">업체 선택</label>
-                      <select class="form-select" id="orderBizSelect" onchange="onOrderBizChange()">
-                        <option value="">— 업체 선택 —</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">담당자 코드</label>
-                      <input class="form-input" id="orderBizCode" value="" placeholder="자동 입력" readonly style="background:var(--cream);">
-                    </div>
-                    <input type="hidden" id="orderBizName">
-                  </div>
-                  <div class="form-group"><label class="form-label">구매 유종</label>
-                    <select class="form-select" id="oilType" onchange="calcOrderPrice()">
-                      <option id="opt_soy">🫘 대두유 — 18L</option>
-                      <option id="opt_canola">🌿 카놀라유 — 18L</option>
-                      <option id="opt_corn">🌽 옥수수유 — 18L</option>
-                    </select>
-                  </div>
-                  <div class="form-group"><label class="form-label">주문 수량</label>
-                    <div style="display:flex;align-items:center;gap:7px">
-                      <div class="tc-btn" style="width:30px;height:30px;font-size:15px" onclick="changeQty(-1)">−</div>
-                      <input class="form-input" id="qtyInput" value="5" type="number" min="1" max="50" style="text-align:center;font-size:15px;font-weight:700;flex:1" oninput="calcOrderPrice()">
-                      <div class="tc-btn" style="width:30px;height:30px;font-size:15px" onclick="changeQty(1)">+</div>
-                    </div>
-                  </div>
-                  <div class="form-group"><label class="form-label">배송 희망일</label><input class="form-input" type="date"></div>
-                  <div class="form-group"><label class="form-label">비고</label><input class="form-input" placeholder="특이사항 입력..."></div>
-                </div>
-              </div>
-              <div class="card">
-                <div class="card-header"><div class="card-title">⚡ 자동 발주 설정</div></div>
-                <div class="card-body">
-                  <div class="auto-order-toggle">
-                    <div class="toggle-info"><div class="tl">자동 발주 활성화</div><div class="td">재고 기준치 이하 시 자동 주문</div></div>
-                    <div class="toggle-switch" id="autoToggle" onclick="toggleAuto()"></div>
-                  </div>
-                  <div class="threshold-row"><div><div class="threshold-label">새식용유 최소 재고 기준</div><div class="threshold-val" id="newOilThresh">2 캔 이하 시 자동발주</div></div><div class="threshold-controls"><div class="tc-btn" onclick="changeThresh('new',-1)">−</div><div class="tc-btn" onclick="changeThresh('new',1)">+</div></div></div>
-                  <div class="threshold-row"><div><div class="threshold-label">폐식용유 자동 수거 기준</div><div class="threshold-val" id="wasteOilThresh">1 캔 이상 시 자동수거</div></div><div class="threshold-controls"><div class="tc-btn" onclick="changeThresh('waste',-1)">−</div><div class="tc-btn" onclick="changeThresh('waste',1)">+</div></div></div>
-                </div>
-              </div>
-            </div>
-            <div class="order-summary">
-              <div class="summary-title">📦 발주 요약</div>
-              <div class="summary-row"><span class="s-label">유종</span><span class="s-val">대두유 18L</span></div>
-              <div class="summary-row"><span class="s-label">단가</span><span class="s-val" id="summary-unit">50,000원 <span style='font-size:10px;color:#666'>VAT포함</span></span></div>
-              <div class="summary-row"><span class="s-label">수량</span><span class="s-val" id="summary-qty">5캔</span></div>
-              <div class="summary-row"><span class="s-label">배송비</span><span class="s-val" style="color:var(--green-main)">무료</span></div>
-              <div class="summary-row total"><span class="s-label">합계</span><span class="s-val" id="summary-total">250,000원</span></div>
-              <div style="margin-top:16px">
-                <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:13px" onclick="submitMainOrder()">📦 발주 확정하기</button>
-                <p style="text-align:center;font-size:9px;color:var(--gray);margin-top:7px">발주 후 납품 처리 탭에서 완료 처리</p>
-              </div>
-              <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-light);">
-                <div style="font-size:10px;color:var(--gray);margin-bottom:8px;font-weight:700;">📋 발주 대기 현황</div>
-                <div id="orderPendingList" style="display:flex;flex-direction:column;gap:6px;">
-                  <div style="font-size:11px;color:#555;text-align:center;padding:8px;">발주 이력 없음</div>
-                </div>
-              </div>
-              <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-light)">
-                <div style="font-size:9px;color:#666;margin-bottom:5px">이번 달 발주</div>
-                <div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--black)" id="orderMonthTotal">0 <span style="font-size:11px;color:#888">캔</span></div>
-                <div style="font-size:9px;color:var(--gray);margin-top:3px" id="orderMonthSub">이번 달 발주 이력 없음</div>
-              </div>
-            </div>
+        <!-- 헤더 KPI -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
+          <div style="background:#1F4D30;border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);">
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">⚡ 자동발주 대기</div>
+            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--green-main);line-height:1;" id="orderAutoCount">0</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;">재고 2캔 이하 · 자동발주 ON</div>
+          </div>
+          <div style="background:var(--white);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+            <div style="font-size:11px;color:var(--gray);margin-bottom:6px;">📦 추가발주 요청</div>
+            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:#185FA5;line-height:1;" id="orderExtraCount">0</div>
+            <div style="font-size:10px;color:var(--gray);margin-top:4px;">업주 직접 요청</div>
+          </div>
+          <div style="background:var(--white);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+            <div style="font-size:11px;color:var(--gray);margin-bottom:6px;">✅ 이번 달 납품</div>
+            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--green-dark);line-height:1;" id="orderMonthTotal">0<span style="font-size:13px;font-weight:500"> 캔</span></div>
+            <div style="font-size:10px;color:var(--gray);margin-top:4px;" id="orderMonthSub">납품 이력 없음</div>
           </div>
         </div>
 
-        <!-- 납품 완료 처리 탭 -->
-        <div id="orderTabContent2" style="display:none;">
-
-          <!-- 자동발주 필요 업체 -->
-          <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:16px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-              <div style="font-size:14px;font-weight:800;letter-spacing:-0.02em;">⚡ 자동발주 필요 업체</div>
-              <div style="font-size:11px;color:var(--gray);">재고 2캔 이하 · 자동발주 ON</div>
-            </div>
-            <div id="autoOrderList">
-              <div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">✅ 자동발주 필요 업체 없음</div>
-            </div>
+        <!-- ① 자동발주 업체 목록 -->
+        <div style="background:var(--white);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:16px;overflow:hidden;">
+          <div style="background:#1F4D30;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:#fff;">⚡ 자동발주 업체 — 납품 대기</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);">재고 2캔 이하 · 자동발주 ON 업체</div>
           </div>
-
-          <!-- 직접 납품 처리 -->
-          <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;">📦 납품 완료 처리</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-              <div>
-                <label class="form-label">업체 선택</label>
-                <select class="form-select" id="delivBizSelect" onchange="onDelivBizChange()">
-                  <option value="">— 업체 선택 —</option>
-                </select>
-              </div>
-              <div>
-                <label class="form-label">유종</label>
-                <select class="form-select" id="delivOilType">
-                  <option value="soy">🫘 대두유</option>
-                  <option value="canola">🌿 카놀라유</option>
-                  <option value="corn">🌽 옥수수유</option>
-                </select>
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-              <div>
-                <label class="form-label">현재 재고 (캔)</label>
-                <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--red-accent);padding:10px;background:var(--cream);border-radius:9px;text-align:center;" id="delivCurrentStock">—</div>
-              </div>
-              <div>
-                <label class="form-label">납품 수량 (캔)</label>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <button onclick="changeDelivQty(-1)" style="width:36px;height:36px;border-radius:9px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:18px;font-weight:700;cursor:pointer;">−</button>
-                  <input type="number" id="delivQty" value="5" min="1" max="50"
-                    style="flex:1;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:800;border:1.5px solid var(--green-main);border-radius:9px;padding:8px;color:var(--green-dark);">
-                  <button onclick="changeDelivQty(1)" style="width:36px;height:36px;border-radius:9px;border:1.5px solid var(--gray-light);background:var(--cream);font-size:18px;font-weight:700;cursor:pointer;">+</button>
-                </div>
-              </div>
-            </div>
-            <div id="delivPreview" style="background:var(--green-pale);border-radius:9px;padding:11px 14px;border:1px solid var(--green-light);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:12px;color:var(--gray);">납품 후 재고</span>
-              <span style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-dark);" id="delivAfterStock">—</span>
-            </div>
-            <button onclick="confirmDelivery()" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;font-weight:800;">
-              ✅ 납품 완료 처리
-            </button>
+          <div id="autoOrderList" style="padding:4px 0;">
+            <div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">✅ 자동발주 필요 업체 없음</div>
           </div>
-
-          <!-- 오늘 납품 이력 -->
-          <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
-            <div style="font-size:14px;font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;">📋 오늘 납품 이력</div>
-            <div id="todayDelivList">
-              <div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">오늘 납품 이력 없음</div>
-            </div>
-          </div>
-
         </div>
+
+        <!-- ② 추가발주 요청 목록 -->
+        <div style="background:var(--white);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);margin-bottom:16px;overflow:hidden;">
+          <div style="background:#185FA5;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:#fff;">📦 추가발주 요청 — 납품 대기</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);">업주가 QR에서 직접 요청한 발주</div>
+          </div>
+          <div id="extraOrderList" style="padding:4px 0;">
+            <div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">📭 추가발주 요청 없음</div>
+          </div>
+        </div>
+
+        <!-- ③ 오늘 납품 이력 -->
+        <div style="background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+          <div style="font-size:14px;font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;">📋 오늘 납품 이력</div>
+          <div id="todayDelivList">
+            <div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">오늘 납품 이력 없음</div>
+          </div>
+        </div>
+
+        <!-- 숨겨진 필드들 (JS 호환용) -->
+        <input type="hidden" id="orderBizName">
+        <input type="hidden" id="orderBizCode">
+        <input type="hidden" id="summary-qty">
+        <input type="hidden" id="summary-total">
+        <input type="hidden" id="summary-unit">
+        <input type="hidden" id="orderPendingList">
+        <input type="hidden" id="newOilThresh">
+        <input type="hidden" id="wasteOilThresh">
+        <input type="hidden" id="autoToggle">
       </div>
     </div>
 
@@ -1325,6 +1236,37 @@
               ✅ 재고 저장 완료
             </button>
             <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--gray);">저장하면 지도에 즉시 반영돼요</div>
+
+            <!-- 추가발주 신청 -->
+            <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--gray-light);">
+              <div style="font-size:12px;font-weight:700;color:#185FA5;margin-bottom:10px;">📦 추가발주 신청 <span style="font-size:10px;font-weight:400;color:var(--gray);">— 자동발주 외 추가 필요 시</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                <div>
+                  <div style="font-size:10px;color:var(--gray);margin-bottom:4px;font-weight:600;">유종</div>
+                  <select class="form-select" id="qrExtraOilType" style="font-size:12px;padding:7px 9px;">
+                    <option value="soy">🫘 대두유</option>
+                    <option value="canola">🌿 카놀라유</option>
+                    <option value="corn">🌽 옥수수유</option>
+                  </select>
+                </div>
+                <div>
+                  <div style="font-size:10px;color:var(--gray);margin-bottom:4px;font-weight:600;">수량 (캔)</div>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="tc-btn" onclick="changeQRExtra(-1)" style="width:28px;height:28px;border-radius:7px;font-size:14px;">−</div>
+                    <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#185FA5;flex:1;text-align:center;" id="qrExtraVal">5</div>
+                    <div class="tc-btn" onclick="changeQRExtra(1)" style="width:28px;height:28px;border-radius:7px;font-size:14px;">+</div>
+                  </div>
+                </div>
+              </div>
+              <!-- 추가발주 금액 미리보기 -->
+              <div style="background:#EEF4FF;border-radius:9px;padding:10px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;border:1px solid #C5D8F5;">
+                <div style="font-size:11px;color:#185FA5;">예상 금액</div>
+                <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:#185FA5;" id="qrExtraPrice">250,000원</div>
+              </div>
+              <button onclick="submitQRExtraOrder()" style="width:100%;background:#185FA5;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font-body);">
+                📦 추가발주 신청
+              </button>
+            </div>
           </div>
         </div>
 
@@ -2177,8 +2119,8 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'qr')      { initQRPanel(); }
   if (id === 'admin')   { renderAdminPrices(); }
   if (id === 'price')   { renderPricePage(); }
-  if (id === 'order')   { updateOrderMonthStats(); populateOrderBizSelect(); renderOrderPendingList(); }
-  if (id === 'delivery') { showPanel('order', null, pushState); setTimeout(() => switchOrderTab('delivery'), 50); return; }
+  if (id === 'order')   { loadBusinessesFromDB().then(() => { renderDeliveryPanel(); updateOrderMonthStats(); }); }
+  if (id === 'delivery') { showPanel('order', null, pushState); return; }
   if (id === 'dashboard') { updateDashboard(); }
 
 }
@@ -4346,21 +4288,232 @@ function renderOwnerRecentHistory() {
 }
 
 
-// 발주/납품 탭 전환
-function switchOrderTab(tab) {
-  const isOrder = tab === 'order';
-  document.getElementById('orderTabContent1').style.display = isOrder ? 'block' : 'none';
-  document.getElementById('orderTabContent2').style.display = isOrder ? 'none' : 'block';
-  document.getElementById('orderTab1').style.background = isOrder ? 'var(--green-main)' : 'transparent';
-  document.getElementById('orderTab1').style.color = isOrder ? '#0D0D0D' : 'var(--gray)';
-  document.getElementById('orderTab2').style.background = isOrder ? 'transparent' : 'var(--green-main)';
-  document.getElementById('orderTab2').style.color = isOrder ? 'var(--gray)' : '#0D0D0D';
-  if (!isOrder) {
-    loadBusinessesFromDB().then(() => renderDeliveryPanel());
+// ===== 발주 페이지 렌더 =====
+function renderDeliveryPanel() {
+  // 자동발주 업체 목록
+  const autoList = document.getElementById('autoOrderList');
+  const autoBiz  = businesses.filter(b => b.auto && b.newOil <= 2);
+
+  // KPI 카운터
+  const autoCountEl  = document.getElementById('orderAutoCount');
+  const extraCountEl = document.getElementById('orderExtraCount');
+  const extraOrders  = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method === '추가발주');
+  const autoOrders   = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method !== '추가발주');
+  if (autoCountEl)  autoCountEl.textContent  = autoBiz.length;
+  if (extraCountEl) extraCountEl.textContent = extraOrders.length;
+
+  // 사이드바 뱃지
+  const sideBadge = document.getElementById('sideDeliveryBadge');
+  if (sideBadge) {
+    const total = autoBiz.length + extraOrders.length;
+    sideBadge.textContent = total;
+    sideBadge.style.display = total > 0 ? 'inline-block' : 'none';
   }
+
+  // ① 자동발주 목록
+  if (autoList) {
+    if (autoBiz.length === 0 && autoOrders.length === 0) {
+      autoList.innerHTML = '<div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">✅ 자동발주 필요 업체 없음</div>';
+    } else {
+      // 자동발주 대기 업체 + 기존 pending 자동발주 이력 합산
+      const rendered = new Set();
+      let html = '';
+
+      // 재고 부족 업체 (아직 pending 없는 경우도 포함)
+      autoBiz.forEach(b => {
+        rendered.add(b.id);
+        const hasPending = historyData.some(h => h.bizId === b.id && h.type === '식용유발주' && h.status === 'pending');
+        html += renderAutoOrderRow(b, hasPending ? 'pending' : 'new');
+      });
+
+      // pending 이력 있는데 재고가 이미 회복된 업체
+      autoOrders.forEach(h => {
+        const b = businesses.find(x => x.id === h.bizId);
+        if (b && !rendered.has(b.id)) {
+          rendered.add(b.id);
+          html += renderAutoOrderRow(b, 'pending');
+        }
+      });
+
+      autoList.innerHTML = html || '<div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">✅ 자동발주 필요 업체 없음</div>';
+    }
+  }
+
+  // ② 추가발주 목록
+  renderExtraOrderList();
+
+  // ③ 오늘 납품 이력
+  renderTodayDelivList();
+
+  // 이번달 통계
+  updateOrderMonthStats();
 }
 
-function toggleSidebar() {
+function renderAutoOrderRow(b, state) {
+  const oilKey   = b.oiltype === '카놀라유' ? 'canola' : b.oiltype === '옥수수유' ? 'corn' : 'soy';
+  const unitPrice= PRICES.oils[oilKey]?.price || PRICES.oils.soy.price;
+  const defaultQty = 5;
+  const amount   = (defaultQty * unitPrice).toLocaleString();
+  const isPending = state === 'pending';
+
+  return `
+  <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--gray-light);">
+    <div style="width:40px;height:40px;background:${b.newOil === 0 ? 'var(--red-accent)' : '#FF9500'};border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+      ${b.newOil === 0 ? '🆘' : '⚡'}
+    </div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-weight:700;font-size:13px;">${b.name}</div>
+      <div style="font-size:11px;color:var(--gray);margin-top:2px;">${b.type} · 현재 재고 <strong style="color:${b.newOil === 0 ? 'var(--red-accent)' : '#D4621A'};">${b.newOil}캔</strong> · ${b.oiltype || '대두유'} ${defaultQty}캔 → <strong style="color:var(--green-dark);">${b.newOil + defaultQty}캔</strong></div>
+    </div>
+    <div style="text-align:right;flex-shrink:0;margin-right:10px;">
+      <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--green-dark);">${amount}원</div>
+      <div style="font-size:10px;margin-top:3px;font-weight:700;color:${isPending ? '#1565C0' : '#D4621A'};background:${isPending ? '#E3F2FD' : '#FFF8F0'};padding:2px 8px;border-radius:6px;display:inline-block;">
+        ${isPending ? '🚛 납품 예정' : '⏳ 대기'}
+      </div>
+    </div>
+    ${isPending
+      ? `<button onclick="confirmDeliveryById(${b.id},'${oilKey}',${defaultQty})" style="background:#E8F5E9;border:1.5px solid #A5D6A7;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;color:#2E7D32;cursor:pointer;white-space:nowrap;">✅ 납품 완료</button>`
+      : `<button onclick="autoDeliverBiz(${b.id},'${oilKey}',${defaultQty})" style="background:var(--green-main);border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;color:#0D0D0D;cursor:pointer;white-space:nowrap;">🚛 납품 처리</button>`
+    }
+  </div>`;
+}
+
+function renderExtraOrderList() {
+  const el = document.getElementById('extraOrderList');
+  if (!el) return;
+  const extraOrders = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method === '추가발주');
+  if (extraOrders.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">📭 추가발주 요청 없음</div>';
+    return;
+  }
+  el.innerHTML = extraOrders.map(h => {
+    const b = businesses.find(x => x.id === h.bizId);
+    return `
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--gray-light);">
+      <div style="width:40px;height:40px;background:#EEF4FF;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📦</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:13px;">${h.biz}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px;">${h.content} · 신청일 ${h.date}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-right:10px;">
+        <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:#185FA5;">${h.amount}</div>
+        <div style="font-size:10px;margin-top:3px;font-weight:700;color:#185FA5;background:#EEF4FF;padding:2px 8px;border-radius:6px;display:inline-block;">📦 추가발주</div>
+      </div>
+      <button onclick="completeExtraOrder(${historyData.indexOf(h)},${b ? b.id : 'null'},${h.qty || 5})"
+        style="background:#E8F5E9;border:1.5px solid #A5D6A7;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;color:#2E7D32;cursor:pointer;white-space:nowrap;">
+        ✅ 납품 완료
+      </button>
+    </div>`;
+  }).join('');
+}
+
+// 자동발주 → 바로 납품 처리 (pending 없을 때)
+async function autoDeliverBiz(bizId, oilKey, qty) {
+  const b = businesses.find(x => String(x.id) === String(bizId));
+  if (!b) return;
+  const unitPrice = PRICES.oils[oilKey]?.price || PRICES.oils.soy.price;
+  const oilName   = PRICES.oils[oilKey]?.label || '대두유';
+  const prevStock = b.newOil;
+  b.newOil += qty;
+  b.lastUpdate = '방금 납품 완료';
+  saveBusinesses();
+  await updateBizStockInDB(b.id, b.newOil, b.wasteOil, b.lastUpdate);
+
+  const now = new Date();
+  const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+  const item = { date: dateStr, rawDate: now.toISOString(), biz: b.name, bizId: b.id, type: '식용유발주', content: oilName + ' ' + qty + '캔 납품 완료 (재고 ' + prevStock + '→' + b.newOil + '캔)', qty, amount: (qty * unitPrice).toLocaleString() + '원', method: '운반관리자', status: 'done' };
+  historyData.unshift(item);
+  saveHistory();
+  await saveHistoryToDB(item);
+  refreshMapMarkers();
+  updateDashboard();
+  renderDeliveryPanel();
+  showToast('t1','✅ 납품 완료!', b.name + ' — ' + oilName + ' ' + qty + '캔 (재고 ' + b.newOil + '캔)');
+}
+
+// pending 상태에서 납품 완료 처리
+async function confirmDeliveryById(bizId, oilKey, qty) {
+  const b = businesses.find(x => String(x.id) === String(bizId));
+  if (!b) return;
+  // pending 이력 → done 처리
+  const pending = historyData.find(h => h.bizId === b.id && h.type === '식용유발주' && h.status === 'pending');
+  if (pending) {
+    pending.status = 'done';
+    pending.content = pending.content.replace('알림', '납품 완료');
+    if (pending.dbId) await db.from('history').update({ status: 'done', content: pending.content }).eq('id', pending.dbId);
+  }
+  await autoDeliverBiz(bizId, oilKey, qty);
+}
+
+// 추가발주 납품 완료
+async function completeExtraOrder(histIdx, bizId, qty) {
+  const h = historyData[histIdx];
+  if (!h) return;
+  h.status = 'done';
+  h.content = h.content.replace('추가발주 신청', '납품 완료');
+  if (h.dbId) await db.from('history').update({ status: 'done', content: h.content }).eq('id', h.dbId);
+  saveHistory();
+  if (bizId) {
+    const b = businesses.find(x => x.id === bizId);
+    if (b) {
+      b.newOil += qty;
+      b.lastUpdate = '방금 납품 완료';
+      saveBusinesses();
+      await updateBizStockInDB(b.id, b.newOil, b.wasteOil, b.lastUpdate);
+    }
+  }
+  refreshMapMarkers();
+  updateDashboard();
+  renderDeliveryPanel();
+  showToast('t1','✅ 추가발주 납품 완료!', h.biz + ' — ' + qty + '캔 납품됨');
+}
+
+// QR 추가발주 신청 (업주용)
+let qrExtraQty = 5;
+function changeQRExtra(delta) {
+  qrExtraQty = Math.max(1, Math.min(50, qrExtraQty + delta));
+  const el = document.getElementById('qrExtraVal');
+  if (el) el.textContent = qrExtraQty;
+  updateQRExtraPrice();
+}
+function updateQRExtraPrice() {
+  const sel = document.getElementById('qrExtraOilType');
+  const oilKey = sel ? sel.value : 'soy';
+  const price  = (qrExtraQty * (PRICES.oils[oilKey]?.price || PRICES.oils.soy.price)).toLocaleString();
+  const el = document.getElementById('qrExtraPrice');
+  if (el) el.textContent = price + '원';
+}
+async function submitQRExtraOrder() {
+  if (!qrSelectedBizId) { showToast('t1','⚠️ 업체를 먼저 선택해주세요',''); return; }
+  const biz     = businesses.find(b => b.id === qrSelectedBizId);
+  if (!biz)  { showToast('t1','⚠️ 업체 정보 오류',''); return; }
+  const sel     = document.getElementById('qrExtraOilType');
+  const oilKey  = sel ? sel.value : 'soy';
+  const oilName = PRICES.oils[oilKey]?.label || '대두유';
+  const price   = qrExtraQty * (PRICES.oils[oilKey]?.price || PRICES.oils.soy.price);
+  const now     = new Date();
+  const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+  const item = {
+    date: dateStr, rawDate: now.toISOString(),
+    biz: biz.name, bizId: biz.id,
+    type: '식용유발주',
+    content: oilName + ' ' + qrExtraQty + '캔 추가발주 신청',
+    qty: qrExtraQty,
+    amount: price.toLocaleString() + '원',
+    method: '추가발주',
+    status: 'pending',
+  };
+  historyData.unshift(item);
+  saveHistory();
+  await saveHistoryToDB(item);
+  updateDashboard();
+  showToast('t1','📦 추가발주 신청 완료!', biz.name + ' — ' + oilName + ' ' + qrExtraQty + '캔 · 담당자에게 전달됐어요');
+}
+
+// QR 추가발주 select 변경 시 금액 업데이트
+document.addEventListener('change', e => {
+  if (e.target && e.target.id === 'qrExtraOilType') updateQRExtraPrice();
+});
   const sidebar  = document.getElementById('mainSidebar');
   const backdrop = document.getElementById('sidebarBackdrop');
   sidebar.classList.toggle('open');
