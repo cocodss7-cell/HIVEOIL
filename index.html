@@ -66,7 +66,7 @@
   .user-role { font-size: 10px; color: #888; font-weight: 400; }
 
   /* MAIN */
-  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; }
+  .main { flex: 1; min-width: 0; overflow-y: auto; display: flex; flex-direction: column; }
   .topbar { background: var(--white); border-bottom: 1px solid #e8ece8; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; flex-shrink: 0; }
   .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
   .page-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; white-space: nowrap; letter-spacing: -0.02em; color: var(--black); }
@@ -84,7 +84,6 @@
 
   /* PANELS */
   .panel { display: none; flex: 1; overflow-y: auto; width: 100%; min-width: 0; }
-  .panel.active { display: flex; flex-direction: column; }
   .panel.active { display: block; }
 
   /* DASHBOARD */
@@ -585,7 +584,7 @@
         <span id="alertBannerContent"></span>
       </div>
 
-      <div style="overflow-y:auto;">
+      <div>
 
         <!-- ① 히어로 배너 -->
         <div style="background:#1F4D30;padding:32px 28px 28px;position:relative;overflow:hidden;">
@@ -4525,6 +4524,8 @@ async function submitQRExtraOrder() {
 document.addEventListener('change', e => {
   if (e.target && e.target.id === 'qrExtraOilType') updateQRExtraPrice();
 });
+
+function toggleSidebar() {
   const sidebar  = document.getElementById('mainSidebar');
   const backdrop = document.getElementById('sidebarBackdrop');
   sidebar.classList.toggle('open');
