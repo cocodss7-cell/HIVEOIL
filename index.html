@@ -280,7 +280,7 @@
   .hamburger-btn {
     width: 36px; height: 36px; border-radius: 10px;
     background: var(--green-pale); border: 1.5px solid var(--green-light);
-    cursor: pointer; display: flex; flex-direction: column;
+    cursor: pointer; display: none; flex-direction: column;
     align-items: center; justify-content: center; gap: 4px;
     flex-shrink: 0;
   }
@@ -311,6 +311,7 @@
     .page-title { font-size: 14px; }
     .topbar-right .btn-outline { display: none; }
     .topbar-right .btn-primary { padding: 7px 12px; font-size: 11px; }
+    .hamburger-btn { display: flex; }
 
     /* 대시보드 */
     .dashboard-grid { padding: 14px 14px 80px; gap: 12px; }
@@ -1409,7 +1410,7 @@
 
     <!-- REGISTER PANEL -->
     <div class="panel" id="panel-register" style="width:100%;">
-      <div style="max-width:680px;padding:28px 26px;">
+      <div style="padding:28px 26px;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
           <div style="width:44px;height:44px;background:var(--green-main);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">➕</div>
           <div>
@@ -1423,6 +1424,12 @@
             <div class="card-title" style="color:var(--white);">🔍 업체 검색 — 카카오 장소 검색</div>
             <div style="font-size:10px;color:#555;">상호명으로 검색하면 주소·좌표 자동 입력</div>
           </div>
+
+        <!-- 2컬럼 레이아웃 시작 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+
+        <!-- 왼쪽: 검색 + 추가정보 + 재고 + 자동발주 + 버튼 -->
+        <div>
           <div style="padding:20px;">
 
             <!-- 검색창 -->
@@ -1462,13 +1469,13 @@
           </div>
         </div>
 
-        <!-- 추가 정보 -->
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-header">
-            <div class="card-title">📋 추가 정보</div>
-          </div>
-          <div style="padding:18px 22px;">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <!-- 오른쪽: 추가정보 + 재고 + 자동발주 + 버튼 -->
+        <div style="padding:20px 20px 20px 0;">
+
+          <!-- 추가 정보 -->
+          <div style="background:var(--cream);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:14px;border:1px solid var(--gray-light);">
+            <div style="font-size:12px;font-weight:700;margin-bottom:12px;">📋 추가 정보</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div class="form-group" style="margin:0">
                 <label class="form-label">업종 *</label>
                 <select class="form-select" id="reg_type">
@@ -1490,15 +1497,14 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-header">
-            <div class="card-title">🫙 식용유 초기 재고 설정</div>
-            <div style="font-size:10px;color:var(--gray);">등록 후 업주가 직접 수정 가능</div>
-          </div>
-          <div style="padding:18px 22px;">
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <!-- 식용유 초기 재고 -->
+          <div style="background:var(--cream);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:14px;border:1px solid var(--gray-light);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-size:12px;font-weight:700;">🫙 식용유 초기 재고 설정</div>
+              <div style="font-size:10px;color:var(--gray);">등록 후 업주가 직접 수정 가능</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
               <div class="form-group" style="margin:0">
                 <label class="form-label">구매 유종</label>
                 <select class="form-select" id="reg_oiltype">
@@ -1509,26 +1515,22 @@
                 </select>
               </div>
               <div class="form-group" style="margin:0">
-                <label class="form-label">새식용유 현재 재고 (캔)</label>
+                <label class="form-label">새식용유 재고 (캔)</label>
                 <input class="form-input" id="reg_newOil" type="number" value="5" min="0" max="50"
                   style="font-family:var(--font-display);font-size:17px;font-weight:800;text-align:center;">
               </div>
               <div class="form-group" style="margin:0">
-                <label class="form-label">폐식용유 현재 보유 (캔)</label>
+                <label class="form-label">폐식용유 보유 (캔)</label>
                 <input class="form-input" id="reg_wasteOil" type="number" value="0" min="0" max="30"
                   style="font-family:var(--font-display);font-size:17px;font-weight:800;text-align:center;">
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="card" style="margin-bottom:20px;">
-          <div class="card-header">
-            <div class="card-title">⚡ 자동발주 설정</div>
-          </div>
-          <div style="padding:16px 22px;display:flex;align-items:center;justify-content:space-between;">
+          <!-- 자동발주 -->
+          <div style="background:var(--cream);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:16px;border:1px solid var(--gray-light);display:flex;align-items:center;justify-content:space-between;">
             <div>
-              <div style="font-size:13px;font-weight:600;">자동발주 활성화</div>
+              <div style="font-size:13px;font-weight:600;">⚡ 자동발주 활성화</div>
               <div style="font-size:11px;color:var(--gray);margin-top:2px;">재고가 기준치 이하 시 자동 주문</div>
             </div>
             <div id="regAutoToggle" onclick="this.classList.toggle('off')"
@@ -1536,14 +1538,18 @@
               <div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:right 0.2s;"></div>
             </div>
           </div>
+
+          <!-- 버튼 -->
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-outline" style="padding:13px 20px;font-size:13px;" onclick="clearRegForm()">🔄 초기화</button>
+            <button class="btn btn-primary" style="flex:1;justify-content:center;padding:13px;font-size:14px;font-weight:800;" onclick="registerBiz()">
+              ✅ 업체 등록 완료
+            </button>
+          </div>
         </div>
 
-        <div style="display:flex;gap:10px;">
-          <button class="btn btn-outline" style="padding:13px 20px;font-size:13px;" onclick="clearRegForm()">🔄 초기화</button>
-          <button class="btn btn-primary" style="flex:1;justify-content:center;padding:13px;font-size:14px;font-weight:800;" onclick="registerBiz()">
-            ✅ 업체 등록 완료
-          </button>
-        </div>
+        </div><!-- 2컬럼 레이아웃 끝 -->
+        </div><!-- card 끝 -->
 
         <!-- 등록된 업체 목록 -->
         <div style="margin-top:24px;">
@@ -2218,32 +2224,40 @@ function renderWasteTable() {
     return;
   }
   document.getElementById('wasteTableBody').innerHTML = pendingBiz.map(b => {
-    const cans  = b.wasteOil;
-    const kg    = (cans * PRICES.waste.can.kg).toFixed(1);
-    const price = (cans * PRICES.waste.can.price).toLocaleString();
+    const cans    = b.wasteOil;
+    const kg      = (cans * PRICES.waste.can.kg).toFixed(1);
+    const price   = (cans * PRICES.waste.can.price).toLocaleString();
     const isUrgent = cans >= 5;
-    // 이 업체의 대기중 수거 신청 이력 있는지
     const hasPending = historyData.some(h => h.bizId === b.id && h.type === '폐유수거' && h.status === 'pending');
+
+    // 상태 뱃지
+    let statusBadge;
+    if (hasPending) {
+      statusBadge = '<span class="status-pill status-inprogress">🚛 수거 예정</span>';
+    } else if (isUrgent) {
+      statusBadge = '<span class="status-pill status-pending">🔴 긴급 수거</span>';
+    } else {
+      statusBadge = '<span class="status-pill" style="background:#FFF8F0;color:#D4621A;">⏳ 수거 대기</span>';
+    }
+
+    // 액션 버튼
+    const actionBtn = hasPending
+      ? `<button class="btn" style="padding:5px 11px;font-size:11px;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7;white-space:nowrap;font-weight:700;"
+            onclick="completeCollect(${b.id})">✅ 수거 완료</button>`
+      : `<button class="btn btn-danger" style="padding:5px 11px;font-size:11px;white-space:nowrap;font-weight:700;"
+            onclick="requestCollect(${b.id})">🚛 수거 신청</button>`;
+
     return `<tr>
       <td><strong>${b.name}</strong></td>
       <td style="color:var(--gray)">${b.type}</td>
       <td><strong style="color:${isUrgent?'var(--red-accent)':'#D4621A'}">${cans}캔</strong></td>
       <td>${b.newOil}/${b.maxNew}캔</td>
-      <td>${kg}kg (${price}원)</td>
-      <td>${isUrgent
-        ? '<span class="status-pill status-pending">긴급 수거</span>'
-        : hasPending
-          ? '<span class="status-pill status-inprogress">신청 완료</span>'
-          : '<span class="status-pill" style="background:#FFF8F0;color:#D4621A;">수거 대기</span>'
-      }</td>
-      <td style="display:flex;gap:6px;">
-        ${!hasPending
-          ? `<button class="btn btn-danger" style="padding:4px 9px;font-size:10px;white-space:nowrap"
-              onclick="requestCollect(${b.id})">🚛 수거 신청</button>`
-          : `<button class="btn" style="padding:4px 9px;font-size:10px;background:#E8F5E9;color:#2E7D32;white-space:nowrap"
-              onclick="completeCollect(${b.id})">✅ 수거 완료</button>`
-        }
+      <td>
+        <div style="font-weight:700;color:var(--black);">${cans}캔 (${kg}kg)</div>
+        <div style="font-size:11px;color:var(--green-dark);font-weight:700;margin-top:2px;">${price}원</div>
       </td>
+      <td>${statusBadge}</td>
+      <td>${actionBtn}</td>
     </tr>`;
   }).join('');
 }
@@ -4005,20 +4019,37 @@ function renderWastePendingList() {
     el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray);font-size:12px;">수거 대기 업체가 없어요</div>';
     return;
   }
-  el.innerHTML = pendingBiz.sort((a,b) => b.wasteOil - a.wasteOil).map(b => `
-    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-light);">
-      <div style="width:36px;height:36px;background:#FFF0F0;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🗑️</div>
+  el.innerHTML = pendingBiz.sort((a,b) => b.wasteOil - a.wasteOil).map(b => {
+    const cans    = b.wasteOil;
+    const kg      = (cans * PRICES.waste.can.kg).toFixed(1);
+    const price   = (cans * PRICES.waste.can.price).toLocaleString();
+    const hasPending = historyData.some(h => h.bizId === b.id && h.type === '폐유수거' && h.status === 'pending');
+    const isUrgent = cans >= 5;
+
+    const statusColor = hasPending ? '#1565C0' : isUrgent ? 'var(--red-accent)' : '#D4621A';
+    const statusBg    = hasPending ? '#E3F2FD' : isUrgent ? '#FFEBEE' : '#FFF8F0';
+    const statusLabel = hasPending ? '🚛 수거 예정' : isUrgent ? '🔴 긴급' : '⏳ 대기';
+
+    const actionBtn = hasPending
+      ? `<button class="btn" style="padding:6px 14px;font-size:11px;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7;white-space:nowrap;font-weight:700;"
+            onclick="completeCollect(${b.id});renderWastePendingList();renderWasteTable();">✅ 수거 완료</button>`
+      : `<button class="btn btn-danger" style="padding:6px 14px;font-size:11px;white-space:nowrap;font-weight:700;"
+            onclick="requestCollect(${b.id});renderWastePendingList();renderWasteTable();">🚛 신청</button>`;
+
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-light);">
+      <div style="width:36px;height:36px;background:${isUrgent?'#FFEBEE':'#FFF0F0'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🗑️</div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:13px;">${b.name}</div>
-        <div style="font-size:11px;color:var(--gray);margin-top:1px;">${b.type} · 폐유 ${b.wasteOil}캔 (${(b.wasteOil * PRICES.waste.can.kg).toFixed(1)}kg)</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px;">${b.type} · <strong style="color:${statusColor};">${cans}캔 (${kg}kg)</strong></div>
       </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--green-dark);">${(b.wasteOil * PRICES.waste.can.price).toLocaleString()}원</div>
-        <div style="font-size:10px;color:var(--gray);margin-top:2px;">🕐 ${b.lastUpdate || '—'}</div>
+      <div style="text-align:right;flex-shrink:0;margin-right:8px;">
+        <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--green-dark);">${price}원</div>
+        <div style="display:inline-block;margin-top:4px;font-size:10px;font-weight:700;color:${statusColor};background:${statusBg};padding:2px 8px;border-radius:6px;">${statusLabel}</div>
       </div>
-      <button class="btn btn-danger" style="padding:6px 12px;font-size:11px;white-space:nowrap;"
-        onclick="requestCollect(${b.id});renderWastePendingList();renderWasteTable();">🚛 신청</button>
-    </div>`).join('');
+      ${actionBtn}
+    </div>`;
+  }).join('');
 }
 
 function renderWasteDoneList() {
