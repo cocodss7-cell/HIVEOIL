@@ -37,10 +37,8 @@
     width: 240px; min-width: 240px; background: #fff;
     display: flex; flex-direction: column; padding: 20px 0 16px;
     z-index: 200; flex-shrink: 0; border-right: 1px solid var(--gray-light);
-    position: fixed; left: 0; top: 0; height: 100vh;
-    transform: translateX(-100%);
+    position: relative; height: 100vh;
     transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
-    box-shadow: 4px 0 24px rgba(0,0,0,0.08);
   }
   .sidebar.open { transform: translateX(0); }
   .sidebar-backdrop {
@@ -68,7 +66,7 @@
   .user-role { font-size: 10px; color: #888; font-weight: 400; }
 
   /* MAIN */
-  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; width: 100%; }
+  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; width: 100%; margin-left: 0; }
   .topbar { background: var(--white); border-bottom: 1px solid #e8ece8; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 9; flex-shrink: 0; }
   .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
   .page-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; white-space: nowrap; letter-spacing: -0.02em; color: var(--black); }
@@ -295,8 +293,13 @@
   /* ===== 모바일 반응형 ===== */
   @media (max-width: 768px) {
 
-    /* 사이드바 숨기기 */
-    .sidebar { display: flex !important; transform: translateX(-100%); }
+    /* 모바일 사이드바 — 오버레이 방식 */
+    .sidebar {
+      position: fixed; left: 0; top: 0; height: 100vh;
+      transform: translateX(-100%);
+      box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+    }
+    .sidebar.open { transform: translateX(0); }
 
     /* 앱 레이아웃 전체 높이 조정 (하단탭 높이 만큼) */
     .app-shell { flex-direction: column; height: 100vh; }
@@ -2396,8 +2399,15 @@ function showToastDemo() {
 
 document.addEventListener('click', e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('show'); });
 
-// 초기 알림
-setTimeout(() => { document.getElementById('toast2').classList.add('show'); setTimeout(() => document.getElementById('toast2').classList.remove('show'), 5000); }, 2000);
+// 초기 알림 — 폐유 대기 업체 있을 때만 표시
+setTimeout(() => {
+  const waitBiz = businesses.filter(b => b.wasteOil >= 1);
+  if (waitBiz.length > 0) {
+    document.getElementById('t2-desc').textContent = waitBiz[0].name + ' — 폐유 ' + waitBiz[0].wasteOil + '캔 수거 필요';
+    document.getElementById('toast2').classList.add('show');
+    setTimeout(() => document.getElementById('toast2').classList.remove('show'), 5000);
+  }
+}, 2000);
 
 renderWasteTable();
 renderHistory();
