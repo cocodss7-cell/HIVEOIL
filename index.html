@@ -3647,72 +3647,75 @@ function renderConsumerView() {
 function updateDashboard() {
   applyPrices();
 
-  // ① 등록 업체 수
+  // ① 등록 업체 수 — businesses 배열 실시간
   const bizCount = document.getElementById('db_biz_count');
-  if (bizCount) bizCount.innerHTML = businesses.length + '<span style="font-size:14px;font-weight:500"> 곳</span>';
+  if (bizCount) bizCount.innerHTML = businesses.length +
+    '<span style="font-size:14px;font-weight:500"> 곳</span>';
 
-  // ② 이번달 납품 실적 — done 완료건 + 현재 업체 재고 합산
-  const thisMonth = new Date().getMonth();
-  const thisYear  = new Date().getFullYear();
-  const oilDone = historyData.filter(h =>
-    h.type === '식용유발주' && h.status === 'done' &&
-    new Date(h.rawDate || h.date).getMonth() === thisMonth &&
-    new Date(h.rawDate || h.date).getFullYear() === thisYear
-  );
+  // ② 이번달 식용유 납품 — done 이력
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const thisYear  = now.getFullYear();
+
+  const oilDone = historyData.filter(h => {
+    if (h.type !== '식용유발주' || h.status !== 'done') return false;
+    const d = new Date(h.rawDate || h.date);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  });
   const oilCans = oilDone.reduce((s,h) => s + (h.qty||0), 0);
-  // 이력 없으면 업체 현재 재고 합산으로 표시
-  const totalNewOil = businesses.reduce((s,b) => s + (b.newOil||0), 0);
   const oilEl  = document.getElementById('db_oil_delivery');
   const oilSub = document.getElementById('db_oil_sub');
   if (oilEl) oilEl.innerHTML = oilCans + '<span style="font-size:14px;font-weight:500"> 캔</span>';
   if (oilSub) oilSub.textContent = oilDone.length > 0
     ? '이번 달 ' + oilDone.length + '건 납품 완료'
-    : businesses.length > 0 ? '현재 전체 재고 ' + totalNewOil + '캔' : '이번 달 납품 이력 없음';
+    : businesses.length > 0
+      ? '현재 재고 합계 ' + businesses.reduce((s,b)=>s+(b.newOil||0),0) + '캔'
+      : '이번 달 납품 이력 없음';
 
-  // ③ 이번달 폐유 수거 실적
-  const wasteDone = historyData.filter(h =>
-    h.type === '폐유수거' && h.status === 'done' &&
-    new Date(h.rawDate || h.date).getMonth() === thisMonth &&
-    new Date(h.rawDate || h.date).getFullYear() === thisYear
-  );
+  // ③ 이번달 폐유 수거 — done 이력
+  const wasteDone = historyData.filter(h => {
+    if (h.type !== '폐유수거' || h.status !== 'done') return false;
+    const d = new Date(h.rawDate || h.date);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  });
   const wasteCans = wasteDone.reduce((s,h) => s + (h.qty||0), 0);
-  // 이력 없으면 현재 폐유 대기량으로 표시
-  const totalWasteOil = businesses.reduce((s,b) => s + (b.wasteOil||0), 0);
   const wasteEl  = document.getElementById('db_waste_total');
   const wasteSub = document.getElementById('db_waste_sub');
   if (wasteEl) wasteEl.innerHTML = wasteCans + '<span style="font-size:14px;font-weight:500"> 캔</span>';
   if (wasteSub) wasteSub.textContent = wasteDone.length > 0
     ? '이번 달 ' + wasteDone.length + '건 수거 완료'
-    : businesses.length > 0 ? '수거 대기 ' + totalWasteOil + '캔' : '이번 달 수거 이력 없음';
+    : businesses.length > 0
+      ? '수거 대기 ' + businesses.reduce((s,b)=>s+(b.wasteOil||0),0) + '캔'
+      : '이번 달 수거 이력 없음';
 
-  // ④ CO2 절감 — 완료 이력 기반, 없으면 현재 업체 재고 기반 추정
-  const totalWasteDone = historyData.filter(h => h.type === '폐유수거'   && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
-  const totalOilDone   = historyData.filter(h => h.type === '식용유발주' && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
+  // ④ CO2 절감 — 전체 done 누적 기반
+  const allWasteDone = historyData.filter(h => h.type === '폐유수거'   && h.status === 'done').reduce((s,h)=>s+(h.qty||0),0);
+  const allOilDone   = historyData.filter(h => h.type === '식용유발주' && h.status === 'done').reduce((s,h)=>s+(h.qty||0),0);
   // 이력 없으면 현재 재고 기반
-  const co2Base = (totalWasteDone + totalOilDone) > 0
-    ? (totalWasteDone + totalOilDone)
-    : totalNewOil + totalWasteOil;
-  const co2 = Math.round(co2Base * PRICES.waste.can.kg * PRICES.carbonRate);
+  const co2Cans = (allWasteDone + allOilDone) > 0
+    ? (allWasteDone + allOilDone)
+    : businesses.reduce((s,b)=>s+(b.newOil||0)+(b.wasteOil||0),0);
+  const co2 = Math.round(co2Cans * PRICES.waste.can.kg * PRICES.carbonRate);
   const co2El = document.getElementById('db_co2');
   if (co2El) co2El.innerHTML = co2.toLocaleString() + '<span style="font-size:14px;font-weight:500"> kg</span>';
 
   // ⑤ ESG 포인트
-  const totalEsg = Math.round(totalWasteDone * PRICES.waste.can.kg * PRICES.esgRate) + (totalOilDone * 5);
+  const totalEsg = Math.round(allWasteDone * PRICES.waste.can.kg * PRICES.esgRate) + (allOilDone * 5);
   const esgEl = document.getElementById('db_esg_pts');
   if (esgEl) esgEl.textContent = totalEsg.toLocaleString();
 
   // ⑥ 알림 배너
-  const lowBizList   = businesses.filter(b => b.auto && b.newOil <= 2);
-  const wasteBizList = businesses.filter(b => b.wasteOil >= 2);
-  const banner  = document.getElementById('alertBanner');
-  const content = document.getElementById('alertBannerContent');
-  if (banner && content) {
+  const lowBiz   = businesses.filter(b => b.auto && b.newOil <= 2);
+  const wasteBiz = businesses.filter(b => b.wasteOil >= 2);
+  const banner   = document.getElementById('alertBanner');
+  const bannerContent = document.getElementById('alertBannerContent');
+  if (banner) {
     const msgs = [
-      ...lowBizList.map(b => b.name + ' 재고 ' + b.newOil + '캔 — 자동발주 필요'),
-      ...wasteBizList.map(b => b.name + ' 폐유 ' + b.wasteOil + '캔 — 수거 필요'),
+      ...lowBiz.map(b => b.name + ' 재고 ' + b.newOil + '캔 — 자동발주 필요'),
+      ...wasteBiz.map(b => b.name + ' 폐유 ' + b.wasteOil + '캔 — 수거 필요'),
     ];
     banner.style.display = msgs.length > 0 ? 'flex' : 'none';
-    if (content) content.textContent = msgs.join(' / ');
+    if (bannerContent) bannerContent.textContent = msgs.join(' / ');
   }
 
   renderDbRecentList();
@@ -4067,22 +4070,38 @@ function completeCollect(bizId) {
   const b = businesses.find(x => x.id === bizId);
   if (!b) return;
 
-  // 해당 업체의 pending 이력 → done으로 변경
+  const prevWaste = b.wasteOil;
+
+  // pending 이력 → done으로 변경
   const item = historyData.find(h => h.bizId === bizId && h.type === '폐유수거' && h.status === 'pending');
   if (item) {
     item.status = 'done';
-    item.content = item.content.replace('수거 신청', '수거 완료');
-    // DB에도 업데이트
+    item.qty = prevWaste; // qty 확실히 기록
+    item.content = '폐유 ' + prevWaste + '캔 수거 완료';
     if (item.dbId) {
-      db.from('history').update({ status: 'done', content: item.content }).eq('id', item.dbId).then(({error}) => {
-        if (error) console.warn('이력 완료 처리 실패:', error.message);
-      });
+      db.from('history').update({ status: 'done', content: item.content, qty: prevWaste }).eq('id', item.dbId)
+        .then(({error}) => { if (error) console.warn('이력 완료 처리 실패:', error.message); });
     }
     saveHistory();
+  } else {
+    // pending 이력 없어도 done 이력 직접 생성
+    const now = new Date();
+    const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+    const newItem = {
+      date: dateStr, rawDate: now.toISOString(),
+      biz: b.name, bizId: b.id,
+      type: '폐유수거',
+      content: '폐유 ' + prevWaste + '캔 수거 완료',
+      qty: prevWaste,
+      amount: (prevWaste * PRICES.waste.can.price).toLocaleString() + '원',
+      method: '수동', status: 'done',
+    };
+    historyData.unshift(newItem);
+    saveHistory();
+    saveHistoryToDB(newItem);
   }
 
-  // 업체 폐유 재고 → 0으로 초기화
-  const prevWaste = b.wasteOil;
+  // 업체 폐유 재고 → 0 초기화
   b.wasteOil = 0;
   b.lastUpdate = '방금 수거 완료';
   saveBusinesses();
