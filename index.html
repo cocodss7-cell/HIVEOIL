@@ -36,8 +36,8 @@
   .sidebar {
     width: 240px; min-width: 240px; background: #fff;
     display: flex; flex-direction: column; padding: 20px 0 16px;
-    z-index: 200; flex-shrink: 0; border-right: 1px solid var(--gray-light);
-    position: relative; height: 100vh;
+    z-index: 10; flex-shrink: 0; border-right: 1px solid var(--gray-light);
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
     transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
   }
   .sidebar.open { transform: translateX(0); }
@@ -3644,61 +3644,68 @@ function renderConsumerView() {
 
 // ===== 대시보드 동적 업데이트 =====
 function updateDashboard() {
-  // topbar 가격 업데이트 (시세 바 대체)
   applyPrices();
 
-  // 업체 수
+  // ① 등록 업체 수 (DB에서 로드된 실제 수)
   const bizCount = document.getElementById('db_biz_count');
   if (bizCount) bizCount.innerHTML = businesses.length + '<span style="font-size:14px;font-weight:500"> 곳</span>';
 
-  // 이번달 납품 캔 수 (historyData 기반)
+  // ② 이번달 납품 실적 — done 완료건만
   const thisMonth = new Date().getMonth();
-  const oilHistory = historyData.filter(h => h.type === '식용유발주' && new Date(h.rawDate||h.date).getMonth() === thisMonth);
-  const oilCans = oilHistory.reduce((s,h) => s + (h.qty||0), 0);
-  const oilEl = document.getElementById('db_oil_delivery');
+  const thisYear  = new Date().getFullYear();
+  const oilDone = historyData.filter(h =>
+    h.type === '식용유발주' && h.status === 'done' &&
+    new Date(h.rawDate||h.date).getMonth() === thisMonth &&
+    new Date(h.rawDate||h.date).getFullYear() === thisYear
+  );
+  const oilCans = oilDone.reduce((s,h) => s + (h.qty||0), 0);
+  const oilEl  = document.getElementById('db_oil_delivery');
   const oilSub = document.getElementById('db_oil_sub');
   if (oilEl) oilEl.innerHTML = oilCans + '<span style="font-size:14px;font-weight:500"> 캔</span>';
-  if (oilSub) oilSub.textContent = oilHistory.length > 0 ? '이번 달 ' + oilHistory.length + '건 납품' : '이번 달 납품 이력 없음';
+  if (oilSub) oilSub.textContent = oilDone.length > 0
+    ? '이번 달 ' + oilDone.length + '건 납품 완료'
+    : '이번 달 납품 이력 없음';
 
-  // 이번달 폐유 수거 캔 수
-  const wasteHistory = historyData.filter(h => h.type === '폐유수거' && new Date(h.rawDate||h.date).getMonth() === thisMonth);
-  const wasteCans = wasteHistory.reduce((s,h) => s + (h.qty||0), 0);
-  const wasteEl = document.getElementById('db_waste_total');
+  // ③ 이번달 폐유 수거 실적 — done 완료건만
+  const wasteDone = historyData.filter(h =>
+    h.type === '폐유수거' && h.status === 'done' &&
+    new Date(h.rawDate||h.date).getMonth() === thisMonth &&
+    new Date(h.rawDate||h.date).getFullYear() === thisYear
+  );
+  const wasteCans = wasteDone.reduce((s,h) => s + (h.qty||0), 0);
+  const wasteEl  = document.getElementById('db_waste_total');
   const wasteSub = document.getElementById('db_waste_sub');
   if (wasteEl) wasteEl.innerHTML = wasteCans + '<span style="font-size:14px;font-weight:500"> 캔</span>';
-  if (wasteSub) wasteSub.textContent = wasteHistory.length > 0 ? '이번 달 ' + wasteHistory.length + '건 수거' : '이번 달 수거 이력 없음';
+  if (wasteSub) wasteSub.textContent = wasteDone.length > 0
+    ? '이번 달 ' + wasteDone.length + '건 수거 완료'
+    : '이번 달 수거 이력 없음';
 
-  // CO2 계산 (전체 폐유 수거 + 식용유 기준 16.5kg/캔)
-  const totalWasteCans = historyData.filter(h => h.type === '폐유수거').reduce((s,h) => s + (h.qty||0), 0);
-  const totalOilCans   = historyData.filter(h => h.type === '식용유발주').reduce((s,h) => s + (h.qty||0), 0);
-  const totalKg = (totalWasteCans + totalOilCans) * PRICES.waste.can.kg;
-  const co2 = Math.round(totalKg * PRICES.carbonRate);
+  // ④ CO2 절감 — 전체 done 기준 누적
+  const totalWasteDone = historyData.filter(h => h.type === '폐유수거'   && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
+  const totalOilDone   = historyData.filter(h => h.type === '식용유발주' && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
+  const co2 = Math.round((totalWasteDone + totalOilDone) * PRICES.waste.can.kg * PRICES.carbonRate);
   const co2El = document.getElementById('db_co2');
   if (co2El) co2El.innerHTML = co2.toLocaleString() + '<span style="font-size:14px;font-weight:500"> kg</span>';
 
-  // ESG 포인트 합계
-  const totalEsg = Math.round(totalWasteCans * PRICES.waste.can.kg * PRICES.esgRate) + (totalOilCans * 5);
+  // ⑤ ESG 포인트 누적
+  const totalEsg = Math.round(totalWasteDone * PRICES.waste.can.kg * PRICES.esgRate) + (totalOilDone * 5);
   const esgEl = document.getElementById('db_esg_pts');
   if (esgEl) esgEl.textContent = totalEsg.toLocaleString();
 
-  // 알림 배너 — 실제 재고 기반
+  // ⑥ 알림 배너
   const lowBizList   = businesses.filter(b => b.auto && b.newOil <= 2);
   const wasteBizList = businesses.filter(b => b.wasteOil >= 2);
   const banner  = document.getElementById('alertBanner');
   const content = document.getElementById('alertBannerContent');
   if (banner && content) {
-    const msgs = [];
-    lowBizList.forEach(b   => msgs.push(b.name + ' 재고 ' + b.newOil + '캔 — 자동발주 필요'));
-    wasteBizList.forEach(b => msgs.push(b.name + ' 폐유 ' + b.wasteOil + '캔 — 수거 필요'));
-    if (msgs.length > 0) {
-      banner.style.display = 'flex';
-      content.textContent  = msgs.join(' / ');
-    } else {
-      banner.style.display = 'none';
-    }
+    const msgs = [
+      ...lowBizList.map(b => b.name + ' 재고 ' + b.newOil + '캔 — 자동발주 필요'),
+      ...wasteBizList.map(b => b.name + ' 폐유 ' + b.wasteOil + '캔 — 수거 필요'),
+    ];
+    banner.style.display = msgs.length > 0 ? 'flex' : 'none';
+    if (content) content.textContent = msgs.join(' / ');
   }
 
-  // 최근 이력
   renderDbRecentList();
 }
 
@@ -3876,14 +3883,16 @@ async function deleteBizFromDB(bizId) {
 window.addEventListener('load', async () => {
   await loadBusinessesFromDB();
   await loadHistoryFromDB();
+  // DB 로드 완료 후 전체 UI 업데이트
   updateDashboard();
   updateTabBadges();
   renderWasteTable();
   renderHistory();
-  // 대시보드가 active이면 강제 재렌더
-  if (document.getElementById('panel-dashboard')?.classList.contains('active')) {
-    updateDashboard();
-  }
+  renderRegBizList();
+  // 현재 활성 패널이 대시보드가 아니어도 데이터 반영
+  const activePanel = location.hash.replace('#','') || 'dashboard';
+  if (activePanel === 'order') renderDeliveryPanel();
+  if (activePanel === 'hq') { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
 });
 
 
