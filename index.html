@@ -3022,23 +3022,38 @@ let qrNewVal = 5, qrWasteVal = 0, qrSelectedBizId = null;
 function initQRPanel() {
   const sel = document.getElementById('qrBizSelect');
   if (!sel) return;
-  sel.innerHTML = '<option value="">— 업체를 선택하세요 —</option>';
-  businesses.forEach(b => {
-    const opt = document.createElement('option');
-    opt.value = b.id;
-    opt.textContent = b.name;
-    sel.appendChild(opt);
-  });
-  const emptyMsg = document.getElementById('qrEmptyMsg');
-  if (emptyMsg) emptyMsg.style.display = businesses.length === 0 ? 'block' : 'none';
+
+  const fillSelect = () => {
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— 업체를 선택하세요 —</option>';
+    businesses.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name + ' (재고 ' + b.newOil + '캔)';
+      sel.appendChild(opt);
+    });
+    if (prev) sel.value = prev;
+    const emptyMsg = document.getElementById('qrEmptyMsg');
+    if (emptyMsg) emptyMsg.style.display = businesses.length === 0 ? 'block' : 'none';
+  };
+
+  // 먼저 로컬 데이터로 즉시 채우기
+  fillSelect();
+
+  // DB에서 최신 데이터로 업데이트
+  loadBusinessesFromDB().then(() => fillSelect()).catch(() => {});
 }
 
 function generateQR() {
   const sel = document.getElementById('qrBizSelect');
+  if (!sel || !sel.value) return;
+
   const bizId = parseInt(sel.value);
-  const biz = businesses.find(b => b.id === bizId);
   const area = document.getElementById('qrCodeArea');
   const emptyMsg = document.getElementById('qrEmptyMsg');
+
+  // businesses 배열에서 찾기
+  let biz = businesses.find(b => String(b.id) === String(bizId));
 
   if (!biz) {
     if (area) area.style.display = 'none';
@@ -3046,15 +3061,44 @@ function generateQR() {
     return;
   }
 
-  qrSelectedBizId = bizId;
-  qrNewVal   = biz.newOil;
-  qrWasteVal = biz.wasteOil;
+  qrSelectedBizId = biz.id;
 
-  if (area) area.style.display = 'block';
+  // DB에서 최신 재고 가져오기 (비동기)
+  db.from('businesses').select('new_oil,waste_oil,last_update').eq('id', biz.id).single()
+    .then(({data, error}) => {
+      if (!error && data) {
+        biz.newOil   = data.new_oil   ?? biz.newOil;
+        biz.wasteOil = data.waste_oil ?? biz.wasteOil;
+        biz.lastUpdate = data.last_update || biz.lastUpdate;
+        saveBusinesses();
+      }
+      // DB 성공/실패 모두 현재 값으로 표시
+      qrNewVal   = biz.newOil;
+      qrWasteVal = biz.wasteOil;
+      const newEl   = document.getElementById('qrNewVal');
+      const wasteEl = document.getElementById('qrWasteVal');
+      const timeEl  = document.getElementById('qrLastTime');
+      if (newEl)   newEl.textContent   = qrNewVal;
+      if (wasteEl) wasteEl.textContent = qrWasteVal;
+      if (timeEl)  timeEl.textContent  = biz.lastUpdate || '—';
+    })
+    .catch(() => {
+      // DB 연결 실패 시 로컬 값 사용
+      qrNewVal   = biz.newOil;
+      qrWasteVal = biz.wasteOil;
+      const newEl   = document.getElementById('qrNewVal');
+      const wasteEl = document.getElementById('qrWasteVal');
+      const timeEl  = document.getElementById('qrLastTime');
+      if (newEl)   newEl.textContent   = qrNewVal;
+      if (wasteEl) wasteEl.textContent = qrWasteVal;
+      if (timeEl)  timeEl.textContent  = biz.lastUpdate || '—';
+    });
+
+  if (area)    area.style.display    = 'block';
   if (emptyMsg) emptyMsg.style.display = 'none';
 
-  // QR 코드 생성 (구글 Charts API 사용)
-  const qrData = encodeURIComponent('sikyongyuniverse://biz/' + bizId + '?name=' + encodeURIComponent(biz.name));
+  // QR 코드 생성
+  const qrData = encodeURIComponent('sikyongyuniverse://biz/' + biz.id + '?name=' + encodeURIComponent(biz.name));
   const qrUrl  = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + qrData;
   const qrImg  = document.getElementById('qrCodeImg');
   if (qrImg) qrImg.innerHTML = `<img src="${qrUrl}" width="160" height="160" alt="QR" style="display:block;border-radius:4px;">`;
@@ -3062,13 +3106,18 @@ function generateQR() {
   const label = document.getElementById('qrBizLabel');
   if (label) label.textContent = biz.name;
 
-  // 미리보기 업데이트
   const previewName = document.getElementById('qrPreviewName');
   if (previewName) previewName.textContent = biz.name;
 
-  document.getElementById('qrNewVal').textContent   = qrNewVal;
-  document.getElementById('qrWasteVal').textContent = qrWasteVal;
-  document.getElementById('qrLastTime').textContent = biz.lastUpdate || '—';
+  // 일단 로컬 값으로 즉시 표시
+  qrNewVal   = biz.newOil;
+  qrWasteVal = biz.wasteOil;
+  const newEl   = document.getElementById('qrNewVal');
+  const wasteEl = document.getElementById('qrWasteVal');
+  const timeEl  = document.getElementById('qrLastTime');
+  if (newEl)   newEl.textContent   = qrNewVal;
+  if (wasteEl) wasteEl.textContent = qrWasteVal;
+  if (timeEl)  timeEl.textContent  = biz.lastUpdate || '—';
 }
 
 function changeQRStock(type, delta) {
@@ -3083,7 +3132,7 @@ function changeQRStock(type, delta) {
 
 function saveQRStock() {
   if (!qrSelectedBizId) { showToast('t1','⚠️ 업체를 먼저 선택해주세요',''); return; }
-  const biz = businesses.find(b => b.id === qrSelectedBizId);
+  const biz = businesses.find(b => String(b.id) === String(qrSelectedBizId));
   if (!biz) return;
 
   // 중복 저장 방지 — 버튼 즉시 비활성화
