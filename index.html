@@ -2182,8 +2182,7 @@ function renderWasteTable() {
   const thisYear2  = now2.getFullYear();
   const doneHistory = historyData.filter(h => {
     if (h.type !== '폐유수거' || h.status !== 'done') return false;
-    const d = new Date(h.rawDate || h.date.replaceAll('.', '-'));
-    return d.getMonth() === thisMonth2 && d.getFullYear() === thisYear2;
+    return isSameMonth(h, thisYear2, thisMonth2);
   });
   const doneEl  = document.getElementById('wasteDoneCount');
   const doneSub = document.getElementById('wasteDoneSub');
@@ -3586,8 +3585,7 @@ function renderEsgPanel() {
 
   // 이번달 — 날짜 파싱 안전하게
   const monthWaste = allWasteDone.filter(h => {
-    const d = new Date(h.rawDate || h.date.replaceAll('.', '-'));
-    return d.getMonth()===thisMonth && d.getFullYear()===thisYear;
+    return isSameMonth(h, thisYear, thisMonth);
   });
   const monthWasteCans = monthWaste.reduce((s,h) => s+(h.qty||0), 0);
   const monthPts = Math.round(monthWasteCans * PRICES.waste.can.kg * PRICES.esgRate);
@@ -3812,8 +3810,7 @@ function updateDashboard() {
 
   const oilDone = historyData.filter(h => {
     if (h.type !== '식용유발주' || h.status !== 'done') return false;
-    const d = new Date(h.rawDate || h.date.replaceAll('.', '-'));
-    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+    return isSameMonth(h, thisYear, thisMonth);
   });
   const oilCans = oilDone.reduce((s,h) => s + (h.qty||0), 0);
   const oilEl  = document.getElementById('db_oil_delivery');
@@ -3828,8 +3825,7 @@ function updateDashboard() {
   // ③ 이번달 폐유 수거 — done 이력
   const wasteDone = historyData.filter(h => {
     if (h.type !== '폐유수거' || h.status !== 'done') return false;
-    const d = new Date(h.rawDate || h.date.replaceAll('.', '-'));
-    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+    return isSameMonth(h, thisYear, thisMonth);
   });
   const wasteCans = wasteDone.reduce((s,h) => s + (h.qty||0), 0);
   const wasteEl  = document.getElementById('db_waste_total');
@@ -3841,19 +3837,17 @@ function updateDashboard() {
       ? '수거 대기 ' + businesses.reduce((s,b)=>s+(b.wasteOil||0),0) + '캔'
       : '이번 달 수거 이력 없음';
 
-  // ④ CO2 절감 — 전체 done 누적 기반
-  const allWasteDone = historyData.filter(h => h.type === '폐유수거'   && h.status === 'done').reduce((s,h)=>s+(h.qty||0),0);
-  const allOilDone   = historyData.filter(h => h.type === '식용유발주' && h.status === 'done').reduce((s,h)=>s+(h.qty||0),0);
-  // 이력 없으면 현재 재고 기반
-  const co2Cans = (allWasteDone + allOilDone) > 0
-    ? (allWasteDone + allOilDone)
-    : businesses.reduce((s,b)=>s+(b.newOil||0)+(b.wasteOil||0),0);
+  // ④ CO2 절감 — 폐유수거 done 누적만
+  const allWasteDoneCans = historyData.filter(h => h.type === '폐유수거' && h.status === 'done').reduce((s,h)=>s+(h.qty||0),0);
+  const co2Cans = allWasteDoneCans > 0
+    ? allWasteDoneCans
+    : businesses.reduce((s,b)=>s+(b.wasteOil||0),0);
   const co2 = Math.round(co2Cans * PRICES.waste.can.kg * PRICES.carbonRate);
   const co2El = document.getElementById('db_co2');
   if (co2El) co2El.innerHTML = co2.toLocaleString() + '<span style="font-size:14px;font-weight:500"> kg</span>';
 
-  // ⑤ ESG 포인트
-  const totalEsg = Math.round(allWasteDone * PRICES.waste.can.kg * PRICES.esgRate) + (allOilDone * 5);
+  // ⑤ ESG 포인트 — 폐유수거만 (식용유 납품 pts 제거)
+  const totalEsg = Math.round(allWasteDoneCans * PRICES.waste.can.kg * PRICES.esgRate);
   const esgEl = document.getElementById('db_esg_pts');
   if (esgEl) esgEl.textContent = totalEsg.toLocaleString();
 
@@ -4347,8 +4341,10 @@ function renderOrderPendingList() {
 }
 
 function updateOrderMonthStats() {
-  const thisMonth = new Date().getMonth();
-  const oilH = historyData.filter(h => h.type === '식용유발주' && new Date(h.rawDate||h.date).getMonth() === thisMonth);
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const thisYear  = now.getFullYear();
+  const oilH = historyData.filter(h => h.type === '식용유발주' && isSameMonth(h, thisYear, thisMonth));
   const totalCans = oilH.reduce((s,h) => s + (h.qty||0), 0);
   const el  = document.getElementById('orderMonthTotal');
   const sub = document.getElementById('orderMonthSub');
@@ -4420,16 +4416,14 @@ function updateHqRealStats() {
   // 이번달 납품 완료
   const oilDone = historyData.filter(h =>
     h.type === '식용유발주' && h.status === 'done' &&
-    new Date(h.rawDate||h.date).getMonth() === thisMonth &&
-    new Date(h.rawDate||h.date).getFullYear() === thisYear
+    isSameMonth(h, thisYear, thisMonth)
   );
   const oilCans = oilDone.reduce((s,h) => s+(h.qty||0), 0);
 
   // 이번달 폐유 수거 완료
   const wasteDone = historyData.filter(h =>
     h.type === '폐유수거' && h.status === 'done' &&
-    new Date(h.rawDate||h.date).getMonth() === thisMonth &&
-    new Date(h.rawDate||h.date).getFullYear() === thisYear
+    isSameMonth(h, thisYear, thisMonth)
   );
   const wasteCans = wasteDone.reduce((s,h) => s+(h.qty||0), 0);
   const wasteKg   = (wasteCans * PRICES.waste.can.kg).toFixed(0);
@@ -4476,8 +4470,7 @@ function renderOwnerMonthlyStats() {
   // 이번달 이력 필터
   const myHistory = historyData.filter(h => {
     if (String(h.bizId) !== String(ownerBizId)) return false;
-    const d = new Date(h.rawDate || h.date);
-    return d.getMonth() === month && d.getFullYear() === year;
+    return isSameMonth(h, year, month);
   });
 
   // 식용유 구매금액
