@@ -3407,6 +3407,18 @@ async function confirmDelivery() {
   saveHistory();
   await saveHistoryToDB(item);
 
+  // 납품 완료 후 해당 업체의 pending 자동발주 이력 → done 처리
+  const pendingAuto = historyData.find(h =>
+    h.bizId === biz.id && h.type === '식용유발주' && h.status === 'pending'
+  );
+  if (pendingAuto) {
+    pendingAuto.status = 'done';
+    saveHistory();
+    if (pendingAuto.dbId) {
+      db.from('history').update({ status: 'done' }).eq('id', pendingAuto.dbId).then(() => {});
+    }
+  }
+
   // 지도 마커 갱신
   if (kakaoMap && mapInitialized) {
     markers.forEach(m => m.overlay.setMap(null));
@@ -3422,7 +3434,6 @@ async function confirmDelivery() {
   renderHistory();
 
   showToast('t1','✅ 납품 완료!', biz.name + ' — ' + oilName + ' ' + qty + '캔 (재고 ' + biz.newOil + '캔으로 갱신)');
-  // 버튼 복구는 renderDeliveryPanel이 새로 렌더하므로 불필요
 }
 
 function renderTodayDelivList() {
