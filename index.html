@@ -1830,8 +1830,7 @@ function applyPrices() {
   });
   // 주간 시세 페이지 업데이트
   renderPricePage();
-  // 대시보드 시세 바 업데이트
-  updateDashboard();
+  // ❌ updateDashboard() 제거 — 무한루프 원인 (updateDashboard가 applyPrices를 호출함)
   // 발주 select 옵션 텍스트 업데이트
   const optMap = { soy:'opt_soy', canola:'opt_canola', corn:'opt_corn' };
   Object.entries(PRICES.oils).forEach(([k,v]) => {
