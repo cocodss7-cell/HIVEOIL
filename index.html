@@ -2117,10 +2117,13 @@ function filterBizList(q) { renderBizList(currentFilter, q); }
 
 // ===== PANEL NAV =====
 function showPanel(id, navEl, pushState=true) {
+  // 패널 전환
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('panel-' + id);
   if (!target) return;
   target.classList.add('active');
+
+  // 네비 활성화
   if (navEl && navEl.classList) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     navEl.classList.add('active');
@@ -2131,25 +2134,42 @@ function showPanel(id, navEl, pushState=true) {
       navMatch.classList.add('active');
     }
   }
+
+  // 탭바 동기화
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  const activeTab = document.getElementById('tab-' + id);
+  if (activeTab) activeTab.classList.add('active');
+
+  // 모바일: 사이드바 닫기
+  if (window.innerWidth <= 768) {
+    document.getElementById('mainSidebar')?.classList.remove('open');
+    document.getElementById('sidebarBackdrop')?.classList.remove('open');
+  }
+
+  // 페이지 타이틀
   const titles = { dashboard:'📊 대시보드', map:'🗺️ 원주 지도 현황', waste:'🗑️ 폐식용유 수거', order:'🫙 식용유 발주·납품', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 QR 재고 입력' };
   const title = titles[id] || '';
-  document.getElementById('page-title-text').textContent = title;
+  const titleEl = document.getElementById('page-title-text');
+  if (titleEl) titleEl.textContent = title;
   document.title = '식용유니버스 HIVE — ' + title;
-  if (pushState) history.pushState({ panel: id }, title, '#' + id);
-  if (id === 'map') {
-    setTimeout(() => { initNaverMap(); if (kakaoMap) kakaoMap.relayout(); }, 80);
-  }
-  if (id === 'waste')   renderWasteTable();
-  if (id === 'history') renderHistory();
-  if (id === 'hq')      { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
-  if (id === 'qr')      { initQRPanel(); }
-  if (id === 'admin')   { renderAdminPrices(); }
-  if (id === 'price')   { renderPricePage(); }
-  if (id === 'esg')     { renderEsgPanel(); }
-  if (id === 'order')   { loadBusinessesFromDB().then(() => { renderDeliveryPanel(); updateOrderMonthStats(); }); }
-  if (id === 'delivery') { showPanel('order', null, pushState); return; }
-  if (id === 'dashboard') { updateDashboard(); }
 
+  // 해시 업데이트
+  if (pushState) history.pushState({ panel: id }, title, '#' + id);
+
+  // 패널별 렌더
+  if (id === 'dashboard') { updateDashboard(); }
+  if (id === 'map')       { setTimeout(() => { if (!mapInitialized) initKakaoMap(); else renderBizList(); if (kakaoMap) kakaoMap.relayout?.(); }, 80); }
+  if (id === 'waste')     { renderWasteTable(); }
+  if (id === 'order')     { renderDeliveryPanel && renderDeliveryPanel(); updateOrderMonthStats && updateOrderMonthStats(); }
+  if (id === 'history')   { renderHistory(); }
+  if (id === 'price')     { renderPricePage(); }
+  if (id === 'esg')       { renderEsgPanel(); }
+  if (id === 'owner')     { renderOwnerPanel && renderOwnerPanel(); }
+  if (id === 'register')  { renderRegBizList(); }
+  if (id === 'hq')        { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
+  if (id === 'admin')     { renderAdminPrices && renderAdminPrices(); }
+  if (id === 'qr')        { initQRPanel && initQRPanel(); }
+  if (id === 'delivery')  { showPanel('order', null, pushState); return; }
 }
 
 // 뒤로가기 / 앞으로가기 처리
@@ -3535,15 +3555,7 @@ function showPanelMobile(id, tabEl) {
   showPanel(id, null, true);
 }
 
-// showPanel 호출 시 탭바도 동기화
-const _origShowPanel2 = showPanel;
-showPanel = function(id, navEl, pushState=true) {
-  _origShowPanel2(id, navEl, pushState);
-  // 탭바 동기화
-  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-  const activeTab = document.getElementById('tab-' + id);
-  if (activeTab) activeTab.classList.add('active');
-};
+// 탭바 동기화는 showPanel 내부에서 직접 처리
 
 // 뱃지 업데이트 함수
 function updateTabBadges() {
@@ -3919,13 +3931,6 @@ async function loadBusinessesFromDB() {
   } catch(e) {
     console.warn('DB 로드 실패, localStorage 사용:', e.message);
     // 실패 시 기존 데이터 유지 (덮어쓰지 않음)
-    updateDashboard && updateDashboard();
-    updateHqRealStats && updateHqRealStats();
-    updateTabBadges && updateTabBadges();
-    renderRegBizList && renderRegBizList();
-  }
-}ssage);
-    // localStorage 데이터로 대시보드 업데이트
     updateDashboard && updateDashboard();
     updateHqRealStats && updateHqRealStats();
     updateTabBadges && updateTabBadges();
@@ -4778,12 +4783,16 @@ function closeSidebar() {
   document.getElementById('mainSidebar')?.classList.remove('open');
   document.getElementById('sidebarBackdrop')?.classList.remove('open');
 }
-// 패널 이동 시 사이드바 닫기
-const _origShowPanel = showPanel;
+// 패널 이동 시 사이드바 닫기 (모바일)
+function closeSidebarOnMobile() {
+  if (window.innerWidth <= 768) {
+    document.getElementById('mainSidebar')?.classList.remove('open');
+    document.getElementById('sidebarBackdrop')?.classList.remove('open');
+  }
+}
 
 // ===== 즉시 실행 - localStorage 데이터로 바로 렌더 =====
 (function initUI() {
-  // DOM 준비되면 즉시 localStorage 데이터로 렌더
   updateDashboard();
   updateTabBadges();
   renderWasteTable();
