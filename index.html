@@ -4623,6 +4623,16 @@ function closeSidebar() {
 // 패널 이동 시 사이드바 닫기
 const _origShowPanel = showPanel;
 
+// ===== 즉시 실행 - localStorage 데이터로 바로 렌더 =====
+(function initUI() {
+  // DOM 준비되면 즉시 localStorage 데이터로 렌더
+  updateDashboard();
+  updateTabBadges();
+  renderWasteTable();
+  renderHistory();
+  renderRegBizList();
+})();
+
 </script>
 </body>
 </html>
