@@ -987,20 +987,16 @@
               <div class="card-title" style="color:var(--green-dark);">🌿 ESG 포인트 적립 기준</div>
             </div>
             <div style="padding:16px 20px;">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-                <div style="background:var(--green-pale);border-radius:10px;padding:14px;border:1px solid var(--green-light);">
-                  <div style="font-size:11px;color:var(--green-dark);font-weight:700;margin-bottom:6px;">🗑️ 폐유 수거 시</div>
-                  <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-dark);">+144 pts</div>
-                  <div style="font-size:10px;color:var(--gray);margin-top:3px;">캔당 (16.5kg × 8.75pts/kg)</div>
-                </div>
-                <div style="background:#EEF4FF;border-radius:10px;padding:14px;border:1px solid #C5D8F5;">
-                  <div style="font-size:11px;color:#185FA5;font-weight:700;margin-bottom:6px;">🫙 식용유 납품 시</div>
-                  <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#185FA5;">+5 pts</div>
-                  <div style="font-size:10px;color:var(--gray);margin-top:3px;">캔당 · 식용유 구매 실적</div>
+              <div style="background:var(--green-pale);border-radius:10px;padding:18px;border:1.5px solid var(--green-light);margin-bottom:12px;">
+                <div style="font-size:12px;color:var(--green-dark);font-weight:700;margin-bottom:8px;">🗑️ 폐식용유 수거 시</div>
+                <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--green-dark);letter-spacing:-0.03em;">+144 pts / 캔</div>
+                <div style="font-size:11px;color:var(--gray);margin-top:8px;line-height:1.7;">
+                  • 1캔(16.5kg) × 8.75pts/kg = <strong>144pts</strong><br>
+                  • 탄소 감축: 16.5kg × 0.7 = <strong style="color:var(--green-dark);">11.55 kg CO₂</strong>
                 </div>
               </div>
-              <div style="background:var(--cream);border-radius:9px;padding:12px 14px;font-size:11px;color:var(--gray);line-height:1.7;">
-                💡 폐유 수거 1캔 = 16.5kg × 0.7(감축계수) = <strong style="color:var(--green-dark);">11.55 kg CO₂ 절감</strong>
+              <div style="background:var(--cream);border-radius:9px;padding:10px 14px;font-size:11px;color:var(--gray);">
+                💡 폐유 수거량이 많을수록 ESG 포인트와 탄소 감축량이 함께 올라가요
               </div>
             </div>
           </div>
@@ -1008,15 +1004,10 @@
           <!-- 이번달 현황 -->
           <div class="card">
             <div class="card-header"><div class="card-title">📊 이번달 ESG 현황</div></div>
-            <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
               <div style="background:var(--cream);border-radius:10px;padding:14px;text-align:center;">
                 <div style="font-size:10px;color:var(--gray);margin-bottom:4px;">🗑️ 폐유 수거</div>
                 <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--green-dark);" id="esg_month_waste_cans">0</div>
-                <div style="font-size:10px;color:var(--gray);">캔</div>
-              </div>
-              <div style="background:var(--cream);border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:10px;color:var(--gray);margin-bottom:4px;">🫙 식용유 납품</div>
-                <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#185FA5;" id="esg_month_oil_cans">0</div>
                 <div style="font-size:10px;color:var(--gray);">캔</div>
               </div>
               <div style="background:var(--green-pale);border-radius:10px;padding:14px;text-align:center;border:1px solid var(--green-light);">
@@ -2186,7 +2177,14 @@ function renderWasteTable() {
   if (waitSub) waitSub.textContent = waitBiz.length > 0
     ? '업체 · 총 ' + (waitBiz.reduce((s,b) => s + b.wasteOil, 0) * PRICES.waste.can.kg).toFixed(0) + 'kg 대기'
     : '수거 대기 없음';
-  const doneHistory = historyData.filter(h => h.type === '폐유수거' && h.status === 'done');
+  const now2 = new Date();
+  const thisMonth2 = now2.getMonth();
+  const thisYear2  = now2.getFullYear();
+  const doneHistory = historyData.filter(h => {
+    if (h.type !== '폐유수거' || h.status !== 'done') return false;
+    const d = new Date(h.rawDate || h.date.replaceAll('.', '-'));
+    return d.getMonth() === thisMonth2 && d.getFullYear() === thisYear2;
+  });
   const doneEl  = document.getElementById('wasteDoneCount');
   const doneSub = document.getElementById('wasteDoneSub');
   if (doneEl)  doneEl.textContent = doneHistory.length;
@@ -3578,45 +3576,37 @@ function renderEsgPanel() {
   const thisMonth = now.getMonth();
   const thisYear  = now.getFullYear();
 
-  // 전체 누적
-  const allWasteDone = historyData.filter(h => h.type === '폐유수거'   && h.status === 'done');
-  const allOilDone   = historyData.filter(h => h.type === '식용유발주' && h.status === 'done');
+  // 전체 누적 — 폐유수거만
+  const allWasteDone = historyData.filter(h => h.type === '폐유수거' && h.status === 'done');
   const totalWasteCans = allWasteDone.reduce((s,h) => s+(h.qty||0), 0);
-  const totalOilCans   = allOilDone.reduce((s,h)   => s+(h.qty||0), 0);
-  const totalPts = Math.round(totalWasteCans * PRICES.waste.can.kg * PRICES.esgRate) + (totalOilCans * 5);
+  const totalPts = Math.round(totalWasteCans * PRICES.waste.can.kg * PRICES.esgRate);
 
   // 등급
   const tier = totalPts >= 50000 ? '🥇 골드' : totalPts >= 10000 ? '🥈 실버' : totalPts >= 1000 ? '🥉 브론즈' : '🌱 새싹';
 
-  // 이번달
+  // 이번달 — 날짜 파싱 안전하게
   const monthWaste = allWasteDone.filter(h => {
-    const d = new Date(h.rawDate||h.date);
-    return d.getMonth()===thisMonth && d.getFullYear()===thisYear;
-  });
-  const monthOil = allOilDone.filter(h => {
-    const d = new Date(h.rawDate||h.date);
+    const d = new Date(h.rawDate || h.date.replaceAll('.', '-'));
     return d.getMonth()===thisMonth && d.getFullYear()===thisYear;
   });
   const monthWasteCans = monthWaste.reduce((s,h) => s+(h.qty||0), 0);
-  const monthOilCans   = monthOil.reduce((s,h)   => s+(h.qty||0), 0);
-  const monthPts = Math.round(monthWasteCans * PRICES.waste.can.kg * PRICES.esgRate) + (monthOilCans * 5);
+  const monthPts = Math.round(monthWasteCans * PRICES.waste.can.kg * PRICES.esgRate);
   const monthCo2 = (monthWasteCans * PRICES.waste.can.kg * PRICES.carbonRate).toFixed(1);
 
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.innerHTML = v; };
-  set('esg_total_pts',       totalPts.toLocaleString());
-  set('esg_tier_badge',      tier);
+  set('esg_total_pts',        totalPts.toLocaleString());
+  set('esg_tier_badge',       tier);
   set('esg_month_waste_cans', monthWasteCans);
-  set('esg_month_oil_cans',   monthOilCans);
   set('esg_month_pts',        monthPts.toLocaleString());
   set('esg_month_co2',        monthCo2);
 
-  // 적립 이력 (done 이력 기반)
+  // 적립 이력 — 폐유수거만
   const esgBody = document.getElementById('esgHistoryBody');
   if (!esgBody) return;
 
-  const allDone = [...allWasteDone, ...allOilDone]
-    .sort((a,b) => new Date(b.rawDate||b.date) - new Date(a.rawDate||a.date))
-    .slice(0, 30);
+  const allDone = [...allWasteDone]
+    .sort((a,b) => new Date(b.rawDate||b.date.replaceAll('.','-')) - new Date(a.rawDate||a.date.replaceAll('.','-')))
+    .slice(0, 50);
 
   if (allDone.length === 0) {
     esgBody.innerHTML = '<div style="text-align:center;padding:24px;color:var(--gray);font-size:12px;">아직 적립 이력이 없어요</div>';
@@ -3629,14 +3619,10 @@ function renderEsgPanel() {
     <thead><tr><th>날짜</th><th>업체</th><th>적립 사유</th><th style="color:var(--green-main)">포인트</th><th>잔액</th></tr></thead>
     <tbody>
       ${allDone.map(h => {
-        const pts = h.type === '폐유수거'
-          ? Math.round((h.qty||0) * PRICES.waste.can.kg * PRICES.esgRate)
-          : (h.qty||0) * 5;
+        const pts = Math.round((h.qty||0) * PRICES.waste.can.kg * PRICES.esgRate);
         const bal = running;
         running -= pts;
-        const label = h.type === '폐유수거'
-          ? `폐유 ${h.qty||0}캔 수거 (${((h.qty||0)*PRICES.waste.can.kg).toFixed(1)}kg)`
-          : `식용유 ${h.qty||0}캔 납품`;
+        const label = `폐유 ${h.qty||0}캔 수거 (${((h.qty||0)*PRICES.waste.can.kg).toFixed(1)}kg)`;
         return `<tr>
           <td>${h.date}</td>
           <td><strong>${h.biz}</strong></td>
@@ -3826,7 +3812,7 @@ function updateDashboard() {
 
   const oilDone = historyData.filter(h => {
     if (h.type !== '식용유발주' || h.status !== 'done') return false;
-    const d = new Date(h.rawDate || h.date);
+    const d = new Date(h.rawDate || h.date.replaceAll('.', '-'));
     return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
   });
   const oilCans = oilDone.reduce((s,h) => s + (h.qty||0), 0);
@@ -3842,7 +3828,7 @@ function updateDashboard() {
   // ③ 이번달 폐유 수거 — done 이력
   const wasteDone = historyData.filter(h => {
     if (h.type !== '폐유수거' || h.status !== 'done') return false;
-    const d = new Date(h.rawDate || h.date);
+    const d = new Date(h.rawDate || h.date.replaceAll('.', '-'));
     return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
   });
   const wasteCans = wasteDone.reduce((s,h) => s + (h.qty||0), 0);
