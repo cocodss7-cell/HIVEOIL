@@ -545,7 +545,7 @@
       <div class="nav-item" onclick="showPanel('register',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
         <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
       </div>
-      <div class="nav-item" onclick="showPanel('admin',this)" style="border:1.5px solid #e0ece0;margin-top:3px;display:none;">
+      <div class="nav-item" onclick="showPanel('admin',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
         <span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span>
       </div>
     </nav>
@@ -1598,15 +1598,29 @@
             <div class="card" style="padding:16px 18px;">
               <div style="font-size:11px;font-weight:700;color:var(--gray);letter-spacing:0.03em;margin-bottom:10px;">📋 최근 변경 이력</div>
               <div id="priceChangeLog" style="display:flex;flex-direction:column;gap:7px;">
-                <div style="font-size:11px;display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-light);">
-                  <span style="color:var(--gray)">2026.03.20</span><span style="color:var(--black);font-weight:600;">대두유 48,000→50,000원</span>
-                </div>
-                <div style="font-size:11px;display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-light);">
-                  <span style="color:var(--gray)">2026.02.15</span><span style="color:var(--black);font-weight:600;">폐유 40kg 9,000→10,000원</span>
-                </div>
-                <div style="font-size:11px;display:flex;justify-content:space-between;padding:6px 0;">
-                  <span style="color:var(--gray)">2026.01.05</span><span style="color:var(--black);font-weight:600;">카놀라유 47,000→50,000원</span>
-                </div>
+                <div style="font-size:11px;color:var(--gray);text-align:center;padding:10px 0;">저장 시 자동 기록돼요</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 데이터 초기화 섹션 -->
+          <div class="card" style="margin-top:20px;border:2px solid #FFD0D0;">
+            <div class="card-header" style="background:#FFF5F5;border-bottom:1px solid #FFD0D0;">
+              <div class="card-title" style="color:#C0392B;">🗑️ 데이터 초기화 (주의)</div>
+              <div style="font-size:10px;color:#E74C3C;font-weight:700;">되돌릴 수 없어요</div>
+            </div>
+            <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
+              <button class="btn" style="background:#FFF5F5;color:#C0392B;border:1.5px solid #FFB3B3;justify-content:center;padding:11px;font-size:12px;font-weight:700;" onclick="adminClearHistory()">
+                📋 진행 이력 전체 삭제 (DB + localStorage)
+              </button>
+              <button class="btn" style="background:#FFF5F5;color:#C0392B;border:1.5px solid #FFB3B3;justify-content:center;padding:11px;font-size:12px;font-weight:700;" onclick="adminClearBusinesses()">
+                🏪 등록 업체 전체 삭제 (DB + localStorage)
+              </button>
+              <button class="btn" style="background:#FFF0F0;color:#922B21;border:2px solid #FF8A80;justify-content:center;padding:11px;font-size:13px;font-weight:800;" onclick="adminClearAll()">
+                ⚠️ 전체 초기화 (업체 + 이력 모두 삭제)
+              </button>
+              <div style="font-size:10px;color:var(--gray);background:var(--cream);border-radius:8px;padding:9px 12px;line-height:1.6;">
+                💡 테스트 데이터 정리 시 사용하세요. Supabase DB와 localStorage 모두 삭제돼요.
               </div>
             </div>
           </div>
@@ -2754,13 +2768,31 @@ function saveWeightRecord() {
   showToast('t1','⚖️ 실측 기록 저장됨','배출량 ' + kg + 'kg 기록이 저장됐어요');
 }
 
-// 페이지 로드 시 저장된 시세 UI 반영
+// 페이지 로드 시 저장된 시세 UI 반영 (비정상 가격 자동 리셋)
 (function() {
   try {
     const saved = localStorage.getItem('hiveoil_prices');
     if (saved) {
-      applyPrices();
+      const parsed = JSON.parse(saved);
+      // 비정상 가격 감지: 기본값의 150% 초과 시 리셋
+      let abnormal = false;
+      if (parsed.oils) {
+        Object.keys(PRICES_DEFAULT.oils).forEach(k => {
+          if (parsed.oils[k] && parsed.oils[k].price > PRICES_DEFAULT.oils[k].price * 1.5) {
+            abnormal = true;
+          }
+        });
+      }
+      if (abnormal) {
+        localStorage.removeItem('hiveoil_prices');
+        console.log('⚠️ 비정상 가격 감지 — 기본값으로 리셋');
+      } else {
+        // 정상이면 저장된 가격 적용
+        if (parsed.oils) Object.keys(parsed.oils).forEach(k => { if (PRICES.oils[k]) PRICES.oils[k].price = parsed.oils[k].price; });
+        if (parsed.waste) Object.keys(parsed.waste).forEach(k => { if (PRICES.waste[k]) PRICES.waste[k].price = parsed.waste[k].price; });
+      }
     }
+    applyPrices();
   } catch(e) {}
 })();
 
@@ -2938,6 +2970,47 @@ function adminResetPrices() {
   applyPrices();
   renderAdminPrices();
   showToast('t1','🔄 초기화 완료','시세가 기본값으로 복원됐어요');
+}
+
+// ===== 데이터 초기화 함수 =====
+async function adminClearHistory() {
+  if (!confirm('진행 이력을 전체 삭제할까요? 되돌릴 수 없어요.')) return;
+  try {
+    // DB 삭제
+    const { error } = await db.from('history').delete().neq('id', 0);
+    if (error) throw error;
+  } catch(e) {
+    console.warn('DB 이력 삭제 실패:', e.message);
+  }
+  // localStorage도 삭제
+  historyData.length = 0;
+  try { localStorage.removeItem('hiveoil_history'); } catch(e) {}
+  updateDashboard();
+  updateHqRealStats();
+  showToast('t1','🗑️ 이력 삭제 완료','진행 이력이 모두 삭제됐어요');
+}
+
+async function adminClearBusinesses() {
+  if (!confirm('등록 업체를 전체 삭제할까요? 되돌릴 수 없어요.')) return;
+  try {
+    const { error } = await db.from('businesses').delete().neq('id', 0);
+    if (error) throw error;
+  } catch(e) {
+    console.warn('DB 업체 삭제 실패:', e.message);
+  }
+  businesses.length = 0;
+  try { localStorage.removeItem('hiveoil_businesses'); } catch(e) {}
+  updateDashboard();
+  updateHqRealStats();
+  renderRegBizList && renderRegBizList();
+  showToast('t1','🗑️ 업체 삭제 완료','등록 업체가 모두 삭제됐어요');
+}
+
+async function adminClearAll() {
+  if (!confirm('업체와 이력을 모두 삭제할까요? 절대 되돌릴 수 없어요!')) return;
+  await adminClearHistory();
+  await adminClearBusinesses();
+  showToast('t1','⚠️ 전체 초기화 완료','업체와 이력이 모두 삭제됐어요');
 }
 
 
