@@ -3086,6 +3086,15 @@ function saveQRStock() {
   const biz = businesses.find(b => b.id === qrSelectedBizId);
   if (!biz) return;
 
+  // 중복 저장 방지 — 버튼 즉시 비활성화
+  const btn = document.querySelector('[onclick="saveQRStock()"]');
+  if (btn) {
+    if (btn.disabled) return; // 이미 처리 중
+    btn.disabled = true;
+    btn.textContent = '⏳ 저장 중...';
+    btn.style.opacity = '0.6';
+  }
+
   const now = new Date();
   const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
 
@@ -3105,6 +3114,19 @@ function saveQRStock() {
     markers = []; infoWindows = [];
     businesses.forEach(b => addMarkerToMap(b));
     renderBizList();
+  }
+
+  // 버튼 완료 상태로 변경
+  if (btn) {
+    btn.textContent = '✅ 저장 완료!';
+    btn.style.background = '#2E7D32';
+    // 3초 후 다시 활성화
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '✅ 재고 저장 완료';
+      btn.style.opacity = '1';
+      btn.style.background = '';
+    }, 3000);
   }
 
   showToast('t1','✅ 재고 저장 완료!', biz.name + ' — 새식용유 '+qrNewVal+'캔, 폐유 '+qrWasteVal+'캔');
@@ -3335,18 +3357,31 @@ function quickDeliver(bizId) {
 }
 
 async function confirmDelivery() {
+  // 중복 방지
+  const btn = document.querySelector('[onclick="confirmDelivery()"]');
+  if (btn) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = '⏳ 처리 중...';
+    btn.style.opacity = '0.6';
+  }
+
   const sel    = document.getElementById('delivBizSelect');
   const biz    = businesses.find(b => String(b.id) === String(sel?.value));
   const qty    = parseInt(document.getElementById('delivQty')?.value) || 5;
   const oilKey = document.getElementById('delivOilType')?.value || 'soy';
   const oilName = PRICES.oils[oilKey]?.label || '식용유';
 
-  if (!biz) { showToast('t1','⚠️ 업체를 선택해주세요',''); return; }
+  if (!biz) {
+    showToast('t1','⚠️ 업체를 선택해주세요','');
+    if (btn) { btn.disabled = false; btn.textContent = '✅ 납품 확정'; btn.style.opacity = '1'; }
+    return;
+  }
 
   // DB에서 최신 재고 읽기
   const dbRes = await db.from('businesses').select('new_oil').eq('id', biz.id).single();
   const realStock = (dbRes.data && !dbRes.error) ? dbRes.data.new_oil : biz.newOil;
-  biz.newOil = realStock; // 로컬도 최신으로
+  biz.newOil = realStock;
   const prevStock = realStock;
   biz.newOil = prevStock + qty;
   biz.lastUpdate = '방금 납품 완료';
@@ -3387,6 +3422,7 @@ async function confirmDelivery() {
   renderHistory();
 
   showToast('t1','✅ 납품 완료!', biz.name + ' — ' + oilName + ' ' + qty + '캔 (재고 ' + biz.newOil + '캔으로 갱신)');
+  // 버튼 복구는 renderDeliveryPanel이 새로 렌더하므로 불필요
 }
 
 function renderTodayDelivList() {
@@ -4319,6 +4355,22 @@ function completeCollect(bizId) {
   const b = businesses.find(x => x.id === bizId);
   if (!b) return;
 
+  // 이미 처리됐거나 폐유 0캔이면 무시
+  if (b.wasteOil <= 0) {
+    showToast('t1','ℹ️ 수거할 폐유가 없어요', b.name + ' — 폐유 재고 0캔');
+    return;
+  }
+  // 처리 중 플래그
+  if (b._collectInProgress) return;
+  b._collectInProgress = true;
+
+  // 버튼 즉시 비활성화
+  document.querySelectorAll(`[onclick*="completeCollect(${bizId})"]`).forEach(btn => {
+    btn.disabled = true;
+    btn.textContent = '⏳ 처리 중...';
+    btn.style.opacity = '0.5';
+  });
+
   const prevWaste = b.wasteOil;
 
   // pending 이력 → done으로 변경
@@ -4368,6 +4420,7 @@ function completeCollect(bizId) {
   renderWasteTable();
   updateDashboard();
   updateTabBadges();
+  b._collectInProgress = false; // 플래그 해제
   showToast('t1','✅ 수거 완료 처리!', b.name + ' — 폐유 ' + prevWaste + '캔 수거 완료 · 재고 0으로 초기화');
 }
 
