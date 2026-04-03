@@ -3052,7 +3052,7 @@ function generateQR() {
   const area = document.getElementById('qrCodeArea');
   const emptyMsg = document.getElementById('qrEmptyMsg');
 
-  // businesses 배열에서 찾기
+  // businesses 배열에서 찾기 (id 타입 상관없이)
   let biz = businesses.find(b => String(b.id) === String(bizId));
 
   if (!biz) {
@@ -3061,41 +3061,25 @@ function generateQR() {
     return;
   }
 
+  // 업체 선택 즉시 로컬 값으로 표시
   qrSelectedBizId = biz.id;
-
-  // DB에서 최신 재고 가져오기 (비동기)
-  db.from('businesses').select('new_oil,waste_oil,last_update').eq('id', biz.id).single()
-    .then(({data, error}) => {
-      if (!error && data) {
-        biz.newOil   = data.new_oil   ?? biz.newOil;
-        biz.wasteOil = data.waste_oil ?? biz.wasteOil;
-        biz.lastUpdate = data.last_update || biz.lastUpdate;
-        saveBusinesses();
-      }
-      // DB 성공/실패 모두 현재 값으로 표시
-      qrNewVal   = biz.newOil;
-      qrWasteVal = biz.wasteOil;
-      const newEl   = document.getElementById('qrNewVal');
-      const wasteEl = document.getElementById('qrWasteVal');
-      const timeEl  = document.getElementById('qrLastTime');
-      if (newEl)   newEl.textContent   = qrNewVal;
-      if (wasteEl) wasteEl.textContent = qrWasteVal;
-      if (timeEl)  timeEl.textContent  = biz.lastUpdate || '—';
-    })
-    .catch(() => {
-      // DB 연결 실패 시 로컬 값 사용
-      qrNewVal   = biz.newOil;
-      qrWasteVal = biz.wasteOil;
-      const newEl   = document.getElementById('qrNewVal');
-      const wasteEl = document.getElementById('qrWasteVal');
-      const timeEl  = document.getElementById('qrLastTime');
-      if (newEl)   newEl.textContent   = qrNewVal;
-      if (wasteEl) wasteEl.textContent = qrWasteVal;
-      if (timeEl)  timeEl.textContent  = biz.lastUpdate || '—';
-    });
+  qrNewVal   = biz.newOil   || 0;
+  qrWasteVal = biz.wasteOil || 0;
 
   if (area)    area.style.display    = 'block';
   if (emptyMsg) emptyMsg.style.display = 'none';
+
+  // 미리보기 업데이트
+  const previewName = document.getElementById('qrPreviewName');
+  const label       = document.getElementById('qrBizLabel');
+  const newEl       = document.getElementById('qrNewVal');
+  const wasteEl     = document.getElementById('qrWasteVal');
+  const timeEl      = document.getElementById('qrLastTime');
+  if (previewName) previewName.textContent = biz.name;
+  if (label)       label.textContent       = biz.name;
+  if (newEl)       newEl.textContent       = qrNewVal;
+  if (wasteEl)     wasteEl.textContent     = qrWasteVal;
+  if (timeEl)      timeEl.textContent      = biz.lastUpdate || '—';
 
   // QR 코드 생성
   const qrData = encodeURIComponent('sikyongyuniverse://biz/' + biz.id + '?name=' + encodeURIComponent(biz.name));
@@ -3103,21 +3087,25 @@ function generateQR() {
   const qrImg  = document.getElementById('qrCodeImg');
   if (qrImg) qrImg.innerHTML = `<img src="${qrUrl}" width="160" height="160" alt="QR" style="display:block;border-radius:4px;">`;
 
-  const label = document.getElementById('qrBizLabel');
-  if (label) label.textContent = biz.name;
-
-  const previewName = document.getElementById('qrPreviewName');
-  if (previewName) previewName.textContent = biz.name;
-
-  // 일단 로컬 값으로 즉시 표시
-  qrNewVal   = biz.newOil;
-  qrWasteVal = biz.wasteOil;
-  const newEl   = document.getElementById('qrNewVal');
-  const wasteEl = document.getElementById('qrWasteVal');
-  const timeEl  = document.getElementById('qrLastTime');
-  if (newEl)   newEl.textContent   = qrNewVal;
-  if (wasteEl) wasteEl.textContent = qrWasteVal;
-  if (timeEl)  timeEl.textContent  = biz.lastUpdate || '—';
+  // DB에서 최신 재고 가져오기 (연결 됐을 때만, 실패해도 무시)
+  if (typeof db !== 'undefined') {
+    try {
+      db.from('businesses').select('new_oil,waste_oil,last_update').eq('id', biz.id).single()
+        .then(({data, error}) => {
+          if (!error && data) {
+            biz.newOil     = data.new_oil   ?? biz.newOil;
+            biz.wasteOil   = data.waste_oil ?? biz.wasteOil;
+            biz.lastUpdate = data.last_update || biz.lastUpdate;
+            saveBusinesses();
+            qrNewVal   = biz.newOil;
+            qrWasteVal = biz.wasteOil;
+            if (newEl)   newEl.textContent   = qrNewVal;
+            if (wasteEl) wasteEl.textContent = qrWasteVal;
+            if (timeEl)  timeEl.textContent  = biz.lastUpdate || '—';
+          }
+        }).catch(() => {});
+    } catch(e) {}
+  }
 }
 
 function changeQRStock(type, delta) {
