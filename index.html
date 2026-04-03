@@ -2182,7 +2182,14 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'register')  { renderRegBizList(); }
   if (id === 'hq')        { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
   if (id === 'admin')     { renderAdminPrices && renderAdminPrices(); }
-  if (id === 'qr')        { initQRPanel && initQRPanel(); }
+  if (id === 'qr') {
+    // businesses가 있으면 즉시, 없으면 DB 로드 후 채우기
+    if (businesses.length > 0) {
+      initQRPanel && initQRPanel();
+    } else {
+      loadBusinessesFromDB().then(() => initQRPanel && initQRPanel());
+    }
+  }
   if (id === 'delivery')  { showPanel('order', null, pushState); return; }
 }
 
@@ -3022,26 +3029,17 @@ let qrNewVal = 5, qrWasteVal = 0, qrSelectedBizId = null;
 function initQRPanel() {
   const sel = document.getElementById('qrBizSelect');
   if (!sel) return;
-
-  const fillSelect = () => {
-    const prev = sel.value;
-    sel.innerHTML = '<option value="">— 업체를 선택하세요 —</option>';
-    businesses.forEach(b => {
-      const opt = document.createElement('option');
-      opt.value = b.id;
-      opt.textContent = b.name + ' (재고 ' + b.newOil + '캔)';
-      sel.appendChild(opt);
-    });
-    if (prev) sel.value = prev;
-    const emptyMsg = document.getElementById('qrEmptyMsg');
-    if (emptyMsg) emptyMsg.style.display = businesses.length === 0 ? 'block' : 'none';
-  };
-
-  // 먼저 로컬 데이터로 즉시 채우기
-  fillSelect();
-
-  // DB에서 최신 데이터로 업데이트
-  loadBusinessesFromDB().then(() => fillSelect()).catch(() => {});
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— 업체를 선택하세요 —</option>';
+  businesses.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = b.name + ' (재고 ' + b.newOil + '캔)';
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+  const emptyMsg = document.getElementById('qrEmptyMsg');
+  if (emptyMsg) emptyMsg.style.display = businesses.length === 0 ? 'block' : 'none';
 }
 
 function generateQR() {
