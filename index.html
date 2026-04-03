@@ -2172,7 +2172,7 @@ function showPanel(id, navEl, pushState=true) {
 
   // 패널별 렌더
   if (id === 'dashboard') { updateDashboard(); }
-  if (id === 'map')       { setTimeout(() => { if (!mapInitialized) initKakaoMap(); else renderBizList(); if (kakaoMap) kakaoMap.relayout?.(); }, 80); }
+  if (id === 'map')       { setTimeout(() => { if (!mapInitialized) initNaverMap(); else renderBizList(); if (kakaoMap) kakaoMap.relayout?.(); }, 80); }
   if (id === 'waste')     { renderWasteTable(); }
   if (id === 'order')     { renderDeliveryPanel && renderDeliveryPanel(); updateOrderMonthStats && updateOrderMonthStats(); }
   if (id === 'history')   { renderHistory(); }
