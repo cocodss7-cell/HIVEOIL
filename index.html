@@ -3644,7 +3644,8 @@ function renderConsumerView() {
 
 // ===== 대시보드 동적 업데이트 =====
 function updateDashboard() {
-  applyPrices();
+  // applyPrices()는 여기서 호출하지 않음 — 무한루프 방지
+  // (applyPrices → updateDashboard → applyPrices 순환 차단)
 
   // ① 등록 업체 수 — businesses 배열 실시간
   const bizCount = document.getElementById('db_biz_count');
