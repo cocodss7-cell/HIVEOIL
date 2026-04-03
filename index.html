@@ -634,7 +634,7 @@
             </div>
             <div style="background:#1F4D30;border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);">
               <div style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;margin-bottom:10px;">🌿 CO₂ 절감</div>
-              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--green-main);line-height:1;" id="db_co2">1,008<span style="font-size:14px;font-weight:500"> kg</span></div>
+              <div style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.05em;color:var(--green-main);line-height:1;" id="db_co2">0<span style="font-size:14px;font-weight:500"> kg</span></div>
               <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:6px;font-weight:600;">월간 탄소 감축</div>
             </div>
           </div>
@@ -3757,29 +3757,38 @@ async function loadBusinessesFromDB() {
     if (error) throw error;
     businesses.length = 0;
     data.forEach(row => businesses.push(dbRowToBiz(row)));
-    saveBusinesses(); // localStorage 백업
+    saveBusinesses();
     renderBizList && renderBizList();
     updateDashboard && updateDashboard();
+    updateHqRealStats && updateHqRealStats();
     updateTabBadges && updateTabBadges();
     renderRegBizList && renderRegBizList();
     console.log('✅ DB에서 업체', businesses.length, '개 로드');
   } catch(e) {
     console.warn('DB 로드 실패, localStorage 사용:', e.message);
+    // localStorage 데이터로 대시보드 업데이트
+    updateDashboard && updateDashboard();
+    updateHqRealStats && updateHqRealStats();
+    updateTabBadges && updateTabBadges();
+    renderRegBizList && renderRegBizList();
   }
 }
 
 // ─── 이력 데이터 로드 ───
 async function loadHistoryFromDB() {
   try {
-    const { data, error } = await db.from('history').select('*').order('created_at', {ascending: false}).limit(100);
+    const { data, error } = await db.from('history').select('*').order('created_at', {ascending: false}).limit(200);
     if (error) throw error;
     historyData.length = 0;
     data.forEach(row => historyData.push(dbRowToHistory(row)));
     saveHistory();
     updateDashboard && updateDashboard();
+    updateHqRealStats && updateHqRealStats();
     console.log('✅ DB에서 이력', historyData.length, '건 로드');
   } catch(e) {
     console.warn('이력 DB 로드 실패:', e.message);
+    updateDashboard && updateDashboard();
+    updateHqRealStats && updateHqRealStats();
   }
 }
 
