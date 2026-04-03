@@ -1597,31 +1597,31 @@
           <div class="stat-card green" style="background:var(--white);padding:16px 18px;">
             <div class="stat-icon">🏪</div>
             <div class="stat-label">전체 등록 업체</div>
-            <div class="stat-value">23</div>
+            <div class="stat-value" id="hq_biz_count">0</div>
             <div class="stat-sub">원주시 전체</div>
           </div>
           <div class="stat-card gold" style="background:var(--white);padding:16px 18px;">
             <div class="stat-icon">🫙</div>
             <div class="stat-label">이번 달 납품 총량</div>
-            <div class="stat-value">184<span style="font-size:12px"> L</span></div>
-            <div class="stat-sub">전월 +12%</div>
+            <div class="stat-value" id="hq_oil_total">0<span style="font-size:12px"> 캔</span></div>
+            <div class="stat-sub" id="hq_oil_sub">납품 이력 없음</div>
           </div>
           <div class="stat-card red" style="background:var(--white);padding:16px 18px;">
             <div class="stat-icon">⚖️</div>
             <div class="stat-label">폐유 수거 총량</div>
-            <div class="stat-value">1,440<span style="font-size:12px"> kg</span></div>
-            <div class="stat-sub">이번 달 누적</div>
+            <div class="stat-value" id="hq_waste_total">0<span style="font-size:12px"> kg</span></div>
+            <div class="stat-sub" id="hq_waste_sub">수거 이력 없음</div>
           </div>
           <div class="stat-card blue" style="background:var(--white);padding:16px 18px;">
             <div class="stat-icon">🌿</div>
             <div class="stat-label">탄소 감축 기여</div>
-            <div class="stat-value">812<span style="font-size:12px"> kg</span></div>
+            <div class="stat-value" id="hq_co2">0<span style="font-size:12px"> kg</span></div>
             <div class="stat-sub">CO₂ 환산</div>
           </div>
           <div style="background:linear-gradient(135deg,#0a2e1a,#05C46B);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);">
             <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-bottom:6px;">전체 ESG 포인트 적립</div>
-            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.04em;line-height:1;">52,300</div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:4px;">pts · 원주 23개 업체 합산</div>
+            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.04em;line-height:1;" id="hq_esg_pts">0</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:4px;" id="hq_esg_sub">pts · 전체 업체 합산</div>
           </div>
         </div>
 
@@ -1703,17 +1703,17 @@
               <div style="padding:16px 18px;">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
                   <div style="background:var(--cream);border-radius:9px;padding:12px;text-align:center;">
-                    <div style="font-size:9px;color:var(--gray);margin-bottom:4px;">식물성 폐유</div>
-                    <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;">74캔 (1,221kg)</div>
+                    <div style="font-size:9px;color:var(--gray);margin-bottom:4px;">폐유 수거 누적</div>
+                    <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;" id="hq_waste_cans">0캔 (0kg)</div>
                   </div>
                   <div style="background:var(--cream);border-radius:9px;padding:12px;text-align:center;">
-                    <div style="font-size:9px;color:var(--gray);margin-bottom:4px;">동물성 기름</div>
-                    <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#D4621A;letter-spacing:-0.04em;">220 kg</div>
+                    <div style="font-size:9px;color:var(--gray);margin-bottom:4px;">현재 폐유 대기</div>
+                    <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:#D4621A;letter-spacing:-0.04em;" id="hq_waste_wait">0 kg</div>
                   </div>
                 </div>
                 <div style="background:#1F4D30;border-radius:9px;padding:12px 14px;">
                   <div style="font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:3px;">바이오디젤 전환 예상량</div>
-                  <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-main);letter-spacing:-0.04em;">1,152 L</div>
+                  <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--green-main);letter-spacing:-0.04em;" id="hq_biodiesel">0 L</div>
                   <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px;">SAF 원료 확보 기여</div>
                 </div>
               </div>
@@ -1736,15 +1736,15 @@
               <div style="display:flex;flex-direction:column;gap:8px;">
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.8);">
                   <span>탄소 감축 (CO₂ 환산)</span>
-                  <strong style="color:#fff;font-family:var(--font-display);">812 kg</strong>
+                  <strong style="color:#fff;font-family:var(--font-display);" id="hq_esg_co2_report">0 kg</strong>
                 </div>
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.8);">
                   <span>바이오디젤 기여량</span>
-                  <strong style="color:#fff;font-family:var(--font-display);">1,152 L</strong>
+                  <strong style="color:#fff;font-family:var(--font-display);" id="hq_esg_bio_report">0 L</strong>
                 </div>
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.8);">
                   <span>참여 업체 수</span>
-                  <strong style="color:#fff;font-family:var(--font-display);">23 개</strong>
+                  <strong style="color:#fff;font-family:var(--font-display);" id="hq_esg_biz_report">0 개</strong>
                 </div>
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.8);">
                   <span>무증빙 거래 건수</span>
@@ -3893,23 +3893,26 @@ async function deleteBizFromDB(bizId) {
 
 // ─── 앱 시작 시 DB 로드 ───
 window.addEventListener('load', async () => {
-  // 먼저 localStorage 데이터로 즉시 렌더
+  // localStorage로 즉시 1차 렌더
   updateDashboard();
 
-  // DB에서 최신 데이터 로드
+  // DB 최신 데이터 로드
   await loadBusinessesFromDB();
   await loadHistoryFromDB();
 
-  // 로드 완료 후 전체 UI 재업데이트
+  // 로드 완료 후 전체 UI 업데이트
   updateDashboard();
+  updateHqRealStats();   // 본사 대시보드도 함께
   updateTabBadges();
   renderWasteTable();
   renderHistory();
   renderRegBizList();
 
+  // 현재 열린 패널 추가 렌더
   const activePanel = location.hash.replace('#','') || 'dashboard';
   if (activePanel === 'order') renderDeliveryPanel();
   if (activePanel === 'hq') { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
+  if (activePanel === 'waste') renderWasteTable();
 });
 
 
@@ -4248,15 +4251,56 @@ function ownerRequestOrder() {
 
 
 function updateHqRealStats() {
-  const totalWaste = historyData.filter(h => h.type === '폐유수거' && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
-  const totalOil   = historyData.filter(h => h.type === '식용유발주' && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
-  const bioL       = (totalWaste * PRICES.waste.can.kg * 0.75).toFixed(0);
-  const el1 = document.getElementById('hqWasteTotalCans');
-  const el2 = document.getElementById('hqOilTotalCans');
-  const el3 = document.getElementById('hqBioLiters');
-  if (el1) el1.textContent = totalWaste + '캔 (' + (totalWaste * PRICES.waste.can.kg).toFixed(0) + 'kg)';
-  if (el2) el2.textContent = totalOil + '캔';
-  if (el3) el3.textContent = bioL + ' L';
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const thisYear  = now.getFullYear();
+
+  // 이번달 납품 완료
+  const oilDone = historyData.filter(h =>
+    h.type === '식용유발주' && h.status === 'done' &&
+    new Date(h.rawDate||h.date).getMonth() === thisMonth &&
+    new Date(h.rawDate||h.date).getFullYear() === thisYear
+  );
+  const oilCans = oilDone.reduce((s,h) => s+(h.qty||0), 0);
+
+  // 이번달 폐유 수거 완료
+  const wasteDone = historyData.filter(h =>
+    h.type === '폐유수거' && h.status === 'done' &&
+    new Date(h.rawDate||h.date).getMonth() === thisMonth &&
+    new Date(h.rawDate||h.date).getFullYear() === thisYear
+  );
+  const wasteCans = wasteDone.reduce((s,h) => s+(h.qty||0), 0);
+  const wasteKg   = (wasteCans * PRICES.waste.can.kg).toFixed(0);
+
+  // 전체 누적 폐유 수거 (차트/바이오디젤용)
+  const allWasteDone = historyData.filter(h => h.type === '폐유수거' && h.status === 'done').reduce((s,h) => s+(h.qty||0), 0);
+  const allWasteKg   = allWasteDone * PRICES.waste.can.kg;
+  const bioL         = (allWasteKg * 0.75).toFixed(0);
+  const co2          = Math.round(allWasteKg * PRICES.carbonRate);
+  const esgPts       = Math.round(allWasteKg * PRICES.esgRate);
+
+  // 현재 폐유 대기량
+  const waitWasteKg = (businesses.reduce((s,b)=>s+(b.wasteOil||0),0) * PRICES.waste.can.kg).toFixed(1);
+
+  // KPI 업데이트
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.innerHTML = val; };
+
+  set('hq_biz_count',   businesses.length);
+  set('hq_oil_total',   oilCans + '<span style="font-size:12px"> 캔</span>');
+  set('hq_oil_sub',     oilDone.length > 0 ? '이번 달 ' + oilDone.length + '건 납품' : '납품 이력 없음');
+  set('hq_waste_total', Number(wasteKg).toLocaleString() + '<span style="font-size:12px"> kg</span>');
+  set('hq_waste_sub',   wasteDone.length > 0 ? '이번 달 ' + wasteDone.length + '건 수거' : '수거 이력 없음');
+  set('hq_co2',         co2.toLocaleString() + '<span style="font-size:12px"> kg</span>');
+  set('hq_esg_pts',     esgPts.toLocaleString());
+  set('hq_esg_sub',     'pts · ' + businesses.length + '개 업체 합산');
+
+  // 배출량/ESG 리포트
+  set('hq_waste_cans',     allWasteDone + '캔 (' + allWasteKg.toFixed(0) + 'kg)');
+  set('hq_waste_wait',     waitWasteKg + ' kg');
+  set('hq_biodiesel',      bioL + ' L');
+  set('hq_esg_co2_report', co2.toLocaleString() + ' kg');
+  set('hq_esg_bio_report', bioL + ' L');
+  set('hq_esg_biz_report', businesses.length + ' 개');
 }
 
 function renderOwnerMonthlyStats() {
