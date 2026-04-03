@@ -3902,6 +3902,11 @@ async function loadBusinessesFromDB() {
   try {
     const { data, error } = await db.from('businesses').select('*').order('id');
     if (error) throw error;
+    if (!data || data.length === 0) {
+      console.log('DB 업체 데이터 없음 — localStorage 유지');
+      updateDashboard && updateDashboard();
+      return;
+    }
     businesses.length = 0;
     data.forEach(row => businesses.push(dbRowToBiz(row)));
     saveBusinesses();
@@ -3913,6 +3918,13 @@ async function loadBusinessesFromDB() {
     console.log('✅ DB에서 업체', businesses.length, '개 로드');
   } catch(e) {
     console.warn('DB 로드 실패, localStorage 사용:', e.message);
+    // 실패 시 기존 데이터 유지 (덮어쓰지 않음)
+    updateDashboard && updateDashboard();
+    updateHqRealStats && updateHqRealStats();
+    updateTabBadges && updateTabBadges();
+    renderRegBizList && renderRegBizList();
+  }
+}ssage);
     // localStorage 데이터로 대시보드 업데이트
     updateDashboard && updateDashboard();
     updateHqRealStats && updateHqRealStats();
