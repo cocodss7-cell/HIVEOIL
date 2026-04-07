@@ -1314,7 +1314,7 @@
                 <div style="font-size:11px;color:#185FA5;">예상 금액</div>
                 <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:#185FA5;" id="qrExtraPrice">250,000원</div>
               </div>
-              <button onclick="submitQRExtraOrder()" style="width:100%;background:#185FA5;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font-body);">
+              <button id="qrExtraBtn" onclick="submitQRExtraOrder()" style="width:100%;background:#185FA5;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font-body);">
                 📦 추가발주 신청
               </button>
             </div>
@@ -3745,8 +3745,7 @@ function renderTodayDelivList() {
   if (!el) return;
   const today = new Date().toISOString().slice(0,10).replaceAll('-','.');
   const todayList = historyData.filter(h =>
-    h.type === '식용유발주' && h.status === 'done' &&
-    h.date === today && h.method === '운반관리자'
+    h.type === '식용유발주' && h.status === 'done' && h.date === today
   );
   if (todayList.length === 0) {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">오늘 납품 이력 없음</div>';
@@ -5369,6 +5368,8 @@ async function completeExtraOrder(histIdx, bizId, qty) {
   refreshMapMarkers();
   updateDashboard();
   renderDeliveryPanel();
+  renderTodayDelivList();
+  updateOrderMonthStats && updateOrderMonthStats();
   showToast('t1','✅ 추가발주 납품 완료!', h.biz + ' — ' + qty + '캔 납품됨');
 }
 
@@ -5411,6 +5412,20 @@ async function submitQRExtraOrder() {
   saveHistory();
   await saveHistoryToDB(item);
   updateDashboard();
+  renderDeliveryPanel && renderDeliveryPanel();
+
+  // 버튼 → 신청 완료 상태로 변경
+  const extraBtn = document.getElementById('qrExtraBtn');
+  if (extraBtn) {
+    extraBtn.textContent = '✅ 추가발주 신청 완료!';
+    extraBtn.style.background = '#2E7D32';
+    extraBtn.disabled = true;
+    setTimeout(() => {
+      extraBtn.textContent = '📦 추가발주 신청';
+      extraBtn.style.background = '#185FA5';
+      extraBtn.disabled = false;
+    }, 3000);
+  }
   showToast('t1','📦 추가발주 신청 완료!', biz.name + ' — ' + oilName + ' ' + qrExtraQty + '캔 · 담당자에게 전달됐어요');
 }
 
