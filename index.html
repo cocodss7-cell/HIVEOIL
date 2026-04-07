@@ -744,9 +744,11 @@
                 📞 전화 문의
               </button>
             </a>
-            <button onclick="showPanel('register',null)" style="background:#0D0D0D;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font-body);">
-              ➕ 업체 등록
-            </button>
+            <a href="#register" style="text-decoration:none;" onclick="setTimeout(()=>showPanel('register',null),0)">
+              <button style="background:#0D0D0D;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font-body);">
+                ➕ 업체 등록
+              </button>
+            </a>
           </div>
         </div>
 
@@ -2502,6 +2504,7 @@ window.addEventListener('popstate', (e) => {
   const validPanels = ['owner-dash','dashboard','map','waste','order','history','price','esg','owner','hq','hq-login','admin','register','qr','apply'];
   const hash = location.hash.replace('#','');
   const startPanel = (hash && validPanels.includes(hash)) ? hash : 'owner-dash';
+  if (startPanel === 'register' && !isAdminMode) { /* 비관리자도 register 패널 접근 가능 */ }
   history.replaceState({ panel: startPanel }, '', '#' + startPanel);
   if (startPanel !== 'dashboard') showPanel(startPanel, null, false);
 })();
@@ -5851,6 +5854,12 @@ function updateApplyKpi() {
 
 // ===== 즉시 실행 - localStorage 데이터로 바로 렌더 =====
 (function initUI() {
+  // CTA 업체등록 버튼 이벤트 리스너 (onclick 대신 안전하게)
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'ctaRegisterBtn') {
+      showPanel('register', null);
+    }
+  });
   updateDashboard();
   updateTabBadges();
   renderWasteTable();
