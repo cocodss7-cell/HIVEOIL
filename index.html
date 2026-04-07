@@ -3568,41 +3568,48 @@ function printQR() {
   win.document.close();
 }
 
-// ===== 카카오 장소 검색 =====
-const KAKAO_REST_KEY = '4d1ebddaf898cab7a0de3c7e8c6ea2b1';
-
-async function searchKakaoPlace() {
-  const query = document.getElementById('kakao_search_input').value.trim();
+// ===== 카카오 장소 검색 (JS SDK - file:// + GitHub Pages 모두 지원) =====
+function searchKakaoPlace() {
+  var query = document.getElementById('kakao_search_input').value.trim();
   if (!query) { showToast('t1','검색어를 입력해주세요',''); return; }
-  const resultsEl = document.getElementById('kakaoResults');
+  var resultsEl = document.getElementById('kakaoResults');
   if (!resultsEl) return;
-  resultsEl.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray);font-size:12px;">검색 중...</div>';
-  try {
-    const url = 'https://dapi.kakao.com/v2/local/search/keyword.json?query=' + encodeURIComponent(query) + '&rect=127.85,37.28,128.05,37.45&size=10';
-    const res = await fetch(url, { headers: { 'Authorization': 'KakaoAK ' + KAKAO_REST_KEY } });
-    if (!res.ok) throw new Error('status ' + res.status);
-    const data = await res.json();
-    if (!data.documents || data.documents.length === 0) {
-      resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">검색 결과가 없어요.</div>';
-      return;
-    }
-    window._kakaoSearchResults = data.documents;
-    resultsEl.innerHTML = data.documents.map(function(place, i) {
-      return '<div onclick="selectKakaoPlace(' + i + ')" style="background:var(--white);border:1.5px solid var(--gray-light);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;margin-bottom:6px;" onmouseover="this.style.borderColor='var(--green-main)';this.style.background='var(--green-pale)'" onmouseout="this.style.borderColor='var(--gray-light)';this.style.background='var(--white)'">'
-        + '<div style="display:flex;align-items:flex-start;gap:10px;">'
-        + '<div style="width:32px;height:32px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🏪</div>'
-        + '<div style="flex:1;min-width:0;">'
-        + '<div style="font-weight:700;font-size:13px;margin-bottom:2px;">' + place.place_name + '</div>'
-        + '<div style="font-size:10px;color:var(--gray);margin-bottom:2px;">' + (place.road_address_name || place.address_name) + '</div>'
-        + '</div>'
-        + '<div style="font-size:10px;color:var(--green-main);font-weight:700;flex-shrink:0;">선택 →</div>'
-        + '</div></div>';
-    }).join('');
-  } catch(err) {
-    console.error('search error:', err);
-    resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red-accent);font-size:12px;">검색 오류. 다시 시도해주세요.</div>';
+  resultsEl.innerHTML = '<div style="text-align:center;padding:16px;color:#6B7D72;font-size:12px;">검색 중...</div>';
+
+  function doSearch() {
+    var ps = new kakao.maps.services.Places();
+    ps.keywordSearch(query, function(data, status) {
+      if (status === kakao.maps.services.Status.OK) {
+        window._kakaoSearchResults = data;
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+          var p = data[i];
+          html += '<div onclick="selectKakaoPlace(' + i + ')" style="background:#fff;border:1.5px solid #DDE8E1;border-radius:11px;padding:12px 14px;cursor:pointer;margin-bottom:6px;transition:all 0.15s;" onmouseover="this.style.borderColor=\'#3D9E6E\';this.style.background=\'#EDF7F1\'" onmouseout="this.style.borderColor=\'#DDE8E1\';this.style.background=\'#fff\'">';
+          html += '<div style="display:flex;align-items:center;gap:10px;">';
+          html += '<div style="font-size:20px;flex-shrink:0;">🏪</div>';
+          html += '<div style="flex:1;min-width:0;">';
+          html += '<div style="font-weight:700;font-size:13px;">' + p.place_name + '</div>';
+          html += '<div style="font-size:10px;color:#6B7D72;margin-top:2px;">' + (p.road_address_name || p.address_name) + '</div>';
+          html += '</div>';
+          html += '<div style="font-size:10px;color:#3D9E6E;font-weight:700;flex-shrink:0;">선택 →</div>';
+          html += '</div></div>';
+        }
+        resultsEl.innerHTML = html;
+      } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+        resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:#6B7D72;font-size:12px;">검색 결과가 없어요. 더 구체적인 상호명으로 검색해보세요.</div>';
+      } else {
+        resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:#C0392B;font-size:12px;">검색 오류가 발생했어요. 다시 시도해주세요.</div>';
+      }
+    });
+  }
+
+  if (window.kakao && kakao.maps && kakao.maps.services) {
+    doSearch();
+  } else {
+    kakao.maps.load(doSearch);
   }
 }
+
 
 function selectKakaoPlace(idx) {
   const place = window._kakaoSearchResults && window._kakaoSearchResults[idx];
