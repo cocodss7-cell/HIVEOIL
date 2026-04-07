@@ -2474,7 +2474,16 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'owner')     { renderOwnerPanel && renderOwnerPanel(); }
   if (id === 'register')  { renderRegBizList(); }
   if (id === 'hq')        { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
-  if (id === 'admin')     { renderAdminPrices && renderAdminPrices(); }
+  if (id === 'admin') {
+    // 관리자 로그인 상태면 비번 화면 건너뛰고 바로 대시 표시
+    if (isAdminMode) {
+      const ls = document.getElementById('adminLoginState');
+      const ds = document.getElementById('adminDashState');
+      if (ls) ls.style.display = 'none';
+      if (ds) ds.style.display = 'block';
+    }
+    renderAdminPrices && renderAdminPrices();
+  }
   if (id === 'apply')     { renderApplyList(); updateApplyKpi(); }
   if (id === 'owner-dash') { renderOwnerDash(); }
   if (id === 'qr') {
