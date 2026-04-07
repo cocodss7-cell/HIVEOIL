@@ -1908,6 +1908,22 @@ function applyPrices() {
 
 // ===== 원주 실제 업체 데이터 =====
 // businesses localStorage 로드
+function getKSTDate(dateStr) {
+  if (!dateStr) return new Date();
+  const d = new Date(dateStr);
+  return new Date(d.getTime() + 9 * 60 * 60 * 1000);
+}
+
+function isSameMonth(h, year, month) {
+  const dateStr = h.rawDate || h.date;
+  if (!dateStr) return false;
+  try {
+    const d = new Date(String(dateStr).replaceAll('.', '-'));
+    const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    return kst.getFullYear() === year && kst.getMonth() === month;
+  } catch(e) { return false; }
+}
+
 function loadBusinesses() {
   try {
     const saved = localStorage.getItem('hiveoil_businesses');
