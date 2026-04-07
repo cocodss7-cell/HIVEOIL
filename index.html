@@ -1793,8 +1793,22 @@
         </div><!-- 2컬럼 레이아웃 끝 -->
         </div><!-- card 끝 -->
 
+        <!-- 승인 대기 섹션 (관리자만 보임) -->
+        <div id="pendingBizSection" style="margin-top:24px;display:none;">
+          <div style="font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            ⏳ 승인 대기
+            <span id="pendingCount" style="background:#E65100;color:#fff;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700;">0</span>
+            <span style="font-size:11px;font-weight:400;color:var(--gray);">— 업주 셀프 등록 신청</span>
+          </div>
+          <div id="pendingBizList" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="text-align:center;padding:20px;color:var(--gray);font-size:13px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);">
+              ✅ 승인 대기 중인 업체가 없어요
+            </div>
+          </div>
+        </div>
+
         <!-- 등록된 업체 목록 -->
-        <div style="margin-top:24px;">
+        <div style="margin-top:20px;">
           <div style="font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
             등록된 업체 <span id="regCount" style="background:var(--green-main);color:#000;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700;">0</span>
           </div>
@@ -1875,27 +1889,7 @@
             </div>
           </div>
 
-          <!-- 데이터 초기화 섹션 -->
-          <div class="card" style="margin-top:20px;border:2px solid #FFD0D0;">
-            <div class="card-header" style="background:#FFF5F5;border-bottom:1px solid #FFD0D0;">
-              <div class="card-title" style="color:#C0392B;">🗑️ 데이터 초기화 (주의)</div>
-              <div style="font-size:10px;color:#E74C3C;font-weight:700;">되돌릴 수 없어요</div>
-            </div>
-            <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
-              <button class="btn" style="background:#FFF5F5;color:#C0392B;border:1.5px solid #FFB3B3;justify-content:center;padding:11px;font-size:12px;font-weight:700;" onclick="adminClearHistory()">
-                📋 진행 이력 전체 삭제 (DB + localStorage)
-              </button>
-              <button class="btn" style="background:#FFF5F5;color:#C0392B;border:1.5px solid #FFB3B3;justify-content:center;padding:11px;font-size:12px;font-weight:700;" onclick="adminClearBusinesses()">
-                🏪 등록 업체 전체 삭제 (DB + localStorage)
-              </button>
-              <button class="btn" style="background:#FFF0F0;color:#922B21;border:2px solid #FF8A80;justify-content:center;padding:11px;font-size:13px;font-weight:800;" onclick="adminClearAll()">
-                ⚠️ 전체 초기화 (업체 + 이력 모두 삭제)
-              </button>
-              <div style="font-size:10px;color:var(--gray);background:var(--cream);border-radius:8px;padding:9px 12px;line-height:1.6;">
-                💡 테스트 데이터 정리 시 사용하세요. Supabase DB와 localStorage 모두 삭제돼요.
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -2472,7 +2466,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'price')     { renderPricePage(); }
   if (id === 'esg')       { renderEsgPanel(); }
   if (id === 'owner')     { renderOwnerPanel && renderOwnerPanel(); }
-  if (id === 'register')  { renderRegBizList(); }
+  if (id === 'register')  { renderRegBizList(); renderPendingBizList(); updateRegisterBadge(); }
   if (id === 'hq')        { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
   if (id === 'admin') {
     // 관리자 로그인 상태면 비번 화면 건너뛰고 바로 대시 표시
@@ -3961,6 +3955,10 @@ function checkAutoOrder(biz) {
 // ===== 업체 등록 =====
 let nextBizId = 1;
 
+// ===== 승인 대기 큐 =====
+var pendingBizData = JSON.parse(localStorage.getItem('hiveoil_pending_biz') || '[]');
+function savePendingBiz() { localStorage.setItem('hiveoil_pending_biz', JSON.stringify(pendingBizData)); }
+
 function registerBiz() {
   const name     = document.getElementById('reg_name').value.trim();
   const type     = document.getElementById('reg_type').value;
@@ -3978,33 +3976,115 @@ function registerBiz() {
   if (!addr) { showToast('t1','⚠️ 업체를 검색해서 선택해주세요','위 검색창에서 상호명으로 검색하세요'); return; }
   if (isNaN(lat) || isNaN(lng)) { showToast('t1','⚠️ 업체를 검색해서 선택해주세요','카카오 검색으로 좌표를 자동 입력해주세요'); return; }
 
-  const newBiz = {
-    id: nextBizId++,
-    name, type, owner, phone, addr,
-    lat, lng,
-    newOil, maxNew: 10,
-    wasteOil,
-    oiltype,
-    auto: autoOn,
-    lastUpdate: '방금 등록',
-  };
+  const bizData = { name, type, owner, phone, addr, lat, lng, newOil, wasteOil, oiltype, auto: autoOn };
 
-  // DB에 먼저 저장 (ID를 받아야 함)
-  saveBizToDB(newBiz).then(ok => {
+  // 관리자: 즉시 등록 / 업주: 승인 대기 큐
+  if (isAdminMode) {
+    const newBiz = { id: nextBizId++, ...bizData, maxNew: 10, lastUpdate: '방금 등록' };
+    saveBizToDB(newBiz).then(() => {
+      businesses.push(newBiz);
+      saveBusinesses();
+      renderRegBizList();
+      updateDashboard();
+      updateTabBadges();
+      if (kakaoMap && mapInitialized) addMarker(newBiz);
+    });
+    showToast('t1','✅ 업체 등록 완료!', name + ' — 지도에 핀이 추가됐어요');
+  } else {
+    // 승인 대기 큐에 저장
+    const now = new Date();
+    const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+    pendingBizData.unshift({ id: Date.now(), ...bizData, requestDate: dateStr, status: 'pending' });
+    savePendingBiz();
+    renderPendingBizList();
+    updateRegisterBadge();
+    showToast('t1','📋 등록 신청 완료!', name + ' — 관리자 승인 후 서비스가 시작돼요');
+  }
+  clearRegForm();
+}
+
+function approvePendingBiz(id) {
+  const idx = pendingBizData.findIndex(p => p.id === id);
+  if (idx === -1) return;
+  const p = pendingBizData[idx];
+  const newBiz = { id: nextBizId++, name: p.name, type: p.type, owner: p.owner, phone: p.phone,
+    addr: p.addr, lat: p.lat, lng: p.lng, newOil: p.newOil, maxNew: 10,
+    wasteOil: p.wasteOil, oiltype: p.oiltype, auto: p.auto, lastUpdate: '방금 승인됨' };
+  saveBizToDB(newBiz).then(() => {
     businesses.push(newBiz);
     saveBusinesses();
+    pendingBizData.splice(idx, 1);
+    savePendingBiz();
     renderRegBizList();
-    updateDashboardStats();
+    renderPendingBizList();
+    updateRegisterBadge();
     updateDashboard();
     updateTabBadges();
     if (kakaoMap && mapInitialized) addMarker(newBiz);
+    showToast('t1','✅ 승인 완료!', newBiz.name + ' — 지도에 등록됐어요');
   });
+}
 
-  // 지도가 열려 있으면 마커 추가
-  if (naverMap && mapInitialized) addMarker(newBiz);
+function rejectPendingBiz(id) {
+  if (!confirm('이 업체 신청을 반려할까요?')) return;
+  pendingBizData = pendingBizData.filter(p => p.id !== id);
+  savePendingBiz();
+  renderPendingBizList();
+  updateRegisterBadge();
+  showToast('t1','❌ 반려됨','신청이 반려 처리됐어요');
+}
 
-  showToast('t1','✅ 업체 등록 완료!', name + ' — 지도에 핀이 추가됐어요');
-  clearRegForm();
+function renderPendingBizList() {
+  const section = document.getElementById('pendingBizSection');
+  const list    = document.getElementById('pendingBizList');
+  const count   = document.getElementById('pendingCount');
+  if (!section || !list) return;
+
+  // 관리자만 보임
+  section.style.display = isAdminMode && pendingBizData.length > 0 ? '' : 'none';
+  if (count) count.textContent = pendingBizData.length;
+
+  if (pendingBizData.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:13px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);">✅ 승인 대기 중인 업체가 없어요</div>';
+    return;
+  }
+  list.innerHTML = pendingBizData.map(p => `
+    <div style="background:var(--white);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid #E65100;display:flex;align-items:center;gap:14px;">
+      <div style="width:38px;height:38px;background:#FFF3E0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏪</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:800;color:var(--black);">${p.name}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px;">${p.type} · ${p.addr}</div>
+        <div style="font-size:10px;color:var(--gray);margin-top:2px;">담당자: ${p.owner||'—'} · ${p.phone||'—'} · 신청일 ${p.requestDate}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+        <button onclick="approvePendingBiz(${p.id})" style="background:var(--green-main);border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:800;color:#0D0D0D;cursor:pointer;">✅ 승인</button>
+        <button onclick="rejectPendingBiz(${p.id})" style="background:#FFF5F5;border:1.5px solid #FFB3B3;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;color:#C0392B;cursor:pointer;">❌ 반려</button>
+      </div>
+    </div>`).join('');
+}
+
+function updateRegisterBadge() {
+  // 사이드바 업체 등록 뱃지 업데이트
+  const pending = pendingBizData.length;
+  const navItems = document.querySelectorAll('.admin-only');
+  // 등록 메뉴 찾아서 배지 업데이트
+  document.querySelectorAll('.nav-item').forEach(item => {
+    if (item.textContent.includes('업체 등록')) {
+      let badge = item.querySelector('.pending-badge');
+      if (pending > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'nav-badge pending-badge';
+          badge.style.cssText = 'background:#E65100;margin-left:auto;';
+          item.appendChild(badge);
+        }
+        badge.textContent = pending;
+        badge.style.display = '';
+      } else if (badge) {
+        badge.style.display = 'none';
+      }
+    }
+  });
 }
 
 function clearRegForm() {
@@ -5610,6 +5690,9 @@ function setAdminMode(on) {
   // 관리자 로그아웃 버튼 표시
   const logoutBtn = document.getElementById('adminLogoutBtn');
   if (logoutBtn) logoutBtn.style.display = on ? '' : 'none';
+  // 승인 대기 섹션 갱신
+  renderPendingBizList && renderPendingBizList();
+  updateRegisterBadge && updateRegisterBadge();
 }
 
 function hqAdminLogout() {
@@ -5785,6 +5868,8 @@ function updateApplyKpi() {
   renderApplyList();
   updateApplyKpi();
   setTimeout(renderOwnerDash, 0); // PRICES 로드 보장 후 실행
+  renderPendingBizList();
+  updateRegisterBadge();
   // 기본 시작 패널: owner-dash (URL 해시 없을 때)
   const hash = location.hash.replace('#','');
   if (!hash) {
