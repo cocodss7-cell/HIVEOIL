@@ -4431,16 +4431,23 @@ function requestCollect(bizId) {
 }
 
 function completeCollect(bizId) {
-  const b = businesses.find(x => x.id === bizId);
+  const b = businesses.find(x => String(x.id) === String(bizId));
   if (!b) return;
 
-  // 이미 처리됐거나 폐유 0캔이면 무시
-  if (b.wasteOil <= 0) {
+  // 처리 중 플래그
+  if (b._collectInProgress) return;
+
+  // pending 이력 확인
+  const pendingItem = historyData.find(h =>
+    String(h.bizId) === String(bizId) && h.type === '폐유수거' && h.status === 'pending'
+  );
+
+  // 폐유 0캔이고 pending 이력도 없으면 무시
+  if (b.wasteOil <= 0 && !pendingItem) {
     showToast('t1','ℹ️ 수거할 폐유가 없어요', b.name + ' — 폐유 재고 0캔');
     return;
   }
-  // 처리 중 플래그
-  if (b._collectInProgress) return;
+
   b._collectInProgress = true;
 
   // 버튼 즉시 비활성화
@@ -4450,17 +4457,18 @@ function completeCollect(bizId) {
     btn.style.opacity = '0.5';
   });
 
-  const prevWaste = b.wasteOil;
+  const prevWaste = pendingItem?.qty || b.wasteOil;
 
   // pending 이력 → done으로 변경
-  const item = historyData.find(h => h.bizId === bizId && h.type === '폐유수거' && h.status === 'pending');
-  if (item) {
-    item.status = 'done';
-    item.qty = prevWaste; // qty 확실히 기록
-    item.content = '폐유 ' + prevWaste + '캔 수거 완료';
-    if (item.dbId) {
-      db.from('history').update({ status: 'done', content: item.content, qty: prevWaste }).eq('id', item.dbId)
-        .then(({error}) => { if (error) console.warn('이력 완료 처리 실패:', error.message); });
+  if (pendingItem) {
+    pendingItem.status = 'done';
+    pendingItem.qty = prevWaste;
+    pendingItem.content = '폐유 ' + prevWaste + '캔 수거 완료';
+    if (pendingItem.dbId) {
+      try {
+        db.from('history').update({ status: 'done', content: pendingItem.content, qty: prevWaste })
+          .eq('id', pendingItem.dbId).then(() => {});
+      } catch(e) {}
     }
     saveHistory();
   } else {
@@ -4478,14 +4486,14 @@ function completeCollect(bizId) {
     };
     historyData.unshift(newItem);
     saveHistory();
-    saveHistoryToDB(newItem);
+    try { saveHistoryToDB(newItem); } catch(e) {}
   }
 
   // 업체 폐유 재고 → 0 초기화
   b.wasteOil = 0;
   b.lastUpdate = '방금 수거 완료';
   saveBusinesses();
-  updateBizStockInDB(b.id, b.newOil, 0, b.lastUpdate);
+  try { updateBizStockInDB(b.id, b.newOil, 0, b.lastUpdate); } catch(e) {}
 
   // 지도 마커 갱신
   if (kakaoMap && mapInitialized) {
@@ -4499,8 +4507,8 @@ function completeCollect(bizId) {
   renderWasteTable();
   updateDashboard();
   updateTabBadges();
-  b._collectInProgress = false; // 플래그 해제
-  showToast('t1','✅ 수거 완료 처리!', b.name + ' — 폐유 ' + prevWaste + '캔 수거 완료 · 재고 0으로 초기화');
+  b._collectInProgress = false;
+  showToast('t1','✅ 수거 완료!', b.name + ' — 폐유 ' + prevWaste + '캔 수거 완료 · 재고 0 초기화');
 }
 
 
