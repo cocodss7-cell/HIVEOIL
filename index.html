@@ -2922,6 +2922,7 @@ const ownerAccounts = {
 };
 let ownerLoggedIn = false;
 let ownerBizId = null;
+var isAdminMode = false; // 관리자 모드 여부
 let ownerNewVal = 2, ownerWasteVal = 4;
 const alertStates = { 1:true, 2:false, 3:false };
 
@@ -5711,8 +5712,6 @@ function closeSidebarOnMobile() {
 }
 
 // ===== 관리자 로그인/모드 전환 =====
-let isAdminMode = false;
-
 function hqAdminLogin() {
   const idEl = document.getElementById('hqAdminId');
   const pwEl = document.getElementById('hqAdminPw');
