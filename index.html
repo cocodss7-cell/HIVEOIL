@@ -2245,25 +2245,11 @@ function addMarkerToMap(biz) {
       ${biz.auto ? '<div class="iw-auto">⚡ 자동발주 ON</div>' : ''}
     </div>
     <div class="iw-btns">
-      <button class="iw-btn collect" id="iw-collect-${biz.id}" style="font-size:12px;padding:9px 0;">♻️ 수거 신청</button>
-      <button class="iw-btn order" id="iw-order-${biz.id}" style="font-size:12px;padding:9px 0;">🫙 발주 납품</button>
+      <button class="iw-btn collect" style="font-size:12px;padding:9px 0;"
+        onclick="event.stopPropagation();openCollectFromMap(${biz.id})">♻️ 수거 신청</button>
+      <button class="iw-btn order" style="font-size:12px;padding:9px 0;"
+        onclick="event.stopPropagation();openOrderFromMap(${biz.id})">🫙 발주 납품</button>
     </div>`;
-
-  // onclick 대신 addEventListener (CustomOverlay 이벤트 버블링 문제 해결)
-  setTimeout(() => {
-    const collectBtn = document.getElementById('iw-collect-' + biz.id);
-    const orderBtn   = document.getElementById('iw-order-'   + biz.id);
-    if (collectBtn) collectBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      openCollectFromMap(biz.id);
-    });
-    if (orderBtn) orderBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      openOrderFromMap(biz.id);
-    });
-  }, 100);
 
   const infoOverlay = new kakao.maps.CustomOverlay({
     position: new kakao.maps.LatLng(biz.lat, biz.lng),
