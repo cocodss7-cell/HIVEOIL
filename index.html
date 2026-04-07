@@ -1815,7 +1815,7 @@
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
             <div>
-              <button id="adminSaveBtn" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:14px;margin-bottom:10px;" onclick="adminSavePrices()">💾 시세 저장 &amp; 전체 반영</button>
+              <button id="adminSaveBtn" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:14px;margin-bottom:10px;" onclick="adminSavePrices(this)">💾 시세 저장 &amp; 전체 반영</button>
               <button class="btn btn-outline" style="width:100%;justify-content:center;padding:10px;font-size:12px;" onclick="adminResetPrices()">🔄 기본값으로 초기화</button>
             </div>
             <div class="card" style="padding:16px 18px;">
@@ -3188,76 +3188,97 @@ function previewWastePrice(key, val) {
   if (el) el.textContent = '변경 후: ' + num.toLocaleString() + '원';
 }
 
-function adminSavePrices() {
+function adminSavePrices(btn) {
+  if (!btn) btn = document.getElementById('adminSaveBtn');
+
+  // ① 버튼 즉시 완료 상태 (DOM 재렌더 전에 먼저)
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '✅ 시세 저장 & 전체 반영 완료';
+    btn.style.background = '#2E7D32';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      btn.innerHTML = '💾 시세 저장 &amp; 전체 반영';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.disabled = false;
+    }, 2500);
+  }
+
+  // ② 변경 감지 (기존값 → 입력값)
   const changes = [];
   Object.keys(PRICES.oils).forEach(k => {
     const input = document.getElementById('oilPrice_' + k);
     if (!input) return;
     const newVal = parseInt(input.value);
-    if (!isNaN(newVal) && newVal > 0 && PRICES.oils[k].price !== newVal) {
-      changes.push(PRICES.oils[k].label + ' ' + PRICES.oils[k].price.toLocaleString() + '→' + newVal.toLocaleString() + '원');
+    if (!isNaN(newVal) && newVal > 0) {
+      if (PRICES.oils[k].price !== newVal)
+        changes.push(PRICES.oils[k].label + ' ' + PRICES.oils[k].price.toLocaleString() + '→' + newVal.toLocaleString() + '원');
       PRICES.oils[k].price = newVal;
     }
   });
   const canInput = document.getElementById('wastePrice_can');
   if (canInput) {
     const newPrice = parseInt(canInput.value);
-    if (!isNaN(newPrice) && newPrice > 0 && PRICES.waste.can.price !== newPrice) {
-      changes.push('폐유 수거 ' + PRICES.waste.can.price.toLocaleString() + '→' + newPrice.toLocaleString() + '원/캔');
+    if (!isNaN(newPrice) && newPrice > 0) {
+      if (PRICES.waste.can.price !== newPrice)
+        changes.push('폐유 수거 ' + PRICES.waste.can.price.toLocaleString() + '→' + newPrice.toLocaleString() + '원/캔');
       PRICES.waste.can.price = newPrice;
     }
   }
   const kgInput = document.getElementById('wasteKgPerCan');
   if (kgInput) {
     const newKg = parseFloat(kgInput.value);
-    if (!isNaN(newKg) && newKg > 0 && PRICES.waste.can.kg !== newKg) {
-      changes.push('캔 기준 ' + PRICES.waste.can.kg + '→' + newKg + 'kg');
+    if (!isNaN(newKg) && newKg > 0) {
+      if (PRICES.waste.can.kg !== newKg)
+        changes.push('캔 기준 ' + PRICES.waste.can.kg + '→' + newKg + 'kg');
       PRICES.waste.can.kg = newKg;
     }
   }
+
+  // ③ 가격 전체 반영 + localStorage 저장
   applyPrices();
-  renderAdminPrices();
-  // localStorage 영구 저장
   try { localStorage.setItem('hiveoil_prices', JSON.stringify(PRICES)); } catch(e) {}
-  // 버튼 완료 상태
-  const saveBtn = document.getElementById('adminSaveBtn');
+
+  // ④ 이력 기록 — 변경 있을 때만 (없으면 "현행 유지"로 기록)
+  const d = new Date();
+  const dateStr = d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+  const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  const logChanges = changes.length > 0 ? changes : [
+    '대두유 ' + PRICES.oils.soy.price.toLocaleString() + '원 (현행 유지)',
+    '카놀라유 ' + PRICES.oils.canola.price.toLocaleString() + '원 (현행 유지)',
+    '폐유 ' + PRICES.waste.can.price.toLocaleString() + '원/캔 (현행 유지)',
+  ];
+
+  // 관리자 패널 최근 이력 (hiveoil_price_log)
+  const prevLog = JSON.parse(localStorage.getItem('hiveoil_price_log') || '[]');
+  prevLog.unshift({ datetime: dateStr + ' ' + timeStr, changes: logChanges });
+  if (prevLog.length > 10) prevLog.pop();
+  localStorage.setItem('hiveoil_price_log', JSON.stringify(prevLog));
+
+  // 가격변동 이력 페이지 (hiveoil_price_history) — 변경 있을 때만
   if (changes.length > 0) {
-    // localStorage에 이력 저장 (최대 10개 유지)
-    const d = new Date();
-    const dateStr = d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
-    const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-    const prevLog = JSON.parse(localStorage.getItem('hiveoil_price_log') || '[]');
-    prevLog.unshift({ datetime: dateStr + ' ' + timeStr, changes });
-    if (prevLog.length > 10) prevLog.pop();
-    localStorage.setItem('hiveoil_price_log', JSON.stringify(prevLog));
-    renderPriceChangeLog();
-
-    // 버튼 완료 상태
-    if (saveBtn) {
-      saveBtn.textContent = '✅ 저장 완료!';
-      saveBtn.style.background = '#2E7D32';
-      saveBtn.disabled = true;
-      setTimeout(() => {
-        saveBtn.innerHTML = '💾 시세 저장 &amp; 전체 반영';
-        saveBtn.style.background = '';
-        saveBtn.disabled = false;
-      }, 2500);
-    }
-
-    showToast('t1','💾 시세 저장 완료!', changes.length + '개 항목 반영됐어요');
     recordPriceChange(changes);
-    renderPricePage();
-  } else {
-    if (saveBtn) {
-      saveBtn.textContent = '✅ 변경 없음';
-      saveBtn.style.background = '#555';
-      setTimeout(() => {
-        saveBtn.innerHTML = '💾 시세 저장 &amp; 전체 반영';
-        saveBtn.style.background = '';
-      }, 2000);
-    }
-    showToast('t1','✅ 변경 없음','현재 시세와 동일합니다');
   }
+  // "현행 유지" 저장도 이력 페이지에 기록 (항상)
+  const hist = loadPriceHistory();
+  if (hist.length === 0 || changes.length > 0) {
+    // 변경 있거나 이력 없을 때 전체 현황 스냅샷 저장
+    const snapshot = [
+      ...Object.values(PRICES.oils).map(v => ({ date: dateStr, rawDate: d.toISOString(), change: v.label + ' ' + v.price.toLocaleString() + '원 저장' })),
+      { date: dateStr, rawDate: d.toISOString(), change: '폐유 수거 ' + PRICES.waste.can.price.toLocaleString() + '원/캔 저장' }
+    ];
+    snapshot.forEach(s => hist.unshift(s));
+    savePriceHistory(hist.slice(0, 100));
+  }
+
+  // ⑤ UI 갱신
+  renderAdminPrices();          // 입력 카드 재렌더
+  renderPriceChangeLog();       // 관리자 최근 이력 카드 (renderAdminPrices 이후에!)
+  renderPricePage();            // 가격변동 이력 페이지
+
+  showToast('t1', changes.length > 0 ? '💾 시세 저장 완료!' : '💾 현재 시세 저장 완료',
+    changes.length > 0 ? changes.join(' / ') : '변경 없이 저장됐어요');
 }
 
 function adminResetPrices() {
