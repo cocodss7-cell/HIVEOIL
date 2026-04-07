@@ -2245,8 +2245,8 @@ function addMarkerToMap(biz) {
       ${biz.auto ? '<div class="iw-auto">⚡ 자동발주 ON</div>' : ''}
     </div>
     <div class="iw-btns">
-      <button class="iw-btn collect" id="iw-collect-${biz.id}">♻️ 수거신청</button>
-      <button class="iw-btn order" id="iw-order-${biz.id}">🫙 발주</button>
+      <button class="iw-btn collect" id="iw-collect-${biz.id}" style="font-size:12px;padding:9px 0;">♻️ 수거 신청</button>
+      <button class="iw-btn order" id="iw-order-${biz.id}" style="font-size:12px;padding:9px 0;">🫙 발주 납품</button>
     </div>`;
 
   // onclick 대신 addEventListener (CustomOverlay 이벤트 버블링 문제 해결)
@@ -2306,34 +2306,47 @@ function openCollectFromMap(id) {
   const biz = businesses.find(b => b.id === id);
   if (!biz) return;
   if (biz.wasteOil === 0) {
-    showToast('t1','⚠️ 폐유가 없어요', biz.name + ' — 폐유 0캔, 수거 신청 불가');
+    showToast('t1','⚠️ 폐유가 없어요', biz.name + ' — 폐유 0캔이라 수거 신청이 불가해요');
     return;
   }
-  // 폐유 수거 패널로 이동 — 신청은 담당자가 버튼 직접 클릭
+  // 폐유 수거 패널로 이동
   showPanel('waste', null);
-  showToast('t1','♻️ 수거 신청 가능', biz.name + ' — 폐유 ' + biz.wasteOil + '캔 · 수거 신청 버튼을 눌러주세요');
+  // 해당 업체 행 하이라이트
+  setTimeout(() => {
+    const tbody = document.getElementById('wasteTableBody');
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach(row => {
+      if (row.textContent.includes(biz.name)) {
+        row.style.transition = 'background 0.3s';
+        row.style.background = '#FFF3E0';
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => { row.style.background = ''; }, 2000);
+      }
+    });
+  }, 200);
+  showToast('t1', '♻️ ' + biz.name, '폐유 ' + biz.wasteOil + '캔 · 수거 신청 버튼을 눌러주세요');
 }
 
 function openOrderFromMap(id) {
   infoWindows.forEach(iw => iw.setMap(null));
+  const biz = businesses.find(b => b.id === id);
+  // 식용유 발주·납품 패널로 이동
   showPanel('order', null);
-  // 패널 전환 + DB 로드 후 업체 선택
+  // 업체 자동 선택
   setTimeout(() => {
     populateOrderBizSelect();
     updateOrderMonthStats();
     renderOrderPendingList();
     const sel = document.getElementById('orderBizSelect');
     if (sel) {
-      // String으로 통일해서 비교
       sel.value = String(id);
-      if (!sel.value || sel.value !== String(id)) {
-        // option이 아직 없으면 다시 시도
-        Array.from(sel.options).forEach(opt => {
-          if (String(opt.value) === String(id)) opt.selected = true;
-        });
-      }
+      Array.from(sel.options).forEach(opt => {
+        if (String(opt.value) === String(id)) opt.selected = true;
+      });
       onOrderBizChange();
     }
+    if (biz) showToast('t1', '🫙 ' + biz.name, '발주 업체로 자동 선택됐어요');
   }, 300);
 }
 
