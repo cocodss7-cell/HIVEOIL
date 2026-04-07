@@ -892,11 +892,21 @@
             <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:#185FA5;line-height:1;" id="orderExtraCount">0</div>
             <div style="font-size:10px;color:var(--gray);margin-top:4px;">업주 직접 요청</div>
           </div>
-          <div style="background:var(--white);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
-            <div style="font-size:11px;color:var(--gray);margin-bottom:6px;">✅ 이번 달 납품</div>
-            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--green-dark);line-height:1;" id="orderMonthTotal">0<span style="font-size:13px;font-weight:500"> 캔</span></div>
+          <div onclick="toggleOrderDonePanel()" id="orderDoneCard" style="background:var(--white);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all 0.2s;"
+            onmouseover="this.style.borderColor='var(--green-main)'" onmouseout="if(!document.getElementById('orderDonePanel')||document.getElementById('orderDonePanel').style.display==='none')this.style.borderColor='transparent'">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:11px;color:var(--gray);">✅ 이번 달 납품</div>
+              <span id="orderDoneArrow" style="font-size:12px;color:var(--gray);">▼</span>
+            </div>
+            <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--green-dark);line-height:1;margin-top:4px;" id="orderMonthTotal">0<span style="font-size:13px;font-weight:500"> 건</span></div>
             <div style="font-size:10px;color:var(--gray);margin-top:4px;" id="orderMonthSub">납품 이력 없음</div>
           </div>
+        </div>
+
+        <!-- 이번 달 납품 이력 펼침 패널 -->
+        <div id="orderDonePanel" style="display:none;background:var(--white);border-radius:16px;padding:16px 20px;box-shadow:var(--shadow);margin-bottom:16px;border-left:4px solid var(--green-dark);">
+          <div style="font-size:13px;font-weight:800;color:var(--green-dark);margin-bottom:12px;">✅ 이번 달 납품 완료 이력</div>
+          <div id="orderDoneList"></div>
         </div>
 
         <!-- ① 자동발주 업체 목록 -->
@@ -4897,14 +4907,64 @@ function updateOrderMonthStats() {
   const now = new Date();
   const thisMonth = now.getMonth();
   const thisYear  = now.getFullYear();
-  const oilH = historyData.filter(h => h.type === '식용유발주' && isSameMonth(h, thisYear, thisMonth));
+  const oilH = historyData.filter(h => h.type === '식용유발주' && h.status === 'done' && isSameMonth(h, thisYear, thisMonth));
   const totalCans = oilH.reduce((s,h) => s + (h.qty||0), 0);
   const el  = document.getElementById('orderMonthTotal');
   const sub = document.getElementById('orderMonthSub');
-  if (el)  el.innerHTML = totalCans + ' <span style="font-size:11px;color:#888">캔</span>';
-  if (sub) sub.textContent = oilH.length > 0 ? '이번 달 ' + oilH.length + '건 발주' : '이번 달 발주 이력 없음';
+  if (el)  el.innerHTML = oilH.length + ' <span style="font-size:13px;font-weight:500">건</span>';
+  if (sub) sub.textContent = oilH.length > 0
+    ? '총 ' + totalCans + '캔 납품 완료'
+    : '이번 달 납품 이력 없음';
+  // 패널 열려있으면 목록도 갱신
+  const donePanel = document.getElementById('orderDonePanel');
+  if (donePanel && donePanel.style.display !== 'none') renderOrderDoneList();
 }
 
+
+// ===== 이번 달 납품 이력 패널 토글 =====
+function toggleOrderDonePanel() {
+  const panel  = document.getElementById('orderDonePanel');
+  const arrow  = document.getElementById('orderDoneArrow');
+  const card   = document.getElementById('orderDoneCard');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  if (isOpen) {
+    panel.style.display = 'none';
+    if (arrow) arrow.textContent = '▼';
+    if (card)  card.style.borderColor = 'transparent';
+  } else {
+    panel.style.display = 'block';
+    if (arrow) arrow.textContent = '▲';
+    if (card)  card.style.borderColor = 'var(--green-main)';
+    renderOrderDoneList();
+  }
+}
+
+function renderOrderDoneList() {
+  const el = document.getElementById('orderDoneList');
+  if (!el) return;
+  const now = new Date();
+  const doneList = historyData.filter(h =>
+    h.type === '식용유발주' && h.status === 'done' && isSameMonth(h, now.getFullYear(), now.getMonth())
+  ).sort((a,b) => new Date(b.rawDate||b.date) - new Date(a.rawDate||a.date));
+
+  if (doneList.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">이번 달 납품 완료 이력이 없어요</div>';
+    return;
+  }
+  el.innerHTML = doneList.map(h => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-light);">
+      <div style="width:36px;height:36px;background:var(--green-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🫙</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:13px;">${h.biz}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:1px;">${h.content} · ${h.date}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--green-dark);">${h.amount}</div>
+        <span class="status-pill status-done" style="font-size:9px;">완료</span>
+      </div>
+    </div>`).join('');
+}
 
 // 업체별 업주 로그인 ID/PW 관리
 const bizPwOverrides = JSON.parse(localStorage.getItem('hiveoil_biz_pw') || '{}');
