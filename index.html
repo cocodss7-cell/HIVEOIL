@@ -1815,7 +1815,7 @@
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
             <div>
-              <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:14px;margin-bottom:10px;" onclick="adminSavePrices()">💾 시세 저장 &amp; 전체 반영</button>
+              <button id="adminSaveBtn" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:14px;margin-bottom:10px;" onclick="adminSavePrices()">💾 시세 저장 &amp; 전체 반영</button>
               <button class="btn btn-outline" style="width:100%;justify-content:center;padding:10px;font-size:12px;" onclick="adminResetPrices()">🔄 기본값으로 초기화</button>
             </div>
             <div class="card" style="padding:16px 18px;">
@@ -3201,22 +3201,51 @@ function adminSavePrices() {
   renderAdminPrices();
   // localStorage 영구 저장
   try { localStorage.setItem('hiveoil_prices', JSON.stringify(PRICES)); } catch(e) {}
+  // 버튼 완료 상태
+  const saveBtn = document.getElementById('adminSaveBtn');
   if (changes.length > 0) {
     const log = document.getElementById('priceChangeLog');
     if (log) {
+      // placeholder 제거
+      const placeholder = log.querySelector('div:only-child');
+      if (placeholder && placeholder.textContent.includes('자동 기록')) log.innerHTML = '';
+
       const d = new Date();
       const dateStr = d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
-      changes.forEach(c => {
-        const row = document.createElement('div');
-        row.style.cssText = 'font-size:11px;display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-light);';
-        row.innerHTML = '<span style="color:var(--gray)">' + dateStr + '</span><span style="color:var(--green-dark);font-weight:700;">' + c + '</span>';
-        log.prepend(row);
-      });
+      const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+
+      // 한 번에 묶어서 상단에 추가
+      const group = document.createElement('div');
+      group.style.cssText = 'background:var(--green-pale);border-radius:8px;padding:8px 11px;border-left:3px solid var(--green-main);';
+      group.innerHTML = '<div style="font-size:10px;color:var(--gray);margin-bottom:5px;">' + dateStr + ' ' + timeStr + '</div>'
+        + changes.map(c => '<div style="font-size:11px;font-weight:700;color:var(--green-dark);margin-top:2px;">✅ ' + c + '</div>').join('');
+      log.prepend(group);
     }
-    showToast('t1','💾 시세 영구 저장 완료', changes.length + '개 항목 저장 — 새로고침해도 유지돼요');
-    recordPriceChange(changes); // 가격변동 이력 기록
-    renderPricePage(); // 시세 페이지 갱신
+
+    // 버튼 완료 상태
+    if (saveBtn) {
+      saveBtn.textContent = '✅ 저장 완료!';
+      saveBtn.style.background = '#2E7D32';
+      saveBtn.disabled = true;
+      setTimeout(() => {
+        saveBtn.innerHTML = '💾 시세 저장 &amp; 전체 반영';
+        saveBtn.style.background = '';
+        saveBtn.disabled = false;
+      }, 2500);
+    }
+
+    showToast('t1','💾 시세 저장 완료!', changes.length + '개 항목 반영됐어요');
+    recordPriceChange(changes);
+    renderPricePage();
   } else {
+    if (saveBtn) {
+      saveBtn.textContent = '✅ 변경 없음';
+      saveBtn.style.background = '#555';
+      setTimeout(() => {
+        saveBtn.innerHTML = '💾 시세 저장 &amp; 전체 반영';
+        saveBtn.style.background = '';
+      }, 2000);
+    }
     showToast('t1','✅ 변경 없음','현재 시세와 동일합니다');
   }
 }
