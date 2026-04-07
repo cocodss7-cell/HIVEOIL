@@ -2253,7 +2253,7 @@ function renderWasteTable() {
     const kg      = (cans * PRICES.waste.can.kg).toFixed(1);
     const price   = (cans * PRICES.waste.can.price).toLocaleString();
     const isUrgent = cans >= 5;
-    const hasPending = historyData.some(h => h.bizId === b.id && h.type === '폐유수거' && h.status === 'pending');
+    const hasPending = historyData.some(h => String(h.bizId) === String(b.id) && h.type === '폐유수거' && h.status === 'pending');
 
     // 상태 뱃지
     let statusBadge;
@@ -4343,7 +4343,7 @@ function renderWastePendingList() {
     const cans    = b.wasteOil;
     const kg      = (cans * PRICES.waste.can.kg).toFixed(1);
     const price   = (cans * PRICES.waste.can.price).toLocaleString();
-    const hasPending = historyData.some(h => h.bizId === b.id && h.type === '폐유수거' && h.status === 'pending');
+    const hasPending = historyData.some(h => String(h.bizId) === String(b.id) && h.type === '폐유수거' && h.status === 'pending');
     const isUrgent = cans >= 5;
 
     const statusColor = hasPending ? '#1565C0' : isUrgent ? 'var(--red-accent)' : '#D4621A';
@@ -4426,6 +4426,7 @@ function requestCollect(bizId) {
   saveHistoryToDB(item);
   updateDashboard();
   renderWasteTable();
+  renderWastePendingList();
   updateTabBadges();
   showToast('t1','🚛 수거 신청 완료!', b.name + ' — ' + b.wasteOil + '캔 · 담당자가 연락드릴게요');
 }
@@ -4505,6 +4506,7 @@ function completeCollect(bizId) {
   }
 
   renderWasteTable();
+  renderWastePendingList();
   updateDashboard();
   updateTabBadges();
   b._collectInProgress = false;
