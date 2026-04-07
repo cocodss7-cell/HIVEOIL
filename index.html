@@ -1239,19 +1239,29 @@
                 <div style="font-size:11px;color:var(--gray);margin-bottom:6px;">🫙 새식용유 재고</div>
                 <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
                   <div class="tc-btn" onclick="changeQRStock('new',-1)" style="width:32px;height:32px;border-radius:8px;">−</div>
-                  <div style="font-family:var(--font-display);font-size:36px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;" id="qrNewVal">5</div>
+                  <input id="qrNewVal" type="number" min="0" max="99"
+                    style="font-family:var(--font-display);font-size:36px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;width:64px;text-align:center;border:none;background:transparent;outline:none;-moz-appearance:textfield;"
+                    value="5"
+                    oninput="qrNewVal=Math.max(0,Math.min(99,parseInt(this.value)||0));this.value=qrNewVal;"
+                    onfocus="this.select()"
+                  >
                   <div class="tc-btn" onclick="changeQRStock('new',1)" style="width:32px;height:32px;border-radius:8px;">+</div>
                 </div>
-                <div style="font-size:10px;color:var(--gray);margin-top:4px;">캔</div>
+                <div style="font-size:10px;color:var(--gray);margin-top:4px;">캔 · 탭하여 직접 입력 가능</div>
               </div>
               <div style="background:#FFF8F0;border-radius:var(--radius-sm);padding:16px;text-align:center;border:1.5px solid #FFD8A8;">
                 <div style="font-size:11px;color:var(--gray);margin-bottom:6px;">🗑️ 폐식용유 보유</div>
                 <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
                   <div class="tc-btn" onclick="changeQRStock('waste',-1)" style="width:32px;height:32px;border-radius:8px;">−</div>
-                  <div style="font-family:var(--font-display);font-size:36px;font-weight:800;color:#D4621A;letter-spacing:-0.04em;" id="qrWasteVal">0</div>
+                  <input id="qrWasteVal" type="number" min="0" max="99"
+                    style="font-family:var(--font-display);font-size:36px;font-weight:800;color:#D4621A;letter-spacing:-0.04em;width:64px;text-align:center;border:none;background:transparent;outline:none;-moz-appearance:textfield;"
+                    value="0"
+                    oninput="qrWasteVal=Math.max(0,Math.min(99,parseInt(this.value)||0));this.value=qrWasteVal;"
+                    onfocus="this.select()"
+                  >
                   <div class="tc-btn" onclick="changeQRStock('waste',1)" style="width:32px;height:32px;border-radius:8px;">+</div>
                 </div>
-                <div style="font-size:10px;color:var(--gray);margin-top:4px;">캔</div>
+                <div style="font-size:10px;color:var(--gray);margin-top:4px;">캔 · 탭하여 직접 입력 가능</div>
               </div>
             </div>
 
@@ -3075,8 +3085,8 @@ function generateQR() {
   const timeEl      = document.getElementById('qrLastTime');
   if (previewName) previewName.textContent = biz.name;
   if (label)       label.textContent       = biz.name;
-  if (newEl)       newEl.textContent       = qrNewVal;
-  if (wasteEl)     wasteEl.textContent     = qrWasteVal;
+  if (newEl)       { newEl.value = qrNewVal; }
+  if (wasteEl)     { wasteEl.value = qrWasteVal; }
   if (timeEl)      timeEl.textContent      = biz.lastUpdate || '—';
 
   // QR 코드 생성
@@ -3097,8 +3107,8 @@ function generateQR() {
             saveBusinesses();
             qrNewVal   = biz.newOil;
             qrWasteVal = biz.wasteOil;
-            if (newEl)   newEl.textContent   = qrNewVal;
-            if (wasteEl) wasteEl.textContent = qrWasteVal;
+            if (newEl) { newEl.value = qrNewVal; }
+            if (wasteEl) { wasteEl.value = qrWasteVal; }
             if (timeEl)  timeEl.textContent  = biz.lastUpdate || '—';
           }
         }).catch(() => {});
@@ -3108,11 +3118,13 @@ function generateQR() {
 
 function changeQRStock(type, delta) {
   if (type === 'new') {
-    qrNewVal = Math.max(0, Math.min(50, qrNewVal + delta));
-    document.getElementById('qrNewVal').textContent = qrNewVal;
+    qrNewVal = Math.max(0, Math.min(99, qrNewVal + delta));
+    const el = document.getElementById('qrNewVal');
+    if (el) el.value = qrNewVal;
   } else {
-    qrWasteVal = Math.max(0, Math.min(30, qrWasteVal + delta));
-    document.getElementById('qrWasteVal').textContent = qrWasteVal;
+    qrWasteVal = Math.max(0, Math.min(99, qrWasteVal + delta));
+    const el = document.getElementById('qrWasteVal');
+    if (el) el.value = qrWasteVal;
   }
 }
 
@@ -3129,6 +3141,12 @@ function saveQRStock() {
     btn.textContent = '⏳ 저장 중...';
     btn.style.opacity = '0.6';
   }
+
+  // input에서 최신값 읽기 (직접 입력 지원)
+  const newEl2   = document.getElementById('qrNewVal');
+  const wasteEl2 = document.getElementById('qrWasteVal');
+  if (newEl2)   qrNewVal   = Math.max(0, Math.min(99, parseInt(newEl2.value)   || 0));
+  if (wasteEl2) qrWasteVal = Math.max(0, Math.min(99, parseInt(wasteEl2.value) || 0));
 
   const now = new Date();
   const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
