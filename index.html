@@ -4395,8 +4395,18 @@ function renderWasteDoneList() {
 }
 
 function requestCollect(bizId) {
-  const b = businesses.find(x => x.id === bizId);
+  const b = businesses.find(x => String(x.id) === String(bizId));
   if (!b) return;
+  if (b.wasteOil <= 0) {
+    showToast('t1','ℹ️ 수거할 폐유가 없어요', b.name + ' — 폐유 재고 0캔');
+    return;
+  }
+  // 이미 pending 이력 있으면 중복 방지
+  const already = historyData.some(h => h.bizId == bizId && h.type === '폐유수거' && h.status === 'pending');
+  if (already) {
+    showToast('t1','ℹ️ 이미 수거 신청됨', b.name + ' — 담당자가 처리 중이에요');
+    return;
+  }
   const now = new Date();
   const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
   const item = {
@@ -4416,6 +4426,7 @@ function requestCollect(bizId) {
   saveHistoryToDB(item);
   updateDashboard();
   renderWasteTable();
+  updateTabBadges();
   showToast('t1','🚛 수거 신청 완료!', b.name + ' — ' + b.wasteOil + '캔 · 담당자가 연락드릴게요');
 }
 
