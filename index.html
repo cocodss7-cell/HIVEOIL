@@ -2118,13 +2118,25 @@ function getKSTDate(dateStr) {
 }
 
 function isSameMonth(h, year, month) {
-  const dateStr = h.rawDate || h.date;
-  if (!dateStr) return false;
-  try {
-    const d = new Date(String(dateStr).replaceAll('.', '-'));
-    const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-    return kst.getFullYear() === year && kst.getMonth() === month;
-  } catch(e) { return false; }
+  // 1순위: date 필드 "2026.04.07" 형식 직접 파싱 (가장 신뢰)
+  if (h.date && h.date !== '—') {
+    const parts = String(h.date).replace(/-/g, '.').split('.');
+    if (parts.length === 3) {
+      const y = parseInt(parts[0]);
+      const m = parseInt(parts[1]) - 1; // 0-indexed
+      if (!isNaN(y) && !isNaN(m)) return y === year && m === month;
+    }
+  }
+  // 2순위: rawDate ISO 문자열 (Supabase created_at)
+  if (h.rawDate) {
+    try {
+      // KST 기준으로 날짜 추출 (UTC+9)
+      const d = new Date(h.rawDate);
+      const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+      return kst.getUTCFullYear() === year && kst.getUTCMonth() === month;
+    } catch(e) {}
+  }
+  return false;
 }
 
 function loadBusinesses() {
@@ -2460,6 +2472,9 @@ function renderWasteTable() {
   if (doneSub) doneSub.textContent = doneHistory.length > 0
     ? '건 · 총 ' + doneHistory.reduce((s,h) => s + (h.qty||0), 0) + '캔 수거 완료'
     : '완료된 수거 없음';
+  // 패널이 열려 있으면 목록도 같이 갱신
+  const donePanel = document.getElementById('wasteDonePanel');
+  if (donePanel && donePanel.style.display !== 'none') renderWasteDoneList();
 
   const pendingBiz = businesses.filter(b => b.wasteOil >= 1).sort((a,b) => b.wasteOil - a.wasteOil);
   if (pendingBiz.length === 0) {
@@ -4617,7 +4632,8 @@ function renderWastePendingList() {
 function renderWasteDoneList() {
   const el = document.getElementById('wasteDoneList');
   if (!el) return;
-  const doneList = historyData.filter(h => h.type === '폐유수거' && h.status === 'done');
+  const now = new Date();
+  const doneList = historyData.filter(h => h.type === '폐유수거' && h.status === 'done' && isSameMonth(h, now.getFullYear(), now.getMonth()));
   if (doneList.length === 0) {
     el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray);font-size:12px;">이번 달 완료된 수거가 없어요</div>';
     return;
