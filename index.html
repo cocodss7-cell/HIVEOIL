@@ -1269,7 +1269,7 @@
               ⏱️ 마지막 입력: <strong id="qrLastTime" style="color:var(--black);">—</strong>
             </div>
 
-            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;font-weight:800;" onclick="saveQRStock()">
+            <button id="qrSaveBtn" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;font-weight:800;" onclick="saveQRStock()">
               ✅ 재고 저장 완료
             </button>
             <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--gray);">저장하면 지도에 즉시 반영돼요</div>
@@ -3133,16 +3133,16 @@ function saveQRStock() {
   const biz = businesses.find(b => String(b.id) === String(qrSelectedBizId));
   if (!biz) return;
 
-  // 중복 저장 방지 — 버튼 즉시 비활성화
-  const btn = document.querySelector('[onclick="saveQRStock()"]');
+  // 버튼 찾기 — id로 정확하게
+  const btn = document.getElementById('qrSaveBtn');
   if (btn) {
-    if (btn.disabled) return; // 이미 처리 중
+    if (btn.disabled) return;
     btn.disabled = true;
-    btn.textContent = '⏳ 저장 중...';
-    btn.style.opacity = '0.6';
+    btn.innerHTML = '⏳ 저장 중...';
+    btn.style.opacity = '0.7';
   }
 
-  // input에서 최신값 읽기 (직접 입력 지원)
+  // input에서 최신값 읽기
   const newEl2   = document.getElementById('qrNewVal');
   const wasteEl2 = document.getElementById('qrWasteVal');
   if (newEl2)   qrNewVal   = Math.max(0, Math.min(99, parseInt(newEl2.value)   || 0));
@@ -3158,7 +3158,8 @@ function saveQRStock() {
   updateBizStockInDB(biz.id, biz.newOil, biz.wasteOil, biz.lastUpdate);
   checkAutoOrder(biz);
 
-  document.getElementById('qrLastTime').textContent = biz.lastUpdate;
+  const lastEl = document.getElementById('qrLastTime');
+  if (lastEl) lastEl.textContent = biz.lastUpdate;
 
   // 지도 마커 갱신
   if (kakaoMap && mapInitialized) {
@@ -3169,22 +3170,19 @@ function saveQRStock() {
     renderBizList();
   }
 
-  // 버튼 완료 상태로 변경
+  // 버튼 완료 상태
   if (btn) {
-    btn.textContent = '✅ 저장 완료!';
+    btn.innerHTML = '✅ 저장 완료!';
     btn.style.background = '#2E7D32';
-    // 3초 후 다시 활성화
+    btn.style.opacity = '1';
     setTimeout(() => {
       btn.disabled = false;
-      btn.textContent = '✅ 재고 저장 완료';
-      btn.style.opacity = '1';
+      btn.innerHTML = '✅ 재고 저장 완료';
       btn.style.background = '';
-    }, 3000);
+    }, 2500);
   }
 
   showToast('t1','✅ 재고 저장 완료!', biz.name + ' — 새식용유 '+qrNewVal+'캔, 폐유 '+qrWasteVal+'캔');
-
-  // 자동발주/수거 알림
   if (qrNewVal <= 2) showToast('t1','⚡ 자동발주 예약!', biz.name+' — 새식용유 부족, 자동발주 대기 중');
   if (qrWasteVal >= 1) setTimeout(() => showToast('t1','♻️ 수거 알림!', biz.name+' — 폐유 '+qrWasteVal+'캔, 수거 신청 가능'), 1000);
 }
