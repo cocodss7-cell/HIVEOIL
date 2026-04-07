@@ -519,44 +519,49 @@
       <div class="logo-title">식용유<span>니버스</span></div>
       <div class="logo-sub">HIVE · 탄소배출을 줄이고</div>
     </div>
-    <nav>
-      <div class="nav-label">메인</div>
-      <div class="nav-item active" onclick="showPanel('dashboard',this)"><span class="icon">📊</span>대시보드</div>
-      <div class="nav-item" onclick="showPanel('map',this)"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
-      <div class="nav-label">업무</div>
-      <div class="nav-item" onclick="showPanel('waste',this)"><span class="icon">🗑️</span>폐유 수거<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
-      <div class="nav-item" onclick="showPanel('order',this)"><span class="icon">🫙</span>식용유 발주·납품<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
-      <div class="nav-item" onclick="showPanel('history',this)"><span class="icon">📋</span>진행 이력</div>
-      <div class="nav-label">정보</div>
-      <div class="nav-item" onclick="showPanel('price',this)"><span class="icon">💹</span>가격변동 이력</div>
-      <div class="nav-item" onclick="showPanel('esg',this)"><span class="icon">🌿</span>ESG 포인트</div>
+    <nav id="mainNav">
+      <!-- ══ 업주 메뉴 (기본 노출) ══ -->
+      <div class="nav-label">메뉴</div>
+      <div class="nav-item active" onclick="showPanel('owner-dash',this)" id="navOwnerDash"><span class="icon">📊</span>대시보드</div>
+      <div class="nav-item" onclick="showPanel('qr',this)" id="navQr"><span class="icon">📱</span>재고 입력</div>
+      <div class="nav-item" onclick="showPanel('waste',this)" id="navWaste"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
+      <div class="nav-item" onclick="showPanel('order',this)" id="navOrder"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
 
-      <div class="nav-label">업주 전용</div>
-      <div class="nav-item" id="ownerNavItem" onclick="showPanel('owner',this)" style="border:1.5px solid #e0ece0;margin-top:4px;">
-        <span class="icon">🏪</span>업주 로그인<span class="nav-badge green" style="font-size:8px;padding:1px 5px">업주</span>
+      <!-- ══ 관리자 전용 메뉴 (로그인 후 표시) ══ -->
+      <div class="nav-label admin-only" style="display:none;">관리자</div>
+      <div class="nav-item admin-only" onclick="showPanel('dashboard',this)" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
+      <div class="nav-item admin-only" onclick="showPanel('map',this)" style="display:none;"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
+      <div class="nav-label admin-only" style="display:none;">업무</div>
+      <div class="nav-item admin-only" onclick="showPanel('history',this)" style="display:none;"><span class="icon">📋</span>진행 이력</div>
+      <div class="nav-label admin-only" style="display:none;">정보</div>
+      <div class="nav-item admin-only" onclick="showPanel('price',this)" style="display:none;"><span class="icon">💹</span>가격변동 이력</div>
+      <div class="nav-item admin-only" onclick="showPanel('esg',this)" style="display:none;"><span class="icon">🌿</span>ESG 포인트</div>
+      <div class="nav-label admin-only" style="display:none;">급식소 ESG</div>
+      <div class="nav-item admin-only" onclick="showPanel('apply',this)" style="display:none;"><span class="icon">🏫</span>수거 신청 관리<span class="nav-badge" id="sideApplyBadge" style="display:none;background:#185FA5;">0</span></div>
+
+      <!-- ══ 본사 관리 (항상 노출, 로그인 전/후 다르게) ══ -->
+      <div class="nav-label" style="margin-top:8px;">본사 관리</div>
+      <div class="nav-item" onclick="showPanel('hq-login',this)" id="navHqLogin">
+        <span class="icon">🏢</span>관리자 로그인<span class="nav-badge" id="navAdminBadge" style="background:#4A90E2;font-size:8px;padding:1px 5px">로그인</span>
       </div>
-      <div class="nav-item" onclick="showPanel('qr',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
-        <span class="icon">📱</span>QR 재고입력
+      <!-- 관리자 로그인 후 표시 -->
+      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;">
+        <span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
       </div>
-      <div class="nav-label">급식소 ESG</div>
-      <div class="nav-item" onclick="showPanel('apply',this)" style="border:1.5px solid #d0e8f0;margin-top:4px;">
-        <span class="icon">🏫</span>수거 신청<span class="nav-badge" id="sideApplyBadge" style="display:none;background:#185FA5;">0</span>
-      </div>
-      <div class="nav-label">본사 관리</div>
-      <div class="nav-item" onclick="showPanel('hq',this)" style="border:1.5px solid #e0ece0;margin-top:4px;">
-        <span class="icon">🏢</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
-      </div>
-      <div class="nav-item" onclick="showPanel('register',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
+      <div class="nav-item admin-only" onclick="showPanel('register',this)" style="display:none;">
         <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
       </div>
-      <div class="nav-item" onclick="showPanel('admin',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
+      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;">
         <span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span>
       </div>
     </nav>
     <div class="sidebar-footer">
+      <button id="adminLogoutBtn" onclick="hqAdminLogout()" style="display:none;width:100%;background:#FFF5F5;border:1.5px solid #FFB3B3;color:#C0392B;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:var(--font-body);">
+        🚪 관리자 로그아웃
+      </button>
       <div id="sidebarUserCard" class="user-card">
         <div class="user-avatar" id="sidebarAvatar">H</div>
-        <div><div class="user-name" id="sidebarName">HIVE 원주점</div><div class="user-role" id="sidebarRole">관리자 계정</div></div>
+        <div><div class="user-name" id="sidebarName">HIVE 원주점</div><div class="user-role" id="sidebarRole">업주 모드</div></div>
       </div>
     </div>
   </aside>
@@ -581,8 +586,202 @@
       </div>
     </div>
 
-    <!-- DASHBOARD -->
-    <div class="panel active" id="panel-dashboard">
+    <!-- OWNER DASHBOARD (기본 화면) -->
+    <div class="panel active" id="panel-owner-dash" style="overflow-y:auto;width:100%;">
+      <div style="max-width:680px;margin:0 auto;padding:28px 20px 100px;">
+
+        <!-- 헤더 브랜딩 -->
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="font-size:48px;margin-bottom:10px;">🫙</div>
+          <div style="font-family:var(--font-display);font-size:26px;font-weight:800;letter-spacing:-0.04em;color:var(--black);">식용유<span style="color:var(--green-main);">니버스</span></div>
+          <div style="font-size:13px;color:var(--gray);margin-top:6px;">HIVE · 원주 식용유 납품 & 폐유 수거 서비스</div>
+          <div id="ownerDashGreeting" style="margin-top:12px;background:var(--green-pale);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--green-dark);display:inline-block;">
+            👋 업체를 선택하거나 QR을 스캔해주세요
+          </div>
+        </div>
+
+        <!-- 업체 현황 카드 (로그인/QR 후 표시) -->
+        <div id="ownerDashBizCard" style="display:none;background:linear-gradient(135deg,#1F4D30,#05C46B);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;color:#fff;box-shadow:0 4px 20px rgba(5,196,107,0.25);">
+          <div style="font-size:11px;opacity:0.7;margin-bottom:4px;">현재 업체</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:14px;" id="ownerDashBizName">—</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+            <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:10px;opacity:0.8;margin-bottom:4px;">🫙 새식용유</div>
+              <div style="font-family:var(--font-display);font-size:24px;font-weight:800;" id="ownerDashNewOil">—</div>
+              <div style="font-size:10px;opacity:0.6;">캔 보유</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:10px;opacity:0.8;margin-bottom:4px;">♻️ 폐식용유</div>
+              <div style="font-family:var(--font-display);font-size:24px;font-weight:800;" id="ownerDashWasteOil">—</div>
+              <div style="font-size:10px;opacity:0.6;">캔 대기</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:10px;opacity:0.8;margin-bottom:4px;">⭐ ESG</div>
+              <div style="font-family:var(--font-display);font-size:24px;font-weight:800;" id="ownerDashEsg">—</div>
+              <div style="font-size:10px;opacity:0.6;">포인트</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 빠른 실행 -->
+        <div style="margin-bottom:24px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--gray);">빠른 실행</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+            <button onclick="showPanel('qr',null)" style="background:var(--white);border:1.5px solid var(--gray-light);border-radius:var(--radius);padding:20px 12px;cursor:pointer;transition:all 0.16s;font-family:var(--font-body);"
+              onmouseover="this.style.borderColor='var(--green-main)';this.style.transform='translateY(-2px)'"
+              onmouseout="this.style.borderColor='var(--gray-light)';this.style.transform=''">
+              <div style="font-size:28px;margin-bottom:8px;">📱</div>
+              <div style="font-size:13px;font-weight:800;color:var(--black);">재고 입력</div>
+              <div style="font-size:10px;color:var(--gray);margin-top:3px;">현재 재고 업데이트</div>
+            </button>
+            <button onclick="showPanel('waste',null)" style="background:var(--white);border:1.5px solid var(--gray-light);border-radius:var(--radius);padding:20px 12px;cursor:pointer;transition:all 0.16s;font-family:var(--font-body);"
+              onmouseover="this.style.borderColor='var(--red-accent)';this.style.transform='translateY(-2px)'"
+              onmouseout="this.style.borderColor='var(--gray-light)';this.style.transform=''">
+              <div style="font-size:28px;margin-bottom:8px;">♻️</div>
+              <div style="font-size:13px;font-weight:800;color:var(--black);">수거 신청</div>
+              <div style="font-size:10px;color:var(--gray);margin-top:3px;">폐유 수거 요청</div>
+            </button>
+            <button onclick="showPanel('order',null)" style="background:var(--white);border:1.5px solid var(--gray-light);border-radius:var(--radius);padding:20px 12px;cursor:pointer;transition:all 0.16s;font-family:var(--font-body);"
+              onmouseover="this.style.borderColor='var(--green-main)';this.style.transform='translateY(-2px)'"
+              onmouseout="this.style.borderColor='var(--gray-light)';this.style.transform=''">
+              <div style="font-size:28px;margin-bottom:8px;">🫙</div>
+              <div style="font-size:13px;font-weight:800;color:var(--black);">발주 신청</div>
+              <div style="font-size:10px;color:var(--gray);margin-top:3px;">식용유 추가 주문</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 이번 주 시세 -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header" style="background:#0D0D0D;">
+            <div class="card-title" style="color:#fff;">💹 이번 주 시세</div>
+          </div>
+          <div style="padding:14px 18px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+            <div style="background:var(--green-pale);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">🫘 대두유 18L</div>
+              <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green-dark);" id="odSoy">—</div>
+            </div>
+            <div style="background:var(--green-pale);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">🌿 카놀라유 18L</div>
+              <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green-dark);" id="odCanola">—</div>
+            </div>
+            <div style="background:var(--green-pale);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">🌽 옥수수유 18L</div>
+              <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green-dark);" id="odCorn">—</div>
+            </div>
+            <div style="background:#FFF8F0;border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">♻️ 폐유 수거</div>
+              <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:#D4621A;" id="odWaste">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HIVE 소개 -->
+        <div style="background:linear-gradient(135deg,#0a2e1a,#1F4D30);border-radius:var(--radius);padding:22px 24px;color:#fff;margin-bottom:14px;">
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:12px;">🫙 식용유니버스 HIVE란?</div>
+          <div style="font-size:12px;line-height:1.9;color:rgba(255,255,255,0.85);">
+            원주 지역 외식업 사장님들을 위한<br>
+            <strong style="color:#7FFFD4;">식용유 정기 납품 + 폐유 수거</strong> 통합 서비스예요.<br><br>
+            🫙 <strong style="color:#fff;">정기 납품</strong> — 재고 2캔 이하 시 자동 발주<br>
+            ♻️ <strong style="color:#fff;">폐유 수거</strong> — 신청 즉시 담당자 배정<br>
+            🌿 <strong style="color:#fff;">ESG 포인트</strong> — 수거할 때마다 포인트 적립<br>
+            📱 <strong style="color:#fff;">QR 한 번</strong> — 재고 관리부터 수거 신청까지
+          </div>
+        </div>
+
+        <!-- 폐유 행방 -->
+        <div class="card" style="margin-bottom:14px;overflow:hidden;">
+          <div style="background:#1C2B22;padding:14px 18px;">
+            <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:#fff;">♻️ 수거된 폐유, 어디로 갈까요?</div>
+          </div>
+          <div style="padding:4px 0;">
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px dashed var(--gray-light);">
+              <div style="width:34px;height:34px;background:var(--green-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">🍳</div>
+              <div><div style="font-size:13px;font-weight:700;">HIVE 수거</div><div style="font-size:11px;color:var(--gray);margin-top:1px;">전용 용기에 담아 담당자가 직접 수거</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px dashed var(--gray-light);">
+              <div style="width:34px;height:34px;background:#E3F2FD;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">⛽</div>
+              <div><div style="font-size:13px;font-weight:700;">바이오디젤 생산</div><div style="font-size:11px;color:var(--gray);margin-top:1px;">경유 대비 CO₂ 80% 절감하는 친환경 연료로 재탄생</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 18px;">
+              <div style="width:34px;height:34px;background:var(--green-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">🌿</div>
+              <div><div style="font-size:13px;font-weight:700;">ESG 인증 + 포인트 적립</div><div style="font-size:11px;color:var(--gray);margin-top:1px;">수거량 기준 탄소 감축 실적 인증 + 포인트 지급</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HIVE 소식 -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-header">
+            <div class="card-title">📢 HIVE 소식</div>
+            <div style="font-size:10px;color:var(--gray);">원주 베타 운영 중</div>
+          </div>
+          <div style="padding:4px 0;">
+            <div style="padding:12px 18px;border-bottom:1px solid var(--gray-light);display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:10px;font-weight:700;background:var(--green-main);color:#000;padding:2px 7px;border-radius:5px;flex-shrink:0;margin-top:1px;">NEW</span>
+              <div><div style="font-size:13px;font-weight:600;">원주 베타 서비스 시작!</div><div style="font-size:11px;color:var(--gray);margin-top:2px;">식용유니버스 HIVE 원주점이 정식 베타 운영을 시작했어요.</div></div>
+            </div>
+            <div style="padding:12px 18px;border-bottom:1px solid var(--gray-light);display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:10px;font-weight:700;background:#E3F2FD;color:#185FA5;padding:2px 7px;border-radius:5px;flex-shrink:0;margin-top:1px;">안내</span>
+              <div><div style="font-size:13px;font-weight:600;">QR 스티커 배포 중</div><div style="font-size:11px;color:var(--gray);margin-top:2px;">업체 전용 QR을 주방·카운터에 붙이면 로그인 없이 바로 재고 입력 가능해요.</div></div>
+            </div>
+            <div style="padding:12px 18px;display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:10px;font-weight:700;background:#FFF8F0;color:#D4621A;padding:2px 7px;border-radius:5px;flex-shrink:0;margin-top:1px;">ESG</span>
+              <div><div style="font-size:13px;font-weight:600;">폐유 포인트 → 원주사랑상품권 전환 예정</div><div style="font-size:11px;color:var(--gray);margin-top:2px;">수거 포인트를 원주사랑상품권으로 전환하는 기능이 곧 추가돼요.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA 배너 -->
+        <div style="background:var(--green-main);border-radius:var(--radius);padding:20px 22px;">
+          <div style="text-align:center;margin-bottom:16px;">
+            <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:#0D0D0D;">🫙 식용유 납품 · 폐유 수거 신청</div>
+            <div style="font-size:12px;color:rgba(0,0,0,0.55);margin-top:4px;">원주시 외식업 사장님이라면 누구나 신청 가능해요</div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;">
+            <a href="tel:01091237042" style="text-decoration:none;">
+              <button style="background:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:13px;font-weight:800;color:#1C2B22;cursor:pointer;font-family:var(--font-body);box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                📞 전화 문의
+              </button>
+            </a>
+            <button onclick="showPanel('register',null)" style="background:#0D0D0D;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font-body);">
+              ➕ 업체 등록
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 관리자 로그인 패널 -->
+    <div class="panel" id="panel-hq-login" style="overflow-y:auto;width:100%;">
+      <div style="max-width:420px;margin:60px auto;padding:0 24px;">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="font-size:44px;margin-bottom:10px;">🏢</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:5px;">본사 관리자 로그인</div>
+          <div style="font-size:12px;color:var(--gray);">HIVE 담당자만 접근 가능합니다</div>
+        </div>
+        <div class="card" style="padding:26px;">
+          <div class="form-group">
+            <label class="form-label">관리자 아이디</label>
+            <input class="form-input" id="hqAdminId" placeholder="관리자 아이디" style="font-size:14px;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">비밀번호</label>
+            <input class="form-input" id="hqAdminPw" type="password" placeholder="비밀번호" style="font-size:14px;"
+              onkeydown="if(event.key==='Enter')hqAdminLogin()">
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;" onclick="hqAdminLogin()">🔐 로그인</button>
+        </div>
+        <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
+          <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 계정</div>
+          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">hive</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">hive2026</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD (관리자용, 기본 숨김) -->
+    <div class="panel" id="panel-dashboard">
       <div class="alert-banner" id="alertBanner" style="display:none;">
         <span>⚡ 자동발주 알림:</span>
         <span id="alertBannerContent"></span>
@@ -2024,32 +2223,26 @@
 
 
   <!-- 모바일 하단 탭바 -->
-  <nav class="bottom-tab-bar">
-    <button class="tab-item active" id="tab-dashboard" onclick="showPanelMobile('dashboard', this)">
-      <div style="position:relative">
-        <span class="tab-icon">📊</span>
-      </div>
+  <nav class="bottom-tab-bar" id="bottomTabBar">
+    <!-- 업주 탭 (기본) -->
+    <button class="tab-item active" id="tab-owner-dash" onclick="showPanelMobile('owner-dash', this)">
+      <span class="tab-icon">📊</span>
       <span class="tab-label">대시보드</span>
     </button>
-    <button class="tab-item" id="tab-map" onclick="showPanelMobile('map', this)">
-      <div style="position:relative">
-        <span class="tab-icon">🗺️</span>
-        <span class="tab-badge" id="tabBadgeMap" style="display:none;">0</span>
-      </div>
-      <span class="tab-label">지도</span>
+    <button class="tab-item" id="tab-qr" onclick="showPanelMobile('qr', this)">
+      <span class="tab-icon">📱</span>
+      <span class="tab-label">재고입력</span>
     </button>
     <button class="tab-item" id="tab-waste" onclick="showPanelMobile('waste', this)">
       <div style="position:relative">
-        <span class="tab-icon">🗑️</span>
+        <span class="tab-icon">♻️</span>
         <span class="tab-badge" id="tabBadgeWaste" style="display:none;">0</span>
       </div>
-      <span class="tab-label">폐유수거</span>
+      <span class="tab-label">수거신청</span>
     </button>
-    <button class="tab-item" id="tab-qr" onclick="showPanelMobile('qr', this)">
-      <div style="position:relative">
-        <span class="tab-icon">📱</span>
-      </div>
-      <span class="tab-label">QR입력</span>
+    <button class="tab-item" id="tab-order" onclick="showPanelMobile('order', this)">
+      <span class="tab-icon">🫙</span>
+      <span class="tab-label">발주신청</span>
     </button>
   </nav>
 
@@ -2093,6 +2286,7 @@ function applyPrices() {
   });
   // 주간 시세 페이지 업데이트
   renderPricePage();
+  renderOwnerDash && renderOwnerDash();
   // ❌ updateDashboard() 제거 — 무한루프 원인 (updateDashboard가 applyPrices를 호출함)
   // 발주 select 옵션 텍스트 업데이트
   const optMap = { soy:'opt_soy', canola:'opt_canola', corn:'opt_corn' };
@@ -2410,7 +2604,7 @@ function showPanel(id, navEl, pushState=true) {
   }
 
   // 페이지 타이틀
-  const titles = { dashboard:'📊 대시보드', map:'🗺️ 원주 지도 현황', waste:'🗑️ 폐식용유 수거', order:'🫙 식용유 발주·납품', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 QR 재고 입력', apply:'🏫 급식소 수거 신청' };
+  const titles = { 'owner-dash':'📊 대시보드', dashboard:'📊 관리자 대시보드', map:'🗺️ 원주 지도 현황', waste:'♻️ 수거 신청', order:'🫙 발주 신청', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', 'hq-login':'🏢 관리자 로그인', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 재고 입력', apply:'🏫 수거 신청 관리' };
   const title = titles[id] || '';
   const titleEl = document.getElementById('page-title-text');
   if (titleEl) titleEl.textContent = title;
@@ -2432,6 +2626,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'hq')        { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
   if (id === 'admin')     { renderAdminPrices && renderAdminPrices(); }
   if (id === 'apply')     { renderApplyList(); updateApplyKpi(); }
+  if (id === 'owner-dash') { renderOwnerDash(); }
   if (id === 'qr') {
     // businesses가 있으면 즉시, 없으면 DB 로드 후 채우기
     if (businesses.length > 0) {
@@ -2451,9 +2646,9 @@ window.addEventListener('popstate', (e) => {
 
 // 첫 로드 시 URL 해시로 패널 결정
 (function() {
-  const validPanels = ['dashboard','map','waste','order','history','price','esg','owner','hq','admin','register','qr','apply'];
+  const validPanels = ['owner-dash','dashboard','map','waste','order','history','price','esg','owner','hq','hq-login','admin','register','qr','apply'];
   const hash = location.hash.replace('#','');
-  const startPanel = (hash && validPanels.includes(hash)) ? hash : 'dashboard';
+  const startPanel = (hash && validPanels.includes(hash)) ? hash : 'owner-dash';
   history.replaceState({ panel: startPanel }, '', '#' + startPanel);
   if (startPanel !== 'dashboard') showPanel(startPanel, null, false);
 })();
@@ -5512,6 +5707,72 @@ function closeSidebarOnMobile() {
   }
 }
 
+// ===== 관리자 로그인/모드 전환 =====
+let isAdminMode = false;
+
+function hqAdminLogin() {
+  const id = (document.getElementById('hqAdminId')?.value || '').trim();
+  const pw = (document.getElementById('hqAdminPw')?.value || '').trim();
+  if (id !== 'hive' || pw !== 'hive2026') {
+    showToast('t1','⚠️ 로그인 실패','아이디 또는 비밀번호가 맞지 않아요');
+    return;
+  }
+  setAdminMode(true);
+  showPanel('hq', null);
+  showToast('t1','✅ 관리자 로그인 완료','전체 관리 기능이 활성화됐어요');
+}
+
+function setAdminMode(on) {
+  isAdminMode = on;
+  // 관리자 전용 메뉴 표시/숨김
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = on ? '' : 'none';
+  });
+  // 관리자 로그인 버튼 상태
+  const loginNav = document.getElementById('navHqLogin');
+  const badge    = document.getElementById('navAdminBadge');
+  if (loginNav) loginNav.style.display = on ? 'none' : '';
+  if (badge)    { badge.textContent = on ? '로그아웃' : '로그인'; badge.style.background = on ? '#C0392B' : '#4A90E2'; }
+  // 사이드바 푸터 역할 표시
+  const roleEl = document.getElementById('sidebarRole');
+  if (roleEl) roleEl.textContent = on ? '관리자 계정' : '업주 모드';
+  // 관리자 로그아웃 버튼 표시
+  const logoutBtn = document.getElementById('adminLogoutBtn');
+  if (logoutBtn) logoutBtn.style.display = on ? '' : 'none';
+}
+
+function hqAdminLogout() {
+  setAdminMode(false);
+  showPanel('owner-dash', null);
+  showToast('t1','👋 로그아웃됐어요','업주 화면으로 돌아갑니다');
+}
+
+// ===== 업주 대시보드 렌더 =====
+function renderOwnerDash() {
+  // 시세 업데이트
+  const el = (id) => document.getElementById(id);
+  if (el('odSoy'))    el('odSoy').textContent    = PRICES.oils.soy.price.toLocaleString() + '원';
+  if (el('odCanola')) el('odCanola').textContent = PRICES.oils.canola.price.toLocaleString() + '원';
+  if (el('odCorn'))   el('odCorn').textContent   = PRICES.oils.corn.price.toLocaleString() + '원';
+  if (el('odWaste'))  el('odWaste').textContent  = PRICES.waste.can.price.toLocaleString() + '원/캔';
+
+  // 업주 로그인 상태면 업체 현황 카드 표시
+  if (ownerBizId) {
+    const b = businesses.find(x => String(x.id) === String(ownerBizId));
+    if (b) {
+      const card = el('ownerDashBizCard');
+      if (card) card.style.display = '';
+      if (el('ownerDashBizName'))  el('ownerDashBizName').textContent  = b.name;
+      if (el('ownerDashNewOil'))   el('ownerDashNewOil').textContent   = b.newOil;
+      if (el('ownerDashWasteOil')) el('ownerDashWasteOil').textContent = b.wasteOil;
+      const esgPts = Math.round(b.wasteOil * 144);
+      if (el('ownerDashEsg'))      el('ownerDashEsg').textContent      = esgPts;
+      const greet = el('ownerDashGreeting');
+      if (greet) greet.textContent = '👋 ' + b.name + ' · 안녕하세요!';
+    }
+  }
+}
+
 // ===== 급식소 수거 신청 =====
 let applyData = JSON.parse(localStorage.getItem('hive_apply') || '[]');
 
@@ -5652,6 +5913,12 @@ function updateApplyKpi() {
   renderRegBizList();
   renderApplyList();
   updateApplyKpi();
+  setTimeout(renderOwnerDash, 0); // PRICES 로드 보장 후 실행
+  // 기본 시작 패널: owner-dash (URL 해시 없을 때)
+  const hash = location.hash.replace('#','');
+  if (!hash) {
+    history.replaceState({ panel: 'owner-dash' }, '', '#owner-dash');
+  }
 })();
 
 </script>
