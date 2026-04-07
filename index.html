@@ -764,7 +764,8 @@
         <div class="card" style="padding:26px;">
           <div class="form-group">
             <label class="form-label">관리자 아이디</label>
-            <input class="form-input" id="hqAdminId" placeholder="관리자 아이디" style="font-size:14px;">
+            <input class="form-input" id="hqAdminId" placeholder="관리자 아이디" style="font-size:14px;"
+              onkeydown="if(event.key==='Enter')document.getElementById('hqAdminPw').focus()">
           </div>
           <div class="form-group">
             <label class="form-label">비밀번호</label>
@@ -1274,11 +1275,13 @@
           <div class="card" style="padding:26px;">
             <div class="form-group">
               <label class="form-label">업체 아이디 (담당자 코드)</label>
-              <input class="form-input" id="ownerIdInput" placeholder="예: WJ-001" style="font-size:14px;">
+              <input class="form-input" id="ownerIdInput" placeholder="예: WJ-001" style="font-size:14px;"
+              onkeydown="if(event.key==='Enter')document.getElementById('ownerPwInput').focus()">
             </div>
             <div class="form-group">
               <label class="form-label">비밀번호</label>
-              <input class="form-input" id="ownerPwInput" type="password" placeholder="핸드폰 번호 뒷 4자리" style="font-size:14px;">
+              <input class="form-input" id="ownerPwInput" type="password" placeholder="핸드폰 번호 뒷 4자리" style="font-size:14px;"
+              onkeydown="if(event.key==='Enter')ownerLogin()">
             </div>
             <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;margin-top:4px;" onclick="ownerLogin()">🔐 로그인</button>
             <div style="text-align:center;margin-top:14px;font-size:11px;color:var(--gray);">
@@ -5711,21 +5714,34 @@ function closeSidebarOnMobile() {
 let isAdminMode = false;
 
 function hqAdminLogin() {
-  const id = (document.getElementById('hqAdminId')?.value || '').trim();
-  const pw = (document.getElementById('hqAdminPw')?.value || '').trim();
-  if (id !== 'hive' || pw !== 'hive2026') {
-    showToast('t1','⚠️ 로그인 실패','아이디 또는 비밀번호가 맞지 않아요');
+  const idEl = document.getElementById('hqAdminId');
+  const pwEl = document.getElementById('hqAdminPw');
+  const id = (idEl?.value || '').trim();
+  const pw = (pwEl?.value || '').trim();
+  if (!id || !pw) {
+    showToast('t1','⚠️ 입력 오류','아이디와 비밀번호를 입력해주세요');
     return;
   }
-  setAdminMode(true);
-  showPanel('hq', null);
-  showToast('t1','✅ 관리자 로그인 완료','전체 관리 기능이 활성화됐어요');
+  if (id !== 'hive' || pw !== 'hive2026') {
+    showToast('t1','⚠️ 로그인 실패','아이디 또는 비밀번호가 맞지 않아요');
+    if (pwEl) { pwEl.style.borderColor='var(--red-accent)'; setTimeout(()=>pwEl.style.borderColor='',1500); }
+    return;
+  }
+  try {
+    setAdminMode(true);
+    showPanel('dashboard', null);
+    showToast('t1','✅ 관리자 로그인 완료','전체 관리 기능이 활성화됐어요');
+  } catch(e) {
+    showToast('t1','❌ 오류 발생', e.message || '관리자 모드 전환 중 오류');
+  }
 }
 
 function setAdminMode(on) {
   isAdminMode = on;
-  // 관리자 전용 메뉴 표시/숨김
+  // 관리자 전용 메뉴 표시/숨김 (nav-badge 등 하위 요소 제외)
   document.querySelectorAll('.admin-only').forEach(el => {
+    // nav-badge는 별도 관리 (숫자 뱃지는 항상 숨김 상태 유지)
+    if (el.classList.contains('nav-badge')) return;
     el.style.display = on ? '' : 'none';
   });
   // 관리자 로그인 버튼 상태
