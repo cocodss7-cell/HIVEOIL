@@ -538,6 +538,10 @@
       <div class="nav-item" onclick="showPanel('qr',this)" style="border:1.5px solid #e0ece0;margin-top:3px;">
         <span class="icon">📱</span>QR 재고입력
       </div>
+      <div class="nav-label">급식소 ESG</div>
+      <div class="nav-item" onclick="showPanel('apply',this)" style="border:1.5px solid #d0e8f0;margin-top:4px;">
+        <span class="icon">🏫</span>수거 신청<span class="nav-badge" id="sideApplyBadge" style="display:none;background:#185FA5;">0</span>
+      </div>
       <div class="nav-label">본사 관리</div>
       <div class="nav-item" onclick="showPanel('hq',this)" style="border:1.5px solid #e0ece0;margin-top:4px;">
         <span class="icon">🏢</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
@@ -1387,6 +1391,205 @@
     </div>
 
 
+    <!-- APPLY PANEL — 급식소 수거 신청 -->
+    <div class="panel" id="panel-apply" style="width:100%;overflow-y:auto;">
+      <div style="padding:28px 26px;max-width:960px;">
+
+        <!-- 헤더 -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+          <div style="width:48px;height:48px;background:#185FA5;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🏫</div>
+          <div>
+            <div style="font-family:var(--font-display);font-size:21px;font-weight:800;letter-spacing:-0.03em;">급식소 폐유 수거 신청</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:2px;">신청하면 HIVE 담당자가 직접 연락드려요 · ESG 포인트 자동 적립</div>
+          </div>
+        </div>
+
+        <!-- KPI 배너 -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;">
+          <div style="background:linear-gradient(135deg,#0a2e1a,#1a5c35);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);">
+            <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:5px;">✅ 누적 신청 접수</div>
+            <div style="font-family:var(--font-display);font-size:30px;font-weight:800;color:#fff;line-height:1;" id="applyKpiTotal">0</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:3px;">급식소</div>
+          </div>
+          <div style="background:var(--white);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+            <div style="font-size:10px;color:var(--gray);margin-bottom:5px;">⏳ 검토 중</div>
+            <div style="font-family:var(--font-display);font-size:30px;font-weight:800;color:#185FA5;line-height:1;" id="applyKpiPending">0</div>
+            <div style="font-size:10px;color:var(--gray);margin-top:3px;">건</div>
+          </div>
+          <div style="background:var(--white);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
+            <div style="font-size:10px;color:var(--gray);margin-bottom:5px;">🌿 예상 월 수거량</div>
+            <div style="font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--green-dark);line-height:1;" id="applyKpiKg">0</div>
+            <div style="font-size:10px;color:var(--gray);margin-top:3px;">L / 월</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;">
+
+          <!-- 신청 폼 -->
+          <div class="card">
+            <div class="card-header" style="background:#0D0D0D;border-bottom:none;">
+              <div class="card-title" style="color:#fff;">📋 신청 정보 입력</div>
+              <div style="font-size:10px;color:#555;">모든 항목 입력 필수</div>
+            </div>
+            <div style="padding:22px;">
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">🏫 급식소명 *</label>
+                  <input class="form-input" id="apply_name" placeholder="예: 원주초등학교 급식실" style="font-size:13px;">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">🏷️ 급식소 유형 *</label>
+                  <select class="form-input" id="apply_type" style="font-size:13px;">
+                    <option value="">— 선택 —</option>
+                    <option value="초등학교">🏫 초등학교</option>
+                    <option value="중학교">🏫 중학교</option>
+                    <option value="고등학교">🏫 고등학교</option>
+                    <option value="유치원">🧸 유치원</option>
+                    <option value="대학교">🎓 대학교</option>
+                    <option value="기업체">🏢 기업체 구내식당</option>
+                    <option value="병원">🏥 병원 급식</option>
+                    <option value="공공기관">🏛️ 공공기관</option>
+                    <option value="복지시설">❤️ 복지시설</option>
+                    <option value="군부대">⚔️ 군부대</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">👤 담당자명 *</label>
+                  <input class="form-input" id="apply_manager" placeholder="예: 김영희 영양사" style="font-size:13px;">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">📞 연락처 *</label>
+                  <input class="form-input" id="apply_phone" placeholder="010-0000-0000" style="font-size:13px;" maxlength="13"
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3')">
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:14px;">
+                <label class="form-label">📍 주소 *</label>
+                <input class="form-input" id="apply_addr" placeholder="예: 강원도 원주시 명륜동 123-4" style="font-size:13px;">
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">🍽️ 일평균 급식 인원 *</label>
+                  <div style="position:relative;">
+                    <input class="form-input" id="apply_pax" type="number" placeholder="예: 350" min="1" style="font-size:13px;padding-right:36px;">
+                    <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--gray);">명</span>
+                  </div>
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label class="form-label">🗑️ 월 예상 폐유 발생량 *</label>
+                  <div style="position:relative;">
+                    <input class="form-input" id="apply_waste" type="number" placeholder="예: 80" min="1" style="font-size:13px;padding-right:28px;" oninput="applyCalcESG()">
+                    <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--gray);">L</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ESG 자동계산 미리보기 -->
+              <div id="applyEsgPreview" style="display:none;background:var(--green-pale);border:1.5px solid var(--green-light);border-radius:12px;padding:14px 18px;margin-bottom:14px;">
+                <div style="font-size:11px;font-weight:700;color:var(--green-dark);margin-bottom:8px;">🌿 예상 ESG 효과 미리보기</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                  <div style="text-align:center;">
+                    <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--green-dark);" id="applyPreCo2">—</div>
+                    <div style="font-size:10px;color:var(--gray);">CO₂ 감축 / 월</div>
+                  </div>
+                  <div style="text-align:center;">
+                    <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:#E65100;" id="applyPrePts">—</div>
+                    <div style="font-size:10px;color:var(--gray);">ESG 포인트 / 월</div>
+                  </div>
+                  <div style="text-align:center;">
+                    <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:#185FA5;" id="applyPreAmt">—</div>
+                    <div style="font-size:10px;color:var(--gray);">예상 정산금 / 월</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label">📝 추가 요청사항 (선택)</label>
+                <textarea class="form-input" id="apply_note" rows="3" placeholder="수거 희망 일정, 특이사항 등 자유롭게 남겨주세요" style="font-size:13px;resize:vertical;line-height:1.6;"></textarea>
+              </div>
+
+              <!-- 약관 동의 -->
+              <div style="background:var(--cream);border-radius:10px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--gray-light);">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+                  <input type="checkbox" id="apply_agree" style="margin-top:3px;accent-color:var(--green-main);width:16px;height:16px;flex-shrink:0;">
+                  <div style="font-size:11px;color:var(--gray);line-height:1.6;">
+                    위 정보는 HIVE의 폐식용유 수거 서비스 운영 목적으로만 사용됩니다. 수집한 개인정보는 서비스 제공 후 3년간 보관 후 파기됩니다.
+                    <strong style="color:var(--black);">개인정보 수집·이용에 동의합니다.</strong>
+                  </div>
+                </label>
+              </div>
+
+              <button class="btn btn-primary" style="width:100%;justify-content:center;padding:15px;font-size:15px;font-weight:800;border-radius:12px;" onclick="submitApply()">
+                🏫 수거 신청 완료
+              </button>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 신청 내역 + 안내 -->
+          <div>
+            <!-- 신청 접수 내역 -->
+            <div class="card" style="margin-bottom:14px;">
+              <div class="card-header">
+                <div class="card-title">📬 신청 접수 내역</div>
+                <div style="font-size:10px;color:var(--gray);" id="applyListCount">0건</div>
+              </div>
+              <div id="applyList" style="max-height:320px;overflow-y:auto;">
+                <div style="text-align:center;padding:30px;color:var(--gray);font-size:12px;">
+                  📭 아직 신청 내역이 없어요
+                </div>
+              </div>
+            </div>
+
+            <!-- 안내 카드 -->
+            <div style="background:linear-gradient(135deg,#0a2e1a,#185FA5);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;">
+              <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">🌿 ESG 포인트 적립 안내</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.8);line-height:1.8;">
+                폐유 1L 수거 시 → <strong style="color:#7FFFD4;">+5 pts</strong> 적립<br>
+                적립 포인트 → 원주사랑상품권 전환 가능<br>
+                월 50L 이상 → <strong style="color:#FFD700;">Gold 등급</strong> 자동 부여<br>
+                연간 ESG 인증서 무료 발급
+              </div>
+            </div>
+
+            <!-- 처리 흐름 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">⏱️ 처리 절차</div>
+              </div>
+              <div style="padding:14px 18px;">
+              <div style="display:flex;flex-direction:column;gap:0;">
+                  <div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--gray-light)">
+                    <div style="width:22px;height:22px;border-radius:50%;background:var(--green-main);color:#000;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--black);padding-top:3px;">신청 접수 (즉시)</div>
+                  </div>
+                  <div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--gray-light)">
+                    <div style="width:22px;height:22px;border-radius:50%;background:var(--green-main);color:#000;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--black);padding-top:3px;">담당자 배정 (1영업일)</div>
+                  </div>
+                  <div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--gray-light)">
+                    <div style="width:22px;height:22px;border-radius:50%;background:var(--green-main);color:#000;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--black);padding-top:3px;">방문 상담 및 용기 지급 (3일 이내)</div>
+                  </div>
+                  <div style="display:flex;gap:12px;padding:9px 0;">
+                    <div style="width:22px;height:22px;border-radius:50%;background:var(--green-main);color:#000;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--black);padding-top:3px;">정기 수거 시작 · ESG 포인트 적립</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <!-- DELIVERY PANEL -->
     <!-- REGISTER PANEL -->
     <div class="panel" id="panel-register" style="width:100%;">
@@ -2084,10 +2287,9 @@ function openCollectFromMap(id) {
     showToast('t1','⚠️ 폐유가 없어요', biz.name + ' — 폐유 0캔, 수거 신청 불가');
     return;
   }
-  // 수거 신청 즉시 처리
-  requestCollect(Number(id) || id);
-  // 폐유 수거 패널로 이동
+  // 폐유 수거 패널로 이동 — 신청은 담당자가 버튼 직접 클릭
   showPanel('waste', null);
+  showToast('t1','♻️ 수거 신청 가능', biz.name + ' — 폐유 ' + biz.wasteOil + '캔 · 수거 신청 버튼을 눌러주세요');
 }
 
 function openOrderFromMap(id) {
@@ -2187,7 +2389,7 @@ function showPanel(id, navEl, pushState=true) {
   }
 
   // 페이지 타이틀
-  const titles = { dashboard:'📊 대시보드', map:'🗺️ 원주 지도 현황', waste:'🗑️ 폐식용유 수거', order:'🫙 식용유 발주·납품', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 QR 재고 입력' };
+  const titles = { dashboard:'📊 대시보드', map:'🗺️ 원주 지도 현황', waste:'🗑️ 폐식용유 수거', order:'🫙 식용유 발주·납품', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 QR 재고 입력', apply:'🏫 급식소 수거 신청' };
   const title = titles[id] || '';
   const titleEl = document.getElementById('page-title-text');
   if (titleEl) titleEl.textContent = title;
@@ -2208,6 +2410,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'register')  { renderRegBizList(); }
   if (id === 'hq')        { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
   if (id === 'admin')     { renderAdminPrices && renderAdminPrices(); }
+  if (id === 'apply')     { renderApplyList(); updateApplyKpi(); }
   if (id === 'qr') {
     // businesses가 있으면 즉시, 없으면 DB 로드 후 채우기
     if (businesses.length > 0) {
@@ -2227,7 +2430,7 @@ window.addEventListener('popstate', (e) => {
 
 // 첫 로드 시 URL 해시로 패널 결정
 (function() {
-  const validPanels = ['dashboard','map','waste','order','history','price','esg','owner','hq','admin','register','qr'];
+  const validPanels = ['dashboard','map','waste','order','history','price','esg','owner','hq','admin','register','qr','apply'];
   const hash = location.hash.replace('#','');
   const startPanel = (hash && validPanels.includes(hash)) ? hash : 'dashboard';
   history.replaceState({ panel: startPanel }, '', '#' + startPanel);
@@ -2281,11 +2484,11 @@ function renderWasteTable() {
       statusBadge = '<span class="status-pill" style="background:#FFF8F0;color:#D4621A;">⏳ 수거 대기</span>';
     }
 
-    // 액션 버튼
+    // 액션 버튼 — 2단계 흐름: [수거 신청] → [수거 완료]
     const actionBtn = hasPending
-      ? `<button class="btn" style="padding:5px 11px;font-size:11px;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7;white-space:nowrap;font-weight:700;"
+      ? `<button class="btn" style="padding:6px 14px;font-size:12px;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7;white-space:nowrap;font-weight:800;border-radius:9px;"
             onclick="completeCollect(${b.id})">✅ 수거 완료</button>`
-      : `<button class="btn btn-danger" style="padding:5px 11px;font-size:11px;white-space:nowrap;font-weight:700;"
+      : `<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;white-space:nowrap;font-weight:800;border-radius:9px;"
             onclick="requestCollect(${b.id})">🚛 수거 신청</button>`;
 
     return `<tr>
@@ -4557,6 +4760,15 @@ function completeCollect(bizId) {
     showToast('t1','ℹ️ 수거할 폐유가 없어요', b.name + ' — 폐유 재고 0캔');
     return;
   }
+  // 수거 신청(pending) 없이 완료 불가 — 신청 버튼 먼저 눌러야 함
+  if (!pendingItem) {
+    showToast('t1','⚠️ 수거 신청이 필요해요', b.name + ' — 🚛 수거 신청 버튼을 먼저 눌러주세요');
+    document.querySelectorAll('[onclick*="completeCollect(' + bizId + ')"]'). forEach(btn => {
+      btn.disabled = false; btn.textContent = '✅ 수거 완료'; btn.style.opacity = '1';
+    });
+    b._collectInProgress = false;
+    return;
+  }
 
   b._collectInProgress = true;
 
@@ -4581,22 +4793,6 @@ function completeCollect(bizId) {
       } catch(e) {}
     }
     saveHistory();
-  } else {
-    // pending 이력 없어도 done 이력 직접 생성
-    const now = new Date();
-    const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
-    const newItem = {
-      date: dateStr, rawDate: now.toISOString(),
-      biz: b.name, bizId: b.id,
-      type: '폐유수거',
-      content: '폐유 ' + prevWaste + '캔 수거 완료',
-      qty: prevWaste,
-      amount: (prevWaste * PRICES.waste.can.price).toLocaleString() + '원',
-      method: '수동', status: 'done',
-    };
-    historyData.unshift(newItem);
-    saveHistory();
-    try { saveHistoryToDB(newItem); } catch(e) {}
   }
 
   // 업체 폐유 재고 → 0 초기화
@@ -5165,6 +5361,137 @@ function closeSidebarOnMobile() {
   }
 }
 
+// ===== 급식소 수거 신청 =====
+let applyData = JSON.parse(localStorage.getItem('hive_apply') || '[]');
+
+function saveApply() { localStorage.setItem('hive_apply', JSON.stringify(applyData)); }
+
+function applyCalcESG() {
+  const l = parseFloat(document.getElementById('apply_waste')?.value || 0);
+  const preview = document.getElementById('applyEsgPreview');
+  if (!preview) return;
+  if (!l || l <= 0) { preview.style.display='none'; return; }
+  preview.style.display = 'block';
+  const co2 = (l * 0.7).toFixed(1);
+  const pts = Math.round(l * 5);
+  const amt = Math.round(l * (PRICES.waste?.price || 1152)).toLocaleString();
+  document.getElementById('applyPreCo2').textContent = co2 + ' kg';
+  document.getElementById('applyPrePts').textContent = pts + ' pts';
+  document.getElementById('applyPreAmt').textContent = amt + '원';
+}
+
+function submitApply() {
+  const name    = document.getElementById('apply_name')?.value.trim();
+  const type    = document.getElementById('apply_type')?.value;
+  const manager = document.getElementById('apply_manager')?.value.trim();
+  const phone   = document.getElementById('apply_phone')?.value.trim();
+  const addr    = document.getElementById('apply_addr')?.value.trim();
+  const pax     = document.getElementById('apply_pax')?.value;
+  const waste   = document.getElementById('apply_waste')?.value;
+  const note    = document.getElementById('apply_note')?.value.trim();
+  const agree   = document.getElementById('apply_agree')?.checked;
+
+  if (!name)    { showToast('t1','⚠️ 입력 오류','급식소명을 입력해주세요'); return; }
+  if (!type)    { showToast('t1','⚠️ 입력 오류','급식소 유형을 선택해주세요'); return; }
+  if (!manager) { showToast('t1','⚠️ 입력 오류','담당자명을 입력해주세요'); return; }
+  if (!phone)   { showToast('t1','⚠️ 입력 오류','연락처를 입력해주세요'); return; }
+  if (!addr)    { showToast('t1','⚠️ 입력 오류','주소를 입력해주세요'); return; }
+  if (!pax || pax <= 0) { showToast('t1','⚠️ 입력 오류','급식 인원을 입력해주세요'); return; }
+  if (!waste || waste <= 0) { showToast('t1','⚠️ 입력 오류','예상 폐유 발생량을 입력해주세요'); return; }
+  if (!agree)   { showToast('t1','⚠️ 동의 필요','개인정보 수집·이용에 동의해주세요'); return; }
+
+  const now = new Date();
+  const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+  const item = {
+    id: Date.now(), date: dateStr, rawDate: now.toISOString(),
+    name, type, manager, phone, addr,
+    pax: parseInt(pax), waste: parseFloat(waste), note,
+    status: 'pending',
+    co2: (parseFloat(waste) * 0.7).toFixed(1),
+    pts: Math.round(parseFloat(waste) * 5),
+    amt: Math.round(parseFloat(waste) * (PRICES.waste?.price || 1152))
+  };
+
+  applyData.unshift(item);
+  saveApply();
+  renderApplyList();
+  updateApplyKpi();
+
+  // 폼 초기화
+  ['apply_name','apply_type','apply_manager','apply_phone','apply_addr','apply_pax','apply_waste','apply_note'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  if (document.getElementById('apply_agree')) document.getElementById('apply_agree').checked = false;
+  if (document.getElementById('applyEsgPreview')) document.getElementById('applyEsgPreview').style.display = 'none';
+
+  showToast('t1','✅ 신청 완료!', name + ' — 담당자가 1영업일 내 연락드릴게요 🙌');
+
+  // 히스토리 기록
+  const hItem = {
+    date: dateStr, rawDate: now.toISOString(),
+    biz: name, bizId: null,
+    type: '급식소신청',
+    content: '[' + type + '] ' + name + ' — 폐유 ' + waste + 'L/월 · ' + manager,
+    qty: 0, amount: item.amt.toLocaleString() + '원/월',
+    method: '급식소 직접신청', status: 'pending'
+  };
+  historyData.unshift(hItem);
+  saveHistory();
+  updateDashboard();
+}
+
+function renderApplyList() {
+  const el = document.getElementById('applyList');
+  const countEl = document.getElementById('applyListCount');
+  if (!el) return;
+  if (countEl) countEl.textContent = applyData.length + '건';
+  if (applyData.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray);font-size:12px;">📭 아직 신청 내역이 없어요</div>';
+    return;
+  }
+  const statusColor = { pending:'#185FA5', approved:'var(--green-dark)', rejected:'var(--red-accent)' };
+  const statusLabel = { pending:'⏳ 검토 중', approved:'✅ 승인', rejected:'❌ 반려' };
+  el.innerHTML = applyData.map(a => `
+    <div style="padding:12px 16px;border-bottom:1px solid var(--gray-light);display:flex;gap:10px;align-items:flex-start;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+          <div style="font-size:13px;font-weight:700;color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.name}</div>
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;background:${statusColor[a.status]}20;color:${statusColor[a.status]};flex-shrink:0;">${statusLabel[a.status]||a.status}</span>
+        </div>
+        <div style="font-size:11px;color:var(--gray);">${a.type} · ${a.manager} · ${a.waste}L/월</div>
+        <div style="font-size:10px;color:var(--gray);margin-top:2px;">${a.date} · 🌿 ${a.co2}kg CO₂ · ⭐ +${a.pts}pts</div>
+      </div>
+      <button onclick="applyApprove(${a.id})" style="font-size:10px;font-weight:700;padding:4px 9px;border-radius:7px;border:1.5px solid var(--green-main);color:var(--green-dark);background:var(--green-pale);cursor:pointer;flex-shrink:0;${a.status!=='pending'?'opacity:0.4;pointer-events:none;':''}">승인</button>
+    </div>`).join('');
+}
+
+function applyApprove(id) {
+  const a = applyData.find(x => x.id === id);
+  if (!a || a.status !== 'pending') return;
+  a.status = 'approved';
+  saveApply();
+  renderApplyList();
+  updateApplyKpi();
+  showToast('t1','✅ 승인 완료!', a.name + ' — 담당자 배정을 진행해주세요');
+}
+
+function updateApplyKpi() {
+  const totalEl   = document.getElementById('applyKpiTotal');
+  const pendingEl = document.getElementById('applyKpiPending');
+  const kgEl      = document.getElementById('applyKpiKg');
+  const badgeEl   = document.getElementById('sideApplyBadge');
+  if (totalEl)   totalEl.textContent   = applyData.length;
+  const pending = applyData.filter(a => a.status === 'pending').length;
+  if (pendingEl) pendingEl.textContent = pending;
+  const kg = applyData.reduce((s, a) => s + (a.waste || 0), 0);
+  if (kgEl)      kgEl.textContent      = kg.toLocaleString();
+  if (badgeEl) {
+    if (pending > 0) { badgeEl.style.display = ''; badgeEl.textContent = pending; }
+    else              badgeEl.style.display = 'none';
+  }
+}
+
 // ===== 즉시 실행 - localStorage 데이터로 바로 렌더 =====
 (function initUI() {
   updateDashboard();
@@ -5172,6 +5499,8 @@ function closeSidebarOnMobile() {
   renderWasteTable();
   renderHistory();
   renderRegBizList();
+  renderApplyList();
+  updateApplyKpi();
 })();
 
 </script>
