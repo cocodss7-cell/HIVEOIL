@@ -3567,102 +3567,51 @@ function printQR() {
   win.document.close();
 }
 
-// ===== 카카오 장소 검색 (JS SDK - CORS 없음) =====
-function searchKakaoPlace() {
+// ===== 카카오 장소 검색 =====
+const KAKAO_REST_KEY = '4d1ebddaf898cab7a0de3c7e8c6ea2b1';
+
+async function searchKakaoPlace() {
   const query = document.getElementById('kakao_search_input').value.trim();
   if (!query) { showToast('t1','🔍 검색어를 입력해주세요',''); return; }
 
   const resultsEl = document.getElementById('kakaoResults');
+  if (!resultsEl) return;
   resultsEl.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray);font-size:12px;">🔍 검색 중...</div>';
 
-  function doSearch() {
-    const ps = new kakao.maps.services.Places();
-    ps.keywordSearch(query, function(data, status) {
-      if (status === kakao.maps.services.Status.OK) {
-        window._kakaoSearchResults = data;
-        renderSearchResults(data, resultsEl);
-      } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-        resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">😅 검색 결과가 없어요.<br>더 구체적인 상호명으로 검색해보세요.</div>';
-      } else {
-        // 검색 실패 시 직접 입력 폼으로 전환
-        showManualInputForm(resultsEl);
-      }
-    });
-  }
+  try {
+    const url = 'https://dapi.kakao.com/v2/local/search/keyword.json?query=' + encodeURIComponent(query) + '&rect=127.85,37.28,128.05,37.45&size=10';
+    const res = await fetch(url, { headers: { 'Authorization': 'KakaoAK ' + KAKAO_REST_KEY } });
+    if (!res.ok) throw new Error('status ' + res.status);
+    const data = await res.json();
 
-  // SDK 완전 로드 후 실행 보장
-  if (window.kakao && kakao.maps && kakao.maps.services) {
-    doSearch();
-  } else {
-    kakao.maps.load(doSearch);
-  }
-}
+    if (!data.documents || data.documents.length === 0) {
+      resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">😅 검색 결과가 없어요.<br>더 구체적인 상호명으로 검색해보세요.</div>';
+      return;
+    }
 
-function showManualInputForm(resultsEl) {
-  resultsEl.innerHTML = `
-    <div style="background:var(--cream);border-radius:var(--radius);padding:16px 18px;border:1.5px solid var(--gray-light);">
-      <div style="font-size:12px;font-weight:700;color:var(--gray);margin-bottom:12px;">📍 주소를 직접 입력해주세요</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <input id="manualBizName" class="form-input" placeholder="상호명 *" style="font-size:13px;">
-        <input id="manualBizAddr" class="form-input" placeholder="주소 * (예: 강원도 원주시 명륜동 123)" style="font-size:13px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <input id="manualBizLat" class="form-input" placeholder="위도 (예: 37.3422)" style="font-size:13px;" type="number" step="0.0001">
-          <input id="manualBizLng" class="form-input" placeholder="경도 (예: 127.9202)" style="font-size:13px;" type="number" step="0.0001">
-        </div>
-        <input id="manualBizPhone" class="form-input" placeholder="전화번호 (선택)" style="font-size:13px;">
-        <button onclick="selectManualInput()" class="btn btn-primary" style="justify-content:center;padding:10px;">✅ 이 정보로 등록</button>
-      </div>
-      <div style="margin-top:8px;font-size:10px;color:var(--gray);">💡 카카오맵에서 업체를 검색해 위도·경도를 확인할 수 있어요</div>
-    </div>`;
-}
-
-function selectManualInput() {
-  const name  = document.getElementById('manualBizName')?.value.trim();
-  const addr  = document.getElementById('manualBizAddr')?.value.trim();
-  const lat   = document.getElementById('manualBizLat')?.value.trim();
-  const lng   = document.getElementById('manualBizLng')?.value.trim();
-  const phone = document.getElementById('manualBizPhone')?.value.trim();
-  if (!name) { showToast('t1','⚠️','상호명을 입력해주세요'); return; }
-  if (!addr) { showToast('t1','⚠️','주소를 입력해주세요'); return; }
-  if (!lat || !lng) { showToast('t1','⚠️','위도·경도를 입력해주세요'); return; }
-  document.getElementById('reg_name').value  = name;
-  document.getElementById('reg_addr').value  = addr;
-  document.getElementById('reg_lat').value   = lat;
-  document.getElementById('reg_lng').value   = lng;
-  document.getElementById('reg_phone').value = phone || '';
-  const prev_name = document.getElementById('prev_name');
-  const prev_addr = document.getElementById('prev_addr');
-  if (prev_name) prev_name.textContent = name;
-  if (prev_addr) prev_addr.textContent = addr;
-  document.getElementById('kakaoResults').innerHTML =
-    `<div style="background:var(--green-pale);border-radius:10px;padding:12px 14px;border:1.5px solid var(--green-light);">
-      <div style="font-size:13px;font-weight:700;color:var(--green-dark);">✅ ${name}</div>
-      <div style="font-size:11px;color:var(--gray);margin-top:3px;">${addr}</div>
-    </div>`;
-  showToast('t1','✅ 업체 정보 입력됨','오른쪽에서 추가 정보를 입력 후 등록하세요');
-}
-
-function renderSearchResults(docs, resultsEl) {
-  resultsEl.innerHTML = docs.map((place, i) => `
-      <div onclick="selectKakaoPlace(${i})" data-idx="${i}"
+    window._kakaoSearchResults = data.documents;
+    resultsEl.innerHTML = data.documents.map((place, i) => \`
+      <div onclick="selectKakaoPlace(\${i})"
         style="background:var(--white);border:1.5px solid var(--gray-light);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:all 0.15s;"
         onmouseover="this.style.borderColor='var(--green-main)';this.style.background='var(--green-pale)'"
         onmouseout="this.style.borderColor='var(--gray-light)';this.style.background='var(--white)'">
         <div style="display:flex;align-items:flex-start;gap:10px;">
           <div style="width:32px;height:32px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🏪</div>
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:13px;letter-spacing:-0.01em;margin-bottom:2px;">${place.place_name}</div>
-            <div style="font-size:10px;color:var(--gray);margin-bottom:2px;">${place.road_address_name || place.address_name}</div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:2px;">\${place.place_name}</div>
+            <div style="font-size:10px;color:var(--gray);margin-bottom:2px;">\${place.road_address_name || place.address_name}</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              ${place.category_group_name ? `<span style="font-size:9px;background:#f0f0f0;color:var(--gray);padding:2px 7px;border-radius:5px;">${place.category_group_name}</span>` : ''}
-              ${place.phone ? `<span style="font-size:9px;background:#f0f0f0;color:var(--gray);padding:2px 7px;border-radius:5px;">📞 ${place.phone}</span>` : ''}
+              \${place.category_group_name ? \`<span style="font-size:9px;background:#f0f0f0;color:var(--gray);padding:2px 7px;border-radius:5px;">\${place.category_group_name}</span>\` : ''}
+              \${place.phone ? \`<span style="font-size:9px;background:#f0f0f0;color:var(--gray);padding:2px 7px;border-radius:5px;">📞 \${place.phone}</span>\` : ''}
             </div>
           </div>
-          <div style="font-size:10px;color:var(--green-main);font-weight:700;white-space:nowrap;flex-shrink:0;">선택 →</div>
+          <div style="font-size:10px;color:var(--green-main);font-weight:700;flex-shrink:0;">선택 →</div>
         </div>
-      </div>
-    `).join('');
-
+      </div>\`).join('');
+  } catch(err) {
+    console.error('search error:', err);
+    resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red-accent);font-size:12px;">⚠️ 검색 오류. GitHub Pages에서 테스트해주세요.</div>';
+  }
 }
 
 function selectKakaoPlace(idx) {
