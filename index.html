@@ -3156,6 +3156,24 @@ function renderAdminPrices() {
       </div>
     </div>
   `;
+
+  // 변경 이력 렌더 (localStorage 기반)
+  renderPriceChangeLog();
+}
+
+function renderPriceChangeLog() {
+  const log = document.getElementById('priceChangeLog');
+  if (!log) return;
+  const entries = JSON.parse(localStorage.getItem('hiveoil_price_log') || '[]');
+  if (entries.length === 0) {
+    log.innerHTML = '<div style="font-size:11px;color:var(--gray);text-align:center;padding:10px 0;">저장 시 자동 기록돼요</div>';
+    return;
+  }
+  log.innerHTML = entries.map(e => `
+    <div style="background:var(--green-pale);border-radius:8px;padding:8px 11px;border-left:3px solid var(--green-main);">
+      <div style="font-size:10px;color:var(--gray);margin-bottom:4px;">${e.datetime}</div>
+      ${e.changes.map(c => '<div style="font-size:11px;font-weight:700;color:var(--green-dark);margin-top:2px;">✅ ' + c + '</div>').join('')}
+    </div>`).join('');
 }
 
 function previewOilPrice(key, val) {
@@ -3204,23 +3222,15 @@ function adminSavePrices() {
   // 버튼 완료 상태
   const saveBtn = document.getElementById('adminSaveBtn');
   if (changes.length > 0) {
-    const log = document.getElementById('priceChangeLog');
-    if (log) {
-      // placeholder 제거
-      const placeholder = log.querySelector('div:only-child');
-      if (placeholder && placeholder.textContent.includes('자동 기록')) log.innerHTML = '';
-
-      const d = new Date();
-      const dateStr = d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
-      const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-
-      // 한 번에 묶어서 상단에 추가
-      const group = document.createElement('div');
-      group.style.cssText = 'background:var(--green-pale);border-radius:8px;padding:8px 11px;border-left:3px solid var(--green-main);';
-      group.innerHTML = '<div style="font-size:10px;color:var(--gray);margin-bottom:5px;">' + dateStr + ' ' + timeStr + '</div>'
-        + changes.map(c => '<div style="font-size:11px;font-weight:700;color:var(--green-dark);margin-top:2px;">✅ ' + c + '</div>').join('');
-      log.prepend(group);
-    }
+    // localStorage에 이력 저장 (최대 10개 유지)
+    const d = new Date();
+    const dateStr = d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+    const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    const prevLog = JSON.parse(localStorage.getItem('hiveoil_price_log') || '[]');
+    prevLog.unshift({ datetime: dateStr + ' ' + timeStr, changes });
+    if (prevLog.length > 10) prevLog.pop();
+    localStorage.setItem('hiveoil_price_log', JSON.stringify(prevLog));
+    renderPriceChangeLog();
 
     // 버튼 완료 상태
     if (saveBtn) {
