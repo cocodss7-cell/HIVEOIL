@@ -1784,7 +1784,7 @@
           <!-- 버튼 -->
           <div style="display:flex;gap:10px;">
             <button class="btn btn-outline" style="padding:13px 20px;font-size:13px;" onclick="clearRegForm()">🔄 초기화</button>
-            <button class="btn btn-primary" style="flex:1;justify-content:center;padding:13px;font-size:14px;font-weight:800;" onclick="registerBiz()">
+            <button id="regCompleteBtn" class="btn btn-primary" style="flex:1;justify-content:center;padding:13px;font-size:14px;font-weight:800;" onclick="registerBizAndFeedback()">
               ✅ 업체 등록 완료
             </button>
           </div>
@@ -3947,6 +3947,24 @@ let nextBizId = 1;
 var pendingBizData = JSON.parse(localStorage.getItem('hiveoil_pending_biz') || '[]');
 function savePendingBiz() { localStorage.setItem('hiveoil_pending_biz', JSON.stringify(pendingBizData)); }
 
+function registerBizAndFeedback() {
+  var btn = document.getElementById('regCompleteBtn');
+  // 관리자면 즉시 등록, 업주면 신청 완료
+  var label = isAdminMode ? '✅ 등록 완료!' : '✅ 신청 완료!';
+  registerBiz();
+  // 버튼 완료 상태
+  if (btn) {
+    btn.textContent = label;
+    btn.style.background = '#2E7D32';
+    btn.disabled = true;
+    setTimeout(function() {
+      btn.innerHTML = '✅ 업체 등록 완료';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 2500);
+  }
+}
+
 function registerBiz() {
   const name     = document.getElementById('reg_name').value.trim();
   const type     = document.getElementById('reg_type').value;
@@ -4023,6 +4041,7 @@ function rejectPendingBiz(id) {
 }
 
 function renderPendingBizList() {
+  if (typeof pendingBizData === 'undefined') return;
   const section = document.getElementById('pendingBizSection');
   const list    = document.getElementById('pendingBizList');
   const count   = document.getElementById('pendingCount');
