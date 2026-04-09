@@ -789,7 +789,7 @@
         </div>
         <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
           <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 계정</div>
-          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">WJ-001</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">전화번호 뒤 4자리</strong></div>
+          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">WJ-001</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">1234</strong></div>
         </div>
       </div>
     </div>
@@ -844,7 +844,7 @@
         </div>
         <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
           <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 계정</div>
-          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">hive</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">hive2026</strong></div>
+          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">hive</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">1234</strong></div>
         </div>
       </div>
     </div>
@@ -1205,7 +1205,7 @@
           </div>
           <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
             <div style="font-size:10px;color:#444;margin-bottom:4px;">🔑 데모 로그인</div>
-            <div style="font-size:12px;color:#666;" id="ownerLoginHint">ID: <strong style="color:var(--green-main)">WJ-001</strong> &nbsp;&nbsp;/&nbsp;&nbsp; PW: <strong style="color:var(--green-main)">전화번호 뒤 4자리</strong></div>
+            <div style="font-size:12px;color:#666;" id="ownerLoginHint">ID: <strong style="color:var(--green-main)">WJ-001</strong> &nbsp;&nbsp;/&nbsp;&nbsp; PW: <strong style="color:var(--green-main)">1234</strong></div>
           </div>
         </div>
       </div>
@@ -1907,7 +1907,7 @@
           </div>
           <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
             <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 비밀번호</div>
-            <div style="font-size:12px;color:#666;"><strong style="color:var(--green-main)">hive2026</strong></div>
+            <div style="font-size:12px;color:#666;"><strong style="color:var(--green-main)">1234</strong></div>
           </div>
         </div>
       </div>
@@ -2835,7 +2835,7 @@ function buildOwnerAccounts() {
     const seq  = idx + 1;
     const code = 'WJ-' + String(seq).padStart(3,'0');
     const phone = (b.phone || '').replace(/[^0-9]/g, '');
-    const defPw = phone.length >= 4 ? phone.slice(-4) : '1234';
+    const defPw = '1234'; // 기본 비밀번호 1234
     const pw    = overrides[String(b.id)] || defPw;
     accounts[code] = { pw, bizId: b.id, name: b.name, seq };
   });
@@ -3162,7 +3162,7 @@ const DEFAULT_PRICES = JSON.parse(JSON.stringify(PRICES));
 
 function adminLogin() {
   const pw = document.getElementById('adminPwInput').value;
-  if (pw !== 'hive2026') {
+  if (pw !== '1234') {
     showToast('t1','❌ 비밀번호 오류','관리자 비밀번호를 확인해주세요');
     const pwEl = document.getElementById('adminPwInput');
     pwEl.style.borderColor = 'var(--red-accent)';
@@ -5715,7 +5715,7 @@ function hqAdminLogin() {
     showToast('t1','⚠️ 입력 오류','아이디와 비밀번호를 입력해주세요');
     return;
   }
-  if (id !== 'hive' || pw !== 'hive2026') {
+  if (id !== 'hive' || pw !== '1234') {
     showToast('t1','⚠️ 로그인 실패','아이디 또는 비밀번호가 맞지 않아요');
     if (pwEl) { pwEl.style.borderColor='var(--red-accent)'; setTimeout(()=>pwEl.style.borderColor='',1500); }
     return;
