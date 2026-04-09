@@ -2,14 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="식용유니버스">
-<meta name="theme-color" content="#05C46B">
-<meta name="description" content="HIVE 식용유 납품·수거 관리 시스템">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2305C46B'/><text y='68' x='50' text-anchor='middle' font-size='55'>🫙</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>식용유니버스 HIVE — 원주 베타</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -279,7 +272,11 @@
 
   /* 대시보드 모바일 */
   @media (max-width: 768px) {
-    #dbKpiRow { grid-template-columns: 1fr 1fr !important; }
+    #dbKpiRow { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+    #dbKpiRow > div { padding: 12px 10px !important; }
+    /* 조치필요 필터 */
+    .filter-chip { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 5px 10px; }
+    .map-filters { overflow-x: auto; flex-wrap: nowrap; }
   }
 
 
@@ -299,33 +296,27 @@
   /* ===== 모바일 반응형 ===== */
   @media (max-width: 768px) {
 
-    /* 모바일 사이드바 */
+    /* 모바일 사이드바 — 오버레이 방식 */
     .sidebar {
       position: fixed; left: 0; top: 0; height: 100vh;
       transform: translateX(-100%);
       transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
-      box-shadow: 4px 0 24px rgba(0,0,0,0.12); z-index: 200;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+      z-index: 200;
     }
     .sidebar.open { transform: translateX(0); }
 
     /* 앱 레이아웃 */
     .app-shell { flex-direction: row; height: 100vh; overflow: hidden; }
-    .main { height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .main { height: 100vh; overflow-y: auto; }
 
-    /* 상단바 */
+    /* 상단바 모바일 최적화 */
     .topbar { padding: 0 14px; height: 52px; }
     .topbar-price-chips { display: none; }
     .page-title { font-size: 14px; }
     .topbar-right .btn-outline { display: none; }
     .topbar-right .btn-primary { padding: 7px 12px; font-size: 11px; }
-    .hamburger-btn { display: flex; }
-
-    /* 터치 최적화: 버튼 최소 44px */
-    .btn, button { min-height: 44px; }
-    .nav-item { min-height: 44px; }
-
-    /* iOS 입력창 자동 확대 방지 */
-    input, select, textarea { font-size: 16px !important; }
+    .hamburger-btn { display: none; }
 
     /* 대시보드 */
     .dashboard-grid { padding: 14px 14px 80px; gap: 12px; }
@@ -334,39 +325,37 @@
     .two-col { grid-template-columns: 1fr; }
     .quick-actions { grid-template-columns: 1fr 1fr; }
 
-    /* 지도 */
-    .map-layout { flex-direction: column; height: calc(100vh - 112px); }
-    .map-sidebar { width: 100%; min-width: unset; height: 220px; border-right: none; border-bottom: 1px solid var(--gray-light); }
-    .map-wrap { flex: 1; }
-    .business-list { max-height: 110px; overflow-y: auto; }
+    /* 지도 레이아웃 */
+    .map-layout { flex-direction: column; height: calc(100vh - 52px - 60px); }
+    .map-sidebar { width: 100%; min-width: unset; height: 260px; border-right: none; border-bottom: 1px solid var(--gray-light); overflow-y: auto; }
+    .map-wrap { flex: 1; min-height: 0; }
+    .business-list { max-height: 130px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    /* 지도 필터 칩 모바일 */
+    .map-filters { display: flex; gap: 6px; padding: 8px 12px; overflow-x: auto; flex-wrap: nowrap; }
+    .filter-chip { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 5px 10px; }
 
     /* 패널 여백 */
     .waste-layout, .history-layout { padding: 14px 14px 80px; }
     .order-layout { grid-template-columns: 1fr; padding: 14px 14px 80px; }
     .order-summary { position: static; }
 
-    /* 정산 패널 */
-    #panel-billing > div { padding: 14px 14px 80px !important; }
-    #panel-billing #billingKpi { grid-template-columns: 1fr 1fr !important; }
-
-    /* ESG, 시세, 업주/QR/등록 */
+    /* ESG, 시세 */
     #panel-price > div, #panel-esg > div { padding: 14px 14px 80px; max-width: 100%; }
+
+    /* 업주/QR/등록 패널 */
     #panel-owner .owner-inner, #panel-qr > div > div, #panel-register > div,
     #panel-admin > div, #panel-hq > div { padding: 14px 14px 80px; max-width: 100%; }
 
-    /* HQ */
+    /* HQ 그리드 모바일 */
     #panel-hq .stat-row { grid-template-columns: 1fr 1fr; }
     #panel-hq > div > div:nth-child(2) { grid-template-columns: 1fr; }
 
-    /* 히스토리 테이블 */
-    .history-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    /* 히스토리 테이블 스크롤 */
+    .history-table-wrap { overflow-x: auto; }
     .history-table { min-width: 600px; }
 
     /* 알림 배너 */
     .alert-banner { font-size: 10px; padding: 7px 14px; gap: 6px; }
-
-    /* Safe Area */
-    .topbar { padding-top: env(safe-area-inset-top); }
   }
 
   /* ===== 하단 탭바 ===== */
@@ -538,42 +527,24 @@
       <div class="logo-sub">HIVE · 탄소배출을 줄이고</div>
     </div>
     <nav id="mainNav">
-      <!-- ══ 공통 (항상 노출) ══ -->
+      <!-- ══ 공통 메뉴 (항상 노출) ══ -->
       <div class="nav-label">메뉴</div>
       <div class="nav-item active" onclick="showPanel('owner-dash',this)" id="navOwnerDash"><span class="icon">📊</span>대시보드</div>
 
-      <!-- ══ 업주 전용 ══ -->
-      <div class="nav-label owner-only" style="display:none;">🏪 업주 전용</div>
-      <div class="nav-item owner-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
-      <div class="nav-item owner-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
-      <div class="nav-item owner-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
+      <!-- ══ 업주/운반자 로그인 후 메뉴 ══ -->
+      <div class="nav-item logged-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
+      <div class="nav-item logged-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
+      <div class="nav-item logged-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
 
-      <!-- ══ 운반자 전용 ══ -->
-      <div class="nav-label driver-only" style="display:none;">🚛 운반자 전용</div>
-      <div class="nav-item driver-only" onclick="showPanel('waste',this)" id="navWasteDriver" style="display:none;"><span class="icon">♻️</span>수거 신청</div>
-      <div class="nav-item driver-only" onclick="showPanel('order',this)" id="navOrderDriver" style="display:none;"><span class="icon">🫙</span>발주 신청</div>
-      <div class="nav-item driver-only" onclick="showPanel('map',this)" id="navMapDriver" style="display:none;"><span class="icon">🗺️</span>지도 현황</div>
-      <div class="nav-item driver-only" onclick="showPanel('dashboard',this)" id="navDashDriver" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
-
-      <!-- ══ 관리자 전용 ══ -->
+      <!-- ══ 관리자 전용 메뉴 (관리자 로그인 후 표시) ══ -->
       <div class="nav-label admin-only" style="display:none;">관리자</div>
       <div class="nav-item admin-only" onclick="showPanel('dashboard',this)" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
-      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;"><span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('qr',this)" style="display:none;"><span class="icon">📱</span>재고 입력</div>
-      <div class="nav-item admin-only" onclick="showPanel('waste',this)" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge2" style="display:none;">0</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('order',this)" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge2" style="display:none;background:#FF9500;">0</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('history',this)" style="display:none;"><span class="icon">📋</span>진행 이력</div>
       <div class="nav-item admin-only" onclick="showPanel('map',this)" style="display:none;"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('billing',this)" style="display:none;"><span class="icon">💰</span>정산 관리</div>
-
+      <div class="nav-label admin-only" style="display:none;">업무</div>
+      <div class="nav-item admin-only" onclick="showPanel('history',this)" style="display:none;"><span class="icon">📋</span>진행 이력</div>
       <div class="nav-label admin-only" style="display:none;">정보</div>
       <div class="nav-item admin-only" onclick="showPanel('price',this)" style="display:none;"><span class="icon">💹</span>가격변동 이력</div>
       <div class="nav-item admin-only" onclick="showPanel('esg',this)" style="display:none;"><span class="icon">🌿</span>ESG 포인트</div>
-
-      <div class="nav-label admin-only" style="display:none;">등록 관리</div>
-      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;"><span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;"><span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span></div>
-
       <div class="nav-label admin-only" style="display:none;">급식소 ESG</div>
       <div class="nav-item admin-only" onclick="showPanel('apply',this)" style="display:none;"><span class="icon">🏫</span>수거 신청 관리<span class="nav-badge" id="sideApplyBadge" style="display:none;background:#185FA5;">0</span></div>
 
@@ -587,6 +558,17 @@
       </div>
       <div class="nav-item" onclick="showPanel('hq-login',this)" id="navHqLogin">
         <span class="icon">🏢</span>관리자 로그인
+      </div>
+
+      <!-- ══ 관리자 로그인 후 메뉴 ══ -->
+      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;">
+        <span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
+      </div>
+      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;">
+        <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
+      </div>
+      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;">
+        <span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -898,7 +880,7 @@
         <div style="padding:20px 28px 28px;">
 
           <!-- KPI 카드 -->
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;">
+          <div id="dbKpiRow" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;">
             <div style="background:var(--white);border-radius:14px;padding:16px;box-shadow:var(--shadow);border:1px solid var(--gray-light);">
               <div style="font-size:11px;color:var(--gray);font-weight:600;margin-bottom:8px;">📍 등록 업체</div>
               <div style="font-family:var(--font-display);font-size:28px;font-weight:800;letter-spacing:-0.05em;color:var(--black);line-height:1;" id="db_biz_count">0</div>
@@ -960,11 +942,9 @@
           </div>
           <div class="business-list" id="bizList"></div>
           <!-- 최적경로 버튼 -->
-          <div style="padding:10px 12px;border-top:1px solid var(--gray-light);flex-shrink:0;">
-            <button onclick="calcOptimalRoute()" style="width:100%;background:var(--green-main);border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:800;color:#000;cursor:pointer;font-family:var(--font-body);">
-              🗺️ 최적 경로 계산
-            </button>
-            <div id="routePanel" style="display:none;margin-top:10px;"></div>
+          <div style="padding:8px 12px;border-top:1px solid var(--gray-light);flex-shrink:0;">
+            <button onclick="calcOptimalRoute()" style="width:100%;background:var(--green-main);border:none;border-radius:9px;padding:9px;font-size:12px;font-weight:800;color:#000;cursor:pointer;font-family:var(--font-body);">🗺️ 최적 경로 계산</button>
+            <div id="routePanel" style="display:none;margin-top:8px;"></div>
           </div>
         </div>
         <div class="map-wrap">
@@ -979,7 +959,7 @@
       </div>
     </div>
 
-    <!-- BILLING PANEL (정산) -->
+    <!-- BILLING PANEL -->
     <div class="panel" id="panel-billing">
       <div style="max-width:900px;margin:0 auto;padding:24px 20px 100px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
@@ -988,17 +968,11 @@
             <div style="font-size:12px;color:var(--gray);margin-top:3px;">납품·수거 이력 기반 자동 계산 · 상계처리 · 계산서 발행</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <select id="billingMonthSel" onchange="renderBilling()" style="height:34px;border:1px solid var(--gray-light);border-radius:8px;padding:0 10px;font-size:12px;font-family:var(--font-body);">
-            </select>
-            <button onclick="renderBilling()" style="background:var(--green-main);border:none;border-radius:8px;padding:0 14px;height:34px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">🔄 새로고침</button>
+            <select id="billingMonthSel" onchange="renderBilling()" style="height:44px;border:1px solid var(--gray-light);border-radius:8px;padding:0 10px;font-size:14px;font-family:var(--font-body);"></select>
+            <button onclick="renderBilling()" style="background:var(--green-main);border:none;border-radius:8px;padding:0 14px;height:44px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);">🔄 새로고침</button>
           </div>
         </div>
-
-        <!-- KPI 요약 -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;" id="billingKpi">
-        </div>
-
-        <!-- 정산 목록 -->
+        <div id="billingKpi" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
         <div id="billingList"></div>
       </div>
     </div>
@@ -2593,7 +2567,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'map')       { setTimeout(() => { if (!mapInitialized) initNaverMap(); else renderBizList(); if (kakaoMap) kakaoMap.relayout?.(); }, 80); }
   if (id === 'waste')     { renderWasteTable(); }
   if (id === 'order')     { renderDeliveryPanel && renderDeliveryPanel(); updateOrderMonthStats && updateOrderMonthStats(); }
-  if (id === 'billing')   { initBillingMonthSel(); renderBilling(); }
+  if (id === 'billing')   { initBillingMonthSel && initBillingMonthSel(); renderBilling && renderBilling(); }
   if (id === 'history')   { renderHistory(); }
   if (id === 'price')     { renderPricePage(); }
   if (id === 'esg')       { renderEsgPanel(); }
@@ -2870,8 +2844,9 @@ function showToastDemo() {
 
 document.addEventListener('click', e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('show'); });
 
-// 초기 알림 — 폐유 대기 업체 있을 때만 표시
+// 초기 알림 — 폐유 대기 업체 있을 때 + 관리자/운반자 로그인시에만 표시
 setTimeout(() => {
+  if (!isAdminMode && !isDriverMode) return;
   const waitBiz = businesses.filter(b => b.wasteOil >= 1);
   if (waitBiz.length > 0) {
     document.getElementById('t2-desc').textContent = waitBiz[0].name + ' — 폐유 ' + waitBiz[0].wasteOil + '캔 수거 필요';
@@ -5821,13 +5796,9 @@ function updateNavByMode() {
   var isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
 
   // 업주 전용
-  document.querySelectorAll('.owner-only').forEach(el => {
-    el.style.display = ownerLoggedIn ? '' : 'none';
-  });
+  document.querySelectorAll('.owner-only').forEach(el => { el.style.display = ownerLoggedIn ? '' : 'none'; });
   // 운반자 전용
-  document.querySelectorAll('.driver-only').forEach(el => {
-    el.style.display = isDriverMode ? '' : 'none';
-  });
+  document.querySelectorAll('.driver-only').forEach(el => { el.style.display = isDriverMode ? '' : 'none'; });
   // 관리자 전용
   document.querySelectorAll('.admin-only').forEach(el => {
     if (el.classList.contains('nav-badge')) return;
@@ -5853,7 +5824,7 @@ function updateNavByMode() {
     else roleEl.textContent = '로그인 후 이용';
   }
 
-  // ── 모바일 하단 탭바 역할별 교체 ──
+  // 모바일 하단 탭바 역할별 교체
   updateBottomTab();
 }
 
@@ -5863,7 +5834,6 @@ function updateBottomTab() {
   const isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
 
   if (!isLogged) {
-    // 비로그인: 대시보드 + 로그인
     bar.innerHTML = `
       <button class="tab-item active" onclick="showPanelMobile('owner-dash',this)">
         <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
@@ -5878,14 +5848,12 @@ function updateBottomTab() {
         <span class="tab-icon">🏢</span><span class="tab-label">관리자</span>
       </button>`;
   } else if (ownerLoggedIn) {
-    // 업주: 재고입력 / 수거신청 / 발주신청 / 더보기
     bar.innerHTML = `
       <button class="tab-item" onclick="showPanelMobile('qr',this)">
         <span class="tab-icon">📱</span><span class="tab-label">재고입력</span>
       </button>
       <button class="tab-item" onclick="showPanelMobile('waste',this)">
-        <div style="position:relative"><span class="tab-icon">♻️</span></div>
-        <span class="tab-label">수거신청</span>
+        <span class="tab-icon">♻️</span><span class="tab-label">수거신청</span>
       </button>
       <button class="tab-item" onclick="showPanelMobile('order',this)">
         <span class="tab-icon">🫙</span><span class="tab-label">발주신청</span>
@@ -5894,7 +5862,6 @@ function updateBottomTab() {
         <span class="tab-icon">☰</span><span class="tab-label">메뉴</span>
       </button>`;
   } else if (isDriverMode) {
-    // 운반자: 수거 / 발주 / 지도 / 대시보드
     bar.innerHTML = `
       <button class="tab-item" onclick="showPanelMobile('waste',this)">
         <span class="tab-icon">♻️</span><span class="tab-label">수거신청</span>
@@ -5909,7 +5876,6 @@ function updateBottomTab() {
         <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
       </button>`;
   } else if (isAdminMode) {
-    // 관리자: 대시보드 / 지도 / 정산 / 메뉴
     bar.innerHTML = `
       <button class="tab-item" onclick="showPanelMobile('dashboard',this)">
         <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
@@ -5917,8 +5883,8 @@ function updateBottomTab() {
       <button class="tab-item" onclick="showPanelMobile('map',this)">
         <span class="tab-icon">🗺️</span><span class="tab-label">지도</span>
       </button>
-      <button class="tab-item" onclick="showPanelMobile('billing',this)">
-        <span class="tab-icon">💰</span><span class="tab-label">정산</span>
+      <button class="tab-item" onclick="showPanelMobile('order',this)">
+        <span class="tab-icon">🫙</span><span class="tab-label">납품</span>
       </button>
       <button class="tab-item" onclick="showPanelMobile('waste',this)">
         <span class="tab-icon">♻️</span><span class="tab-label">수거</span>
@@ -6182,248 +6148,152 @@ function updateApplyKpi() {
 })();
 
 // ============================================================
-// ① 최적 경로 계산 시스템
+// 최적 경로 계산
 // ============================================================
-var routePolyline = null;
-var routeMarkerObjs = [];
+var routePolyline = null, routeMarkerObjs = [], _skipRouteIds = new Set();
 
-function haversine(lat1, lng1, lat2, lng2) {
-  const R = 6371;
-  const dLat = (lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
-
-function nearestNeighbor(start, points) {
-  const visited = new Array(points.length).fill(false);
-  const order = []; let cur = start, totalDist = 0;
-  for (let i = 0; i < points.length; i++) {
-    let minDist=Infinity, minIdx=-1;
-    points.forEach((p,idx) => {
-      if (!visited[idx]) {
-        const d = haversine(cur.lat, cur.lng, p.lat, p.lng);
-        if (d < minDist) { minDist=d; minIdx=idx; }
-      }
-    });
-    if (minIdx===-1) break;
-    visited[minIdx]=true; totalDist+=minDist;
-    order.push({biz:points[minIdx], dist:minDist});
-    cur = points[minIdx];
+function nearestNeighbor(start,points){
+  const visited=new Array(points.length).fill(false),order=[];
+  let cur=start,totalDist=0;
+  for(let i=0;i<points.length;i++){
+    let minD=Infinity,minI=-1;
+    points.forEach((p,idx)=>{ if(!visited[idx]){const d=haversine(cur.lat,cur.lng,p.lat,p.lng);if(d<minD){minD=d;minI=idx;}} });
+    if(minI===-1)break;
+    visited[minI]=true;totalDist+=minD;order.push({biz:points[minI],dist:minD});cur=points[minI];
   }
-  return {order, totalDist};
+  return{order,totalDist};
 }
-
-var _skipRouteIds = new Set();
-
-function calcOptimalRoute() {
-  const targets = businesses.filter(b => !_skipRouteIds.has(b.id) && (b.newOil<=2 || b.wasteOil>=1));
-  if (targets.length===0) {
-    showToast('t1','✅ 조치 필요 업체 없음','모든 업체 정상 상태예요');
-    const panel=document.getElementById('routePanel');
-    if(panel) panel.style.display='none';
-    return;
-  }
-  const HIVE = {lat:37.3638, lng:127.9298, name:'HIVE 본사'};
-  const {order, totalDist} = nearestNeighbor(HIVE, targets);
-  const driveMin = Math.round((totalDist/30)*60);
-  const totalMin = driveMin + order.length*10;
-  const hh=Math.floor(totalMin/60), mm=totalMin%60;
-
-  if (kakaoMap) drawRouteOnMap(HIVE, order);
-
-  const panel = document.getElementById('routePanel');
+function calcOptimalRoute(){
+  const targets=businesses.filter(b=>!_skipRouteIds.has(b.id)&&(b.newOil<=2||b.wasteOil>=1));
+  if(targets.length===0){showToast('t1','✅ 조치 필요 업체 없음','모든 업체 정상');const p=document.getElementById('routePanel');if(p)p.style.display='none';return;}
+  const HIVE={lat:37.3638,lng:127.9298};
+  const{order,totalDist}=nearestNeighbor(HIVE,targets);
+  const totalMin=Math.round((totalDist/30)*60)+order.length*10;
+  const hh=Math.floor(totalMin/60),mm=totalMin%60;
+  if(kakaoMap)drawRouteOnMap(HIVE,order);
+  const panel=document.getElementById('routePanel');
   panel.style.display='block';
-  panel.innerHTML = `
-    <div style="font-size:11px;font-weight:800;color:var(--green-dark);margin-bottom:8px;">
-      🗺️ 최적 경로 — ${order.length}개 업체
-      <span style="float:right;color:var(--gray);font-weight:400;">${totalDist.toFixed(1)}km · ${hh>0?hh+'h ':''}${mm}min</span>
-    </div>
+  panel.innerHTML=`
+    <div style="font-size:11px;font-weight:800;color:var(--green-dark);margin-bottom:8px;">🗺️ 최적 경로 — ${order.length}개 업체 <span style="float:right;color:var(--gray);font-weight:400;">${totalDist.toFixed(1)}km · ${hh>0?hh+'h ':''}${mm}min</span></div>
     <div style="font-size:10px;color:#888;margin-bottom:6px;">📍 HIVE 본사 출발</div>
-    ${order.map((item,i) => {
+    ${order.map((item,i)=>{
       const b=item.biz;
-      const tags=[
-        b.newOil<=2?'<span style="background:#FFF0F0;color:var(--red-accent);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;">⚡납품</span>':'',
-        b.wasteOil>=1?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;">♻️수거</span>':''
-      ].filter(Boolean).join(' ');
-      return `<div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray-light);">
+      const tags=[b.newOil<=2?'<span style="background:#FFF0F0;color:var(--red-accent);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;">⚡납품</span>':'',b.wasteOil>=1?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;">♻️수거</span>':''].filter(Boolean).join(' ');
+      return`<div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray-light);">
         <div style="width:20px;height:20px;min-width:20px;background:var(--green-main);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;">${i+1}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:11px;font-weight:700;">${b.name}</div>
-          <div style="margin-top:2px;">${tags} <span style="font-size:9px;color:var(--gray);">+${item.dist.toFixed(1)}km</span></div>
-        </div>
-        <div onclick="skipRoute(${b.id})" title="이 업체 제외" style="cursor:pointer;font-size:10px;color:var(--gray);padding:2px 6px;border:1px solid var(--gray-light);border-radius:5px;">✕</div>
+        <div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;">${b.name}</div><div style="margin-top:2px;">${tags} <span style="font-size:9px;color:var(--gray);">+${item.dist.toFixed(1)}km</span></div></div>
+        <div onclick="skipRoute(${b.id})" style="cursor:pointer;font-size:10px;color:var(--gray);padding:2px 6px;border:1px solid var(--gray-light);border-radius:5px;">✕</div>
       </div>`;
     }).join('')}
-    <div style="margin-top:8px;padding:8px;background:#E8F5E9;border-radius:8px;font-size:10px;color:#2E7D32;font-weight:700;text-align:center;">
-      예상 소요 ${hh>0?hh+'시간 ':''}${mm}분 (이동+업체당 작업 10분)
-    </div>
+    <div style="margin-top:8px;padding:8px;background:#E8F5E9;border-radius:8px;font-size:10px;color:#2E7D32;font-weight:700;text-align:center;">예상 ${hh>0?hh+'시간 ':''}${mm}분 (이동+작업)</div>
     <button onclick="clearRoute()" style="margin-top:6px;width:100%;background:#FFF5F5;border:1px solid #FFB3B3;color:#C0392B;border-radius:7px;padding:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">✕ 경로 지우기</button>`;
 }
-
-function drawRouteOnMap(start, order) {
-  if (!kakaoMap) return;
-  if (routePolyline) routePolyline.setMap(null);
-  routeMarkerObjs.forEach(m => m.setMap(null));
-  routeMarkerObjs = [];
-  const path = [new kakao.maps.LatLng(start.lat, start.lng)];
-  order.forEach(item => path.push(new kakao.maps.LatLng(item.biz.lat, item.biz.lng)));
-  routePolyline = new kakao.maps.Polyline({path, strokeWeight:4, strokeColor:'#05C46B', strokeOpacity:0.9, strokeStyle:'solid'});
+function drawRouteOnMap(start,order){
+  if(!kakaoMap)return;
+  if(routePolyline)routePolyline.setMap(null);
+  routeMarkerObjs.forEach(m=>m.setMap(null));routeMarkerObjs=[];
+  const path=[new kakao.maps.LatLng(start.lat,start.lng)];
+  order.forEach(item=>path.push(new kakao.maps.LatLng(item.biz.lat,item.biz.lng)));
+  routePolyline=new kakao.maps.Polyline({path,strokeWeight:4,strokeColor:'#05C46B',strokeOpacity:0.9,strokeStyle:'solid'});
   routePolyline.setMap(kakaoMap);
-  order.forEach((item,i) => {
-    const el = document.createElement('div');
-    el.style.cssText = 'background:#05C46B;color:#000;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);';
-    el.textContent = i+1;
-    const overlay = new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(item.biz.lat,item.biz.lng), content:el, yAnchor:1.3});
-    overlay.setMap(kakaoMap);
-    routeMarkerObjs.push(overlay);
+  order.forEach((item,i)=>{
+    const el=document.createElement('div');
+    el.style.cssText='background:#05C46B;color:#000;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);';
+    el.textContent=i+1;
+    const overlay=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(item.biz.lat,item.biz.lng),content:el,yAnchor:1.3});
+    overlay.setMap(kakaoMap);routeMarkerObjs.push(overlay);
   });
-  kakaoMap.setCenter(new kakao.maps.LatLng(order[0].biz.lat, order[0].biz.lng));
+  kakaoMap.setCenter(new kakao.maps.LatLng(order[0].biz.lat,order[0].biz.lng));
 }
-
-function skipRoute(bizId) {
-  _skipRouteIds.add(bizId);
-  calcOptimalRoute();
-}
-
-function clearRoute() {
-  if (routePolyline) routePolyline.setMap(null);
-  routeMarkerObjs.forEach(m => m.setMap(null));
-  routeMarkerObjs=[]; routePolyline=null; _skipRouteIds=new Set();
-  const panel=document.getElementById('routePanel');
-  if(panel) panel.style.display='none';
+function skipRoute(bizId){_skipRouteIds.add(bizId);calcOptimalRoute();}
+function clearRoute(){
+  if(routePolyline)routePolyline.setMap(null);
+  routeMarkerObjs.forEach(m=>m.setMap(null));routeMarkerObjs=[];routePolyline=null;_skipRouteIds=new Set();
+  const p=document.getElementById('routePanel');if(p)p.style.display='none';
 }
 
 // ============================================================
-// ② 정산 시스템
+// 정산 시스템
 // ============================================================
-var billingData = JSON.parse(localStorage.getItem('hiveoil_billing')||'{}');
+var billingData=JSON.parse(localStorage.getItem('hiveoil_billing')||'{}');
 function saveBillingData(){try{localStorage.setItem('hiveoil_billing',JSON.stringify(billingData));}catch(e){}}
 function getBillingKey(bizId,month){return bizId+'_'+month;}
 
 function initBillingMonthSel(){
-  const sel=document.getElementById('billingMonthSel');
-  if(!sel) return;
-  const now=new Date(); sel.innerHTML='';
+  const sel=document.getElementById('billingMonthSel');if(!sel)return;
+  const now=new Date();sel.innerHTML='';
   for(let i=0;i<6;i++){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
     const val=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0');
-    const opt=document.createElement('option');
-    opt.value=val; opt.textContent=val+(i===0?' (이번달)':' ('+i+'개월 전)');
-    sel.appendChild(opt);
+    const opt=document.createElement('option');opt.value=val;opt.textContent=val+(i===0?' (이번달)':' ('+i+'개월 전)');sel.appendChild(opt);
   }
 }
 
 function renderBilling(){
-  const sel=document.getElementById('billingMonthSel');
-  if(!sel) return;
-  const month=sel.value;
-  const [yr,mo]=month.split('.').map(Number);
-
+  const sel=document.getElementById('billingMonthSel');if(!sel)return;
+  const month=sel.value;const[yr,mo]=month.split('.').map(Number);
   const stats={};
   businesses.forEach(b=>{stats[b.id]={biz:b,deliveryCnt:0,deliveryAmt:0,wasteCnt:0,wasteAmt:0};});
   historyData.forEach(h=>{
-    if(!h.rawDate||h.status!=='done') return;
+    if(!h.rawDate||h.status!=='done')return;
     const d=new Date(h.rawDate);
-    if(d.getFullYear()!==yr||d.getMonth()+1!==mo) return;
-    const s=stats[h.bizId]; if(!s) return;
+    if(d.getFullYear()!==yr||d.getMonth()+1!==mo)return;
+    const s=stats[h.bizId];if(!s)return;
     const amt=parseInt((h.amount||'0').replace(/[^0-9]/g,''))||0;
-    if(h.type==='식용유발주'){s.deliveryCnt+=h.qty||0; s.deliveryAmt+=amt;}
-    if(h.type==='폐유수거')  {s.wasteCnt  +=h.qty||0; s.wasteAmt  +=amt;}
+    if(h.type==='식용유발주'){s.deliveryCnt+=h.qty||0;s.deliveryAmt+=amt;}
+    if(h.type==='폐유수거'){s.wasteCnt+=h.qty||0;s.wasteAmt+=amt;}
   });
-
   const active=Object.values(stats).filter(s=>s.deliveryAmt>0||s.wasteAmt>0);
   const totalD=active.reduce((a,x)=>a+x.deliveryAmt,0);
   const totalW=active.reduce((a,x)=>a+x.wasteAmt,0);
   const totalN=totalD-totalW;
   const unpaid=active.filter(s=>!(billingData[getBillingKey(s.biz.id,month)]?.paid)).length;
-
-  const kpiEl=document.getElementById('billingKpi');
-  if(kpiEl) kpiEl.innerHTML=[
-    ['📦 총 납품액',totalD.toLocaleString()+'원','var(--green-dark)'],
-    ['♻️ 총 수거액',totalW.toLocaleString()+'원','#FF9500'],
-    ['💰 상계 후 청구액',totalN.toLocaleString()+'원','var(--red-accent)'],
-    ['⏳ 미수 업체',unpaid+'곳','#C0392B'],
-  ].map(([label,val,color])=>`
-    <div style="background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center;">
-      <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${label}</div>
-      <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:${color};">${val}</div>
-    </div>`).join('');
-
-  const listEl=document.getElementById('billingList');
-  if(!listEl) return;
-  if(active.length===0){
-    listEl.innerHTML='<div style="text-align:center;padding:60px;color:var(--gray);"><div style="font-size:36px;margin-bottom:12px;">📭</div><div>'+month+' 정산 대상 거래가 없어요</div></div>';
-    return;
-  }
-
+  const kpi=document.getElementById('billingKpi');
+  if(kpi)kpi.innerHTML=[['📦 총 납품액',totalD.toLocaleString()+'원','var(--green-dark)'],['♻️ 총 수거액',totalW.toLocaleString()+'원','#FF9500'],['💰 상계 후 청구액',totalN.toLocaleString()+'원','var(--red-accent)'],['⏳ 미수 업체',unpaid+'곳','#C0392B']].map(([l,v,c])=>`<div style="background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center;"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${l}</div><div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:${c};">${v}</div></div>`).join('');
+  const listEl=document.getElementById('billingList');if(!listEl)return;
+  if(active.length===0){listEl.innerHTML='<div style="text-align:center;padding:60px;color:var(--gray);"><div style="font-size:36px;margin-bottom:12px;">📭</div><div>'+month+' 정산 대상 거래가 없어요</div></div>';return;}
   listEl.innerHTML=active.map(s=>{
-    const key=getBillingKey(s.biz.id,month);
-    const bd=billingData[key]||{};
-    const net=s.deliveryAmt-s.wasteAmt;
-    const taxIssued=bd.taxInvoice||false, paid=bd.paid||false;
-    const borderColor=paid?'var(--green-main)':net>0?'var(--red-accent)':'var(--gray-light)';
-    return `
-    <div style="background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);margin-bottom:12px;border-left:4px solid ${borderColor};">
+    const key=getBillingKey(s.biz.id,month);const bd=billingData[key]||{};
+    const net=s.deliveryAmt-s.wasteAmt;const taxIssued=bd.taxInvoice||false,paid=bd.paid||false;
+    return`<div style="background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);margin-bottom:12px;border-left:4px solid ${paid?'var(--green-main)':net>0?'var(--red-accent)':'var(--gray-light)'};">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
         <div style="font-family:var(--font-display);font-size:15px;font-weight:800;">${s.biz.name}</div>
         <div style="font-size:11px;color:var(--gray);">${s.biz.type}</div>
         <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">
-          ${taxIssued
-            ?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">✅ 계산서발행</span>'
-            :'<span style="background:#FFF8F0;color:#D4621A;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">📄 미발행</span>'}
-          ${paid
-            ?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">✅ 입금완료</span>'
-            :'<span style="background:#FFEBEE;color:#C0392B;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">⏳ 미수</span>'}
+          ${taxIssued?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">✅ 계산서발행</span>':'<span style="background:#FFF8F0;color:#D4621A;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">📄 미발행</span>'}
+          ${paid?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">✅ 입금완료</span>':'<span style="background:#FFEBEE;color:#C0392B;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">⏳ 미수</span>'}
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div style="background:#F8FFF8;border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">📦 납품 (${s.deliveryCnt}캔)</div>
-          <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--green-dark);">+${s.deliveryAmt.toLocaleString()}원</div>
-        </div>
-        <div style="background:#FFF8F0;border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">♻️ 수거 (${s.wasteCnt}캔)</div>
-          <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:#FF9500;">-${s.wasteAmt.toLocaleString()}원</div>
-        </div>
-        <div style="background:${net>0?'#FFEBEE':'#E8F5E9'};border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">💰 상계 후 청구</div>
-          <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:${net>0?'var(--red-accent)':'var(--green-dark)'};">${net>=0?'+':''}${net.toLocaleString()}원</div>
-        </div>
+        <div style="background:#F8FFF8;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--gray);margin-bottom:3px;">📦 납품(${s.deliveryCnt}캔)</div><div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--green-dark);">+${s.deliveryAmt.toLocaleString()}원</div></div>
+        <div style="background:#FFF8F0;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--gray);margin-bottom:3px;">♻️ 수거(${s.wasteCnt}캔)</div><div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:#FF9500;">-${s.wasteAmt.toLocaleString()}원</div></div>
+        <div style="background:${net>0?'#FFEBEE':'#E8F5E9'};border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--gray);margin-bottom:3px;">💰 상계후 청구</div><div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:${net>0?'var(--red-accent)':'var(--green-dark)'};">${net>=0?'+':''}${net.toLocaleString()}원</div></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        ${!taxIssued
-          ?`<button onclick="openHometax(${s.biz.id},'${month}')" style="background:var(--green-main);border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">📄 홈택스 계산서 발행</button>`
-          :`<button onclick="toggleTaxInvoice(${s.biz.id},'${month}',false)" style="background:#F5F5F5;border:1px solid var(--gray-light);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);color:var(--gray);">↩ 발행취소</button>`}
-        ${(taxIssued&&!paid)
-          ?`<button onclick="markPaid(${s.biz.id},'${month}',true)" style="background:#185FA5;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;font-family:var(--font-body);">✅ 입금완료</button>`:''}
-        ${paid
-          ?`<button onclick="markPaid(${s.biz.id},'${month}',false)" style="background:#F5F5F5;border:1px solid var(--gray-light);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);color:var(--gray);">↩ 미수로 변경</button>`:''}
+        ${!taxIssued?`<button onclick="openHometax(${s.biz.id},'${month}')" style="background:var(--green-main);border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">📄 홈택스 계산서 발행</button>`:`<button onclick="toggleTaxInvoice(${s.biz.id},'${month}',false)" style="background:#F5F5F5;border:1px solid var(--gray-light);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--gray);font-family:var(--font-body);">↩ 발행취소</button>`}
+        ${(taxIssued&&!paid)?`<button onclick="markPaid(${s.biz.id},'${month}',true)" style="background:#185FA5;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;font-family:var(--font-body);">✅ 입금완료</button>`:''}
+        ${paid?`<button onclick="markPaid(${s.biz.id},'${month}',false)" style="background:#F5F5F5;border:1px solid var(--gray-light);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--gray);font-family:var(--font-body);">↩ 미수로 변경</button>`:''}
       </div>
     </div>`;
   }).join('');
 }
-
 function openHometax(bizId,month){
   window.open('https://www.hometax.go.kr/websquare/websquare.wss?w2xPath=/ui/pp/index_pp.xml&menuCd=SX0101','_blank');
-  showToast('t1','📄 홈택스로 이동','계산서 발행 후 아래에서 "발행완료" 처리해주세요');
-  // 홈택스에서 발행하고 돌아오면 직접 클릭하도록 상태 변경 안 함
+  showToast('t1','📄 홈택스로 이동','발행 후 아래에서 완료 처리해주세요');
 }
-
 function toggleTaxInvoice(bizId,month,issued){
-  const key=getBillingKey(bizId,month);
-  billingData[key]=billingData[key]||{};
-  billingData[key].taxInvoice=issued;
-  saveBillingData(); renderBilling();
-  showToast('t1',issued?'✅ 계산서 발행완료':'↩ 발행 취소','정산 현황 업데이트됐어요');
+  const key=getBillingKey(bizId,month);billingData[key]=billingData[key]||{};billingData[key].taxInvoice=issued;
+  saveBillingData();renderBilling();showToast('t1',issued?'✅ 계산서 발행완료':'↩ 발행 취소','정산 현황 업데이트됐어요');
 }
-
 function markPaid(bizId,month,paid){
-  const key=getBillingKey(bizId,month);
-  billingData[key]=billingData[key]||{};
-  billingData[key].paid=paid;
-  if(paid) billingData[key].paidDate=new Date().toISOString().slice(0,10);
-  saveBillingData(); renderBilling();
-  showToast('t1',paid?'✅ 입금완료':'↩ 미수로 변경','정산 현황 업데이트됐어요');
+  const key=getBillingKey(bizId,month);billingData[key]=billingData[key]||{};billingData[key].paid=paid;
+  if(paid)billingData[key].paidDate=new Date().toISOString().slice(0,10);
+  saveBillingData();renderBilling();showToast('t1',paid?'✅ 입금완료':'↩ 미수로 변경','정산 현황 업데이트됐어요');
 }
 
 </script>
