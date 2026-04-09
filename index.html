@@ -5468,10 +5468,19 @@ function renderDeliveryPanel() {
         // 업주 로그인 시 자기 업체 이력만
         if (ownerLoggedIn && ownerBizId && String(h.bizId) !== String(ownerBizId)) return;
         const b = businesses.find(x => String(x.id) === String(h.bizId));
-        if (b && !rendered.has(b.id)) {
-          rendered.add(b.id);
-          html += renderAutoOrderRow(b, 'pending');
+        if (!b || rendered.has(b.id)) return;
+        // 재고가 이미 충분히 회복됐으면(>2캔) stale pending 이력 자동 완료 처리
+        if (b.newOil > 2) {
+          historyData.forEach(item => {
+            if (String(item.bizId) === String(b.id) && item.type === '식용유발주' && item.status === 'pending' && item.method !== '추가발주') {
+              item.status = 'done';
+            }
+          });
+          saveHistory();
+          return; // 목록에 표시 안 함
         }
+        rendered.add(b.id);
+        html += renderAutoOrderRow(b, 'pending');
       });
 
       autoList.innerHTML = html || '<div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">✅ 자동발주 필요 업체 없음</div>';
