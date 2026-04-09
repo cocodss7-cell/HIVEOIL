@@ -1031,12 +1031,7 @@
           <div id="wasteDoneList"></div>
         </div>
 
-        <div class="history-table-wrap">
-          <table class="history-table">
-            <thead><tr><th>업체명</th><th>업종</th><th>폐유 현황</th><th>새식용유 재고</th><th>예상 수거량</th><th>상태</th><th>액션</th></tr></thead>
-            <tbody id="wasteTableBody"></tbody>
-          </table>
-        </div>
+        <div id="wasteCardList"></div>
       </div>
     </div>
 
@@ -2716,47 +2711,50 @@ function renderWasteTable() {
   if (donePanel && donePanel.style.display !== 'none') renderWasteDoneList();
 
   const pendingBiz = myBiz.filter(b => b.wasteOil >= 1).sort((a,b) => b.wasteOil - a.wasteOil);
+  const cardEl = document.getElementById('wasteCardList');
+  if (!cardEl) return;
   if (pendingBiz.length === 0) {
-    document.getElementById('wasteTableBody').innerHTML =
-      '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray);">♻️ 수거 대기 중인 업체가 없어요</td></tr>';
+    cardEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);font-size:13px;">♻️ 수거 대기 중인 업체가 없어요</div>';
     return;
   }
-  document.getElementById('wasteTableBody').innerHTML = pendingBiz.map(b => {
-    const cans    = b.wasteOil;
-    const kg      = (cans * PRICES.waste.can.kg).toFixed(1);
-    const price   = (cans * PRICES.waste.can.price).toLocaleString();
+  cardEl.innerHTML = pendingBiz.map(b => {
+    const cans = b.wasteOil;
+    const kg   = (cans * PRICES.waste.can.kg).toFixed(1);
+    const price = (cans * PRICES.waste.can.price).toLocaleString();
     const isUrgent = cans >= 5;
     const hasPending = historyData.some(h => String(h.bizId) === String(b.id) && h.type === '폐유수거' && h.status === 'pending');
-
-    // 상태 뱃지
-    let statusBadge;
-    if (hasPending) {
-      statusBadge = '<span class="status-pill status-inprogress">🚛 수거 예정</span>';
-    } else if (isUrgent) {
-      statusBadge = '<span class="status-pill status-pending">🔴 긴급 수거</span>';
-    } else {
-      statusBadge = '<span class="status-pill" style="background:#FFF8F0;color:#D4621A;">⏳ 수거 대기</span>';
-    }
-
-    // 액션 버튼 — 2단계 흐름: [수거 신청] → [수거 완료]
+    const statusColor = hasPending ? '#1565C0' : isUrgent ? 'var(--red-accent)' : '#D4621A';
+    const statusBg    = hasPending ? '#E3F2FD'  : isUrgent ? '#FFEBEE'           : '#FFF8F0';
+    const statusLabel = hasPending ? '🚛 수거예정' : isUrgent ? '🔴 긴급' : '⏳ 대기';
     const actionBtn = hasPending
-      ? `<button class="btn" style="padding:6px 14px;font-size:12px;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7;white-space:nowrap;font-weight:800;border-radius:9px;"
-            onclick="completeCollect(${b.id})">✅ 수거 완료</button>`
-      : `<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;white-space:nowrap;font-weight:800;border-radius:9px;"
-            onclick="requestCollect(${b.id})">🚛 수거 신청</button>`;
-
-    return `<tr>
-      <td><strong>${b.name}</strong></td>
-      <td style="color:var(--gray)">${b.type}</td>
-      <td><strong style="color:${isUrgent?'var(--red-accent)':'#D4621A'}">${cans}캔</strong></td>
-      <td>${b.newOil}/${b.maxNew}캔</td>
-      <td>
-        <div style="font-weight:700;color:var(--black);">${cans}캔 (${kg}kg)</div>
-        <div style="font-size:11px;color:var(--green-dark);font-weight:700;margin-top:2px;">${price}원</div>
-      </td>
-      <td>${statusBadge}</td>
-      <td>${actionBtn}</td>
-    </tr>`;
+      ? `<button onclick="doCompleteCollect(${b.id})" style="flex:1;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-body);">✅ 수거 완료</button>`
+      : `<button onclick="doRequestCollect(${b.id})" style="flex:1;background:var(--red-accent);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-body);">🚛 수거 신청</button>`;
+    return `
+    <div style="background:var(--white);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:10px;border-left:4px solid ${statusColor};">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <div style="font-weight:800;font-size:15px;">${b.name}</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:1px;">${b.type}</div>
+        </div>
+        <span style="background:${statusBg};color:${statusColor};border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;">${statusLabel}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+        <div style="background:#FFF8F0;border-radius:9px;padding:9px;text-align:center;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">♻️ 폐유</div>
+          <div style="font-family:var(--font-display);font-size:17px;font-weight:800;color:${isUrgent?'var(--red-accent)':'#D4621A'};">${cans}캔</div>
+        </div>
+        <div style="background:#F8FFF8;border-radius:9px;padding:9px;text-align:center;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">🫙 새식용유</div>
+          <div style="font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--green-dark);">${b.newOil}<span style="font-size:10px;font-weight:500;">/${b.maxNew}</span></div>
+        </div>
+        <div style="background:#F0FFF4;border-radius:9px;padding:9px;text-align:center;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">💰 수거액</div>
+          <div style="font-family:var(--font-display);font-size:13px;font-weight:800;color:var(--green-dark);">${price}원</div>
+          <div style="font-size:9px;color:var(--gray);">${kg}kg</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">${actionBtn}</div>
+    </div>`;
   }).join('');
 }
 
