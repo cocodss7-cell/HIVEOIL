@@ -430,6 +430,25 @@
 </head>
 <body>
 
+<!-- 조치필요 바텀시트 -->
+<div id="actionSheetBackdrop" onclick="closeActionSheet()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;"></div>
+<div id="actionSheet" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;z-index:501;max-height:75vh;overflow:hidden;flex-direction:column;box-shadow:0 -8px 32px rgba(0,0,0,0.18);transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);">
+  <!-- 핸들 -->
+  <div style="padding:12px;text-align:center;flex-shrink:0;">
+    <div style="width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto;"></div>
+  </div>
+  <!-- 헤더 -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 18px 12px;flex-shrink:0;">
+    <div>
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:800;">🚨 조치 필요 업체</div>
+      <div style="font-size:11px;color:var(--gray);margin-top:2px;" id="actionSheetSub">재고부족 또는 폐유 수거 필요</div>
+    </div>
+    <button onclick="closeActionSheet()" style="background:#f5f5f5;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+  </div>
+  <!-- 업체 목록 -->
+  <div id="actionSheetList" style="overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 24px;flex:1;"></div>
+</div>
+
 <!-- Toasts -->
 <div class="notify-toast" id="toast1">
   <div class="toast-icon">🫙</div>
@@ -938,7 +957,7 @@
             <div class="filter-chip active" onclick="toggleFilter(this,'all')">전체</div>
             <div class="filter-chip" onclick="toggleFilter(this,'low')">⚠️ 재고부족</div>
             <div class="filter-chip" onclick="toggleFilter(this,'waste')">♻️ 폐유대기</div>
-            <div class="filter-chip" onclick="toggleFilter(this,'action')">🚨 조치필요</div>
+            <div class="filter-chip" onclick="openActionSheet()">🚨 조치필요</div>
           </div>
           <div class="business-list" id="bizList"></div>
           <!-- 최적경로 버튼 -->
@@ -2517,6 +2536,58 @@ function toggleFilter(el, filter) {
   el.classList.add('active');
   currentFilter = filter;
   renderBizList(filter);
+}
+
+function openActionSheet() {
+  const targets = businesses.filter(b => b.newOil <= 2 || b.wasteOil >= 1);
+  const sub = document.getElementById('actionSheetSub');
+  const list = document.getElementById('actionSheetList');
+  if (sub) sub.textContent = `총 ${targets.length}개 업체 조치 필요`;
+
+  if (!list) return;
+  if (targets.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);"><div style="font-size:32px;margin-bottom:10px;">✅</div>조치 필요 업체가 없어요</div>';
+  } else {
+    list.innerHTML = targets.map(b => {
+      const needDelivery = b.newOil <= 2;
+      const needWaste    = b.wasteOil >= 1;
+      return `
+      <div onclick="closeActionSheet();selectBizFromList(${b.id});" style="display:flex;align-items:center;gap:12px;padding:13px 6px;border-bottom:1px solid var(--gray-light);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+        <div style="width:40px;height:40px;min-width:40px;border-radius:12px;background:${needDelivery?'#FFEBEE':'#FFF8F0'};display:flex;align-items:center;justify-content:center;font-size:20px;">
+          ${needDelivery ? '⚠️' : '♻️'}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;">${b.name}</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:2px;">${b.type}</div>
+          <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;">
+            ${needDelivery ? `<span style="background:#FFEBEE;color:var(--red-accent);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">⚡ 재고 ${b.newOil}캔 — 납품필요</span>` : ''}
+            ${needWaste    ? `<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">♻️ 폐유 ${b.wasteOil}캔 — 수거필요</span>` : ''}
+          </div>
+        </div>
+        <div style="font-size:18px;color:var(--gray);">›</div>
+      </div>`;
+    }).join('');
+  }
+
+  // 바텀시트 표시
+  const sheet    = document.getElementById('actionSheet');
+  const backdrop = document.getElementById('actionSheetBackdrop');
+  sheet.style.display    = 'flex';
+  backdrop.style.display = 'block';
+  // 애니메이션
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { sheet.style.transform = 'translateY(0)'; });
+  });
+}
+
+function closeActionSheet() {
+  const sheet    = document.getElementById('actionSheet');
+  const backdrop = document.getElementById('actionSheetBackdrop');
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => {
+    sheet.style.display    = 'none';
+    backdrop.style.display = 'none';
+  }, 300);
 }
 
 function filterBizList(q) { renderBizList(currentFilter, q); }
