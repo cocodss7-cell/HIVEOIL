@@ -2,7 +2,14 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="식용유니버스">
+<meta name="theme-color" content="#05C46B">
+<meta name="description" content="HIVE 식용유 납품·수거 관리 시스템">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2305C46B'/><text y='68' x='50' text-anchor='middle' font-size='55'>🫙</text></svg>">
 <title>식용유니버스 HIVE — 원주 베타</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -292,27 +299,33 @@
   /* ===== 모바일 반응형 ===== */
   @media (max-width: 768px) {
 
-    /* 모바일 사이드바 — 오버레이 방식 */
+    /* 모바일 사이드바 */
     .sidebar {
       position: fixed; left: 0; top: 0; height: 100vh;
       transform: translateX(-100%);
       transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
-      box-shadow: 4px 0 24px rgba(0,0,0,0.12);
-      z-index: 200;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.12); z-index: 200;
     }
     .sidebar.open { transform: translateX(0); }
 
     /* 앱 레이아웃 */
     .app-shell { flex-direction: row; height: 100vh; overflow: hidden; }
-    .main { height: 100vh; overflow-y: auto; }
+    .main { height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-    /* 상단바 모바일 최적화 */
+    /* 상단바 */
     .topbar { padding: 0 14px; height: 52px; }
     .topbar-price-chips { display: none; }
     .page-title { font-size: 14px; }
     .topbar-right .btn-outline { display: none; }
     .topbar-right .btn-primary { padding: 7px 12px; font-size: 11px; }
     .hamburger-btn { display: flex; }
+
+    /* 터치 최적화: 버튼 최소 44px */
+    .btn, button { min-height: 44px; }
+    .nav-item { min-height: 44px; }
+
+    /* iOS 입력창 자동 확대 방지 */
+    input, select, textarea { font-size: 16px !important; }
 
     /* 대시보드 */
     .dashboard-grid { padding: 14px 14px 80px; gap: 12px; }
@@ -321,34 +334,39 @@
     .two-col { grid-template-columns: 1fr; }
     .quick-actions { grid-template-columns: 1fr 1fr; }
 
-    /* 지도 레이아웃 */
+    /* 지도 */
     .map-layout { flex-direction: column; height: calc(100vh - 112px); }
-    .map-sidebar { width: 100%; min-width: unset; height: 200px; border-right: none; border-bottom: 1px solid var(--gray-light); }
+    .map-sidebar { width: 100%; min-width: unset; height: 220px; border-right: none; border-bottom: 1px solid var(--gray-light); }
     .map-wrap { flex: 1; }
-    .business-list { max-height: 120px; }
+    .business-list { max-height: 110px; overflow-y: auto; }
 
     /* 패널 여백 */
     .waste-layout, .history-layout { padding: 14px 14px 80px; }
     .order-layout { grid-template-columns: 1fr; padding: 14px 14px 80px; }
     .order-summary { position: static; }
 
-    /* ESG, 시세 */
-    #panel-price > div, #panel-esg > div { padding: 14px 14px 80px; max-width: 100%; }
+    /* 정산 패널 */
+    #panel-billing > div { padding: 14px 14px 80px !important; }
+    #panel-billing #billingKpi { grid-template-columns: 1fr 1fr !important; }
 
-    /* 업주/QR/등록 패널 */
+    /* ESG, 시세, 업주/QR/등록 */
+    #panel-price > div, #panel-esg > div { padding: 14px 14px 80px; max-width: 100%; }
     #panel-owner .owner-inner, #panel-qr > div > div, #panel-register > div,
     #panel-admin > div, #panel-hq > div { padding: 14px 14px 80px; max-width: 100%; }
 
-    /* HQ 그리드 모바일 */
+    /* HQ */
     #panel-hq .stat-row { grid-template-columns: 1fr 1fr; }
     #panel-hq > div > div:nth-child(2) { grid-template-columns: 1fr; }
 
-    /* 히스토리 테이블 스크롤 */
-    .history-table-wrap { overflow-x: auto; }
+    /* 히스토리 테이블 */
+    .history-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .history-table { min-width: 600px; }
 
     /* 알림 배너 */
     .alert-banner { font-size: 10px; padding: 7px 14px; gap: 6px; }
+
+    /* Safe Area */
+    .topbar { padding-top: env(safe-area-inset-top); }
   }
 
   /* ===== 하단 탭바 ===== */
@@ -5802,19 +5820,22 @@ function hqAdminLogin() {
 function updateNavByMode() {
   var isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
 
-  // 사이드바 logged-only 메뉴
-  document.querySelectorAll('.logged-only').forEach(el => {
-    el.style.display = isLogged ? '' : 'none';
+  // 업주 전용
+  document.querySelectorAll('.owner-only').forEach(el => {
+    el.style.display = ownerLoggedIn ? '' : 'none';
   });
-
-  // admin-only 메뉴
+  // 운반자 전용
+  document.querySelectorAll('.driver-only').forEach(el => {
+    el.style.display = isDriverMode ? '' : 'none';
+  });
+  // 관리자 전용
   document.querySelectorAll('.admin-only').forEach(el => {
     if (el.classList.contains('nav-badge')) return;
     el.style.display = isAdminMode ? '' : 'none';
   });
 
-  // 로그인 버튼들: 로그인 상태면 숨김
-  ['navOwnerLogin', 'navDriverLogin', 'navHqLogin', 'navLoginLabel'].forEach(function(id) {
+  // 로그인 버튼들
+  ['navOwnerLogin','navDriverLogin','navHqLogin','navLoginLabel'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.display = isLogged ? 'none' : '';
   });
@@ -5826,18 +5847,86 @@ function updateNavByMode() {
   // 사이드바 푸터 역할
   var roleEl = document.getElementById('sidebarRole');
   if (roleEl) {
-    if (isAdminMode)       roleEl.textContent = '관리자';
-    else if (isDriverMode) roleEl.textContent = '운반자';
+    if (isAdminMode)        roleEl.textContent = '관리자';
+    else if (isDriverMode)  roleEl.textContent = '운반자';
     else if (ownerLoggedIn) roleEl.textContent = '업주';
     else roleEl.textContent = '로그인 후 이용';
   }
 
-  // 모바일 하단 탭바
-  document.querySelectorAll('.tab-logged-only').forEach(el => {
-    el.style.display = isLogged ? '' : 'none';
-  });
-  var tabLoginBtn = document.getElementById('tab-login');
-  if (tabLoginBtn) tabLoginBtn.style.display = isLogged ? 'none' : '';
+  // ── 모바일 하단 탭바 역할별 교체 ──
+  updateBottomTab();
+}
+
+function updateBottomTab() {
+  const bar = document.getElementById('bottomTabBar');
+  if (!bar) return;
+  const isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
+
+  if (!isLogged) {
+    // 비로그인: 대시보드 + 로그인
+    bar.innerHTML = `
+      <button class="tab-item active" onclick="showPanelMobile('owner-dash',this)">
+        <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('owner-login',this)">
+        <span class="tab-icon">🏪</span><span class="tab-label">업주로그인</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('driver-login',this)">
+        <span class="tab-icon">🚛</span><span class="tab-label">운반자</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('hq-login',this)">
+        <span class="tab-icon">🏢</span><span class="tab-label">관리자</span>
+      </button>`;
+  } else if (ownerLoggedIn) {
+    // 업주: 재고입력 / 수거신청 / 발주신청 / 더보기
+    bar.innerHTML = `
+      <button class="tab-item" onclick="showPanelMobile('qr',this)">
+        <span class="tab-icon">📱</span><span class="tab-label">재고입력</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('waste',this)">
+        <div style="position:relative"><span class="tab-icon">♻️</span></div>
+        <span class="tab-label">수거신청</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('order',this)">
+        <span class="tab-icon">🫙</span><span class="tab-label">발주신청</span>
+      </button>
+      <button class="tab-item" onclick="toggleSidebar()">
+        <span class="tab-icon">☰</span><span class="tab-label">메뉴</span>
+      </button>`;
+  } else if (isDriverMode) {
+    // 운반자: 수거 / 발주 / 지도 / 대시보드
+    bar.innerHTML = `
+      <button class="tab-item" onclick="showPanelMobile('waste',this)">
+        <span class="tab-icon">♻️</span><span class="tab-label">수거신청</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('order',this)">
+        <span class="tab-icon">🫙</span><span class="tab-label">발주신청</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('map',this)">
+        <span class="tab-icon">🗺️</span><span class="tab-label">지도</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('dashboard',this)">
+        <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
+      </button>`;
+  } else if (isAdminMode) {
+    // 관리자: 대시보드 / 지도 / 정산 / 메뉴
+    bar.innerHTML = `
+      <button class="tab-item" onclick="showPanelMobile('dashboard',this)">
+        <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('map',this)">
+        <span class="tab-icon">🗺️</span><span class="tab-label">지도</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('billing',this)">
+        <span class="tab-icon">💰</span><span class="tab-label">정산</span>
+      </button>
+      <button class="tab-item" onclick="showPanelMobile('waste',this)">
+        <span class="tab-icon">♻️</span><span class="tab-label">수거</span>
+      </button>
+      <button class="tab-item" onclick="toggleSidebar()">
+        <span class="tab-icon">☰</span><span class="tab-label">메뉴</span>
+      </button>`;
+  }
 }
 
 // ===== 업주 로그인 =====
