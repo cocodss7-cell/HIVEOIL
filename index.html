@@ -2853,12 +2853,12 @@ const ownerAccounts = {
   'WJ-002': { pw:'5678', bizId:2 },
   'WJ-003': { pw:'0000', bizId:3 },
 };
-let ownerLoggedIn = false;
+var ownerLoggedIn = false;
 var ownerBizId = null;
 var isAdminMode = false;
 var isDriverMode = false;
 var pendingBizData = JSON.parse(localStorage.getItem('hiveoil_pending_biz') || '[]');
-let ownerNewVal = 2, ownerWasteVal = 4;
+var ownerNewVal = 2, ownerWasteVal = 4;
 const alertStates = { 1:true, 2:false, 3:false };
 
 function ownerLogin() { doOwnerLogin(); }
@@ -3984,7 +3984,7 @@ function checkAutoOrder(biz) {
 }
 
 // ===== 업체 등록 =====
-let nextBizId = 1;
+var nextBizId = 1;
 
 // ===== 승인 대기 큐 =====
 function savePendingBiz() { localStorage.setItem('hiveoil_pending_biz', JSON.stringify(pendingBizData)); }
@@ -5627,7 +5627,7 @@ async function completeExtraOrder(histIdx, bizId, qty) {
 }
 
 // QR 추가발주 신청 (업주용)
-let qrExtraQty = 5;
+var qrExtraQty = 5;
 function changeQRExtra(delta) {
   qrExtraQty = Math.max(1, Math.min(50, qrExtraQty + delta));
   const el = document.getElementById('qrExtraVal');
@@ -5867,7 +5867,7 @@ function renderOwnerDash() {
 }
 
 // ===== 급식소 수거 신청 =====
-let applyData = JSON.parse(localStorage.getItem('hive_apply') || '[]');
+var applyData = JSON.parse(localStorage.getItem('hive_apply') || '[]');
 
 function saveApply() { localStorage.setItem('hive_apply', JSON.stringify(applyData)); }
 
