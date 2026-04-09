@@ -2381,44 +2381,45 @@ function addMarkerToMap(biz) {
 
   const customOverlay = new kakao.maps.CustomOverlay({
     position: new kakao.maps.LatLng(biz.lat, biz.lng),
-    content: markerContent,
-    yAnchor: 1,
+    content: markerContent, yAnchor: 1,
   });
   customOverlay.setMap(kakaoMap);
 
-  // 인포윈도우
   const iwContent = document.createElement('div');
   iwContent.className = 'kakao-iw';
-  iwContent.innerHTML = `
-    <div class="iw-name">${biz.name}</div>
-    <div class="iw-type">${biz.type}</div>
-    <div class="iw-stocks">
-      <div class="iw-stock new"><label>새식용유</label><strong style="color:${isLow?'#E83A2F':'#00a857'}">${biz.newOil}</strong><span style="font-size:9px;color:#999">/ ${biz.maxNew}캔</span></div>
-      <div class="iw-stock waste"><label>폐식용유</label><strong style="color:${isWaste?'#7A5000':'#D4621A'}">${biz.wasteOil}</strong><span style="font-size:9px;color:#999">캔 대기</span></div>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <div style="font-size:9px;color:#888;">🕐 ${biz.lastUpdate || '—'} 업데이트</div>
-      ${biz.auto ? '<div class="iw-auto">⚡ 자동발주 ON</div>' : ''}
-    </div>
-    <div class="iw-btns">
-      <button class="iw-btn collect" style="font-size:12px;padding:9px 0;"
-        onclick="event.stopPropagation();openCollectFromMap(${biz.id})">♻️ 수거 신청</button>
-      <button class="iw-btn order" style="font-size:12px;padding:9px 0;"
-        onclick="event.stopPropagation();openOrderFromMap(${biz.id})">🫙 발주 납품</button>
-    </div>`;
+
+  function refreshIwContent() {
+    const cur = businesses.find(x => x.id === biz.id) || biz;
+    const low = cur.newOil <= 2, waste = cur.wasteOil >= 5;
+    iwContent.innerHTML = `
+      <div class="iw-name">${cur.name}</div>
+      <div class="iw-type">${cur.type}</div>
+      <div class="iw-stocks">
+        <div class="iw-stock new"><label>새식용유</label><strong style="color:${low?'#E83A2F':'#00a857'}">${cur.newOil}</strong><span style="font-size:9px;color:#999">/ ${cur.maxNew}캔</span></div>
+        <div class="iw-stock waste"><label>폐식용유</label><strong style="color:${waste?'#7A5000':'#D4621A'}">${cur.wasteOil}</strong><span style="font-size:9px;color:#999">캔 대기</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:9px;color:#888;">🕐 ${cur.lastUpdate||'—'} 업데이트</div>
+        ${cur.auto ? '<div class="iw-auto">⚡ 자동발주 ON</div>' : ''}
+      </div>
+      <div class="iw-btns">
+        <button class="iw-btn collect" style="font-size:12px;padding:9px 0;"
+          onclick="event.stopPropagation();openCollectFromMap(${cur.id})">♻️ 수거 신청</button>
+        <button class="iw-btn order" style="font-size:12px;padding:9px 0;"
+          onclick="event.stopPropagation();openOrderFromMap(${cur.id})">🫙 발주 납품</button>
+      </div>`;
+  }
 
   const infoOverlay = new kakao.maps.CustomOverlay({
     position: new kakao.maps.LatLng(biz.lat, biz.lng),
-    content: iwContent,
-    yAnchor: 1.15,
-    zIndex: 10,
+    content: iwContent, yAnchor: 1.15, zIndex: 10,
   });
 
-  // 마커 클릭 시 인포윈도우 토글
   markerContent.addEventListener('click', () => {
     infoWindows.forEach(iw => iw.setMap(null));
     const isOpen = infoOverlay.getMap();
     if (!isOpen) {
+      refreshIwContent(); // 클릭 시점에 최신 재고 반영
       infoOverlay.setMap(kakaoMap);
       kakaoMap.setCenter(new kakao.maps.LatLng(biz.lat, biz.lng));
     }
@@ -2430,9 +2431,6 @@ function addMarkerToMap(biz) {
   markers.push({ biz, overlay: customOverlay });
   infoWindows.push(infoOverlay);
 }
-
-
-
 function refreshMapMarkers() {
   if (!kakaoMap || !mapInitialized) return;
   markers.forEach(m => m.overlay.setMap(null));
@@ -5583,31 +5581,44 @@ function renderDeliveryPanel() {
 }
 
 function renderAutoOrderRow(b, state) {
-  const oilKey   = b.oiltype === '카놀라유' ? 'canola' : b.oiltype === '옥수수유' ? 'corn' : 'soy';
-  const unitPrice= PRICES.oils[oilKey]?.price || PRICES.oils.soy.price;
+  const oilKey    = b.oiltype === '카놀라유' ? 'canola' : b.oiltype === '옥수수유' ? 'corn' : 'soy';
+  const unitPrice = PRICES.oils[oilKey]?.price || PRICES.oils.soy.price;
   const defaultQty = 5;
-  const amount   = (defaultQty * unitPrice).toLocaleString();
+  const amount    = (defaultQty * unitPrice).toLocaleString();
   const isPending = state === 'pending';
+  const isUrgent  = b.newOil === 0;
 
   return `
-  <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--gray-light);" id="autoRow_${b.id}">
-    <div style="width:40px;height:40px;background:${b.newOil === 0 ? 'var(--red-accent)' : '#FF9500'};border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
-      ${b.newOil === 0 ? '🆘' : '⚡'}
+  <div style="background:var(--white);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:10px;border-left:4px solid ${isUrgent?'var(--red-accent)':'#FF9500'};" id="autoRow_${b.id}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <div style="font-weight:800;font-size:15px;">${b.name}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:1px;">${b.type}</div>
+      </div>
+      <span style="background:${isPending?'#E3F2FD':'#FFF8F0'};color:${isPending?'#1565C0':'#D4621A'};border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;">
+        ${isPending ? '🚛 납품예정' : '📦 납품필요'}
+      </span>
     </div>
-    <div style="flex:1;min-width:0;">
-      <div style="font-weight:700;font-size:13px;">${b.name}</div>
-      <div style="font-size:11px;color:var(--gray);margin-top:2px;">${b.type} · 현재 재고 <strong style="color:${b.newOil === 0 ? 'var(--red-accent)' : '#D4621A'};">${b.newOil}캔</strong> · ${b.oiltype || '대두유'} ${defaultQty}캔 → <strong style="color:var(--green-dark);">${b.newOil + defaultQty}캔</strong></div>
-    </div>
-    <div style="text-align:right;flex-shrink:0;margin-right:10px;">
-      <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--green-dark);">${amount}원</div>
-      <div style="font-size:10px;margin-top:3px;font-weight:700;color:${isPending ? '#1565C0' : '#D4621A'};background:${isPending ? '#E3F2FD' : '#FFF8F0'};padding:2px 8px;border-radius:6px;display:inline-block;">
-        ${isPending ? '🚛 납품 예정' : '📦 납품 필요'}
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:${isUrgent?'#FFEBEE':'#FFF8F0'};border-radius:9px;padding:9px;text-align:center;">
+        <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">🫙 현재재고</div>
+        <div style="font-family:var(--font-display);font-size:17px;font-weight:800;color:${isUrgent?'var(--red-accent)':'#D4621A'};">${b.newOil}캔</div>
+      </div>
+      <div style="background:#F8FFF8;border-radius:9px;padding:9px;text-align:center;">
+        <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">📦 납품후</div>
+        <div style="font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--green-dark);">${b.newOil+defaultQty}캔</div>
+      </div>
+      <div style="background:#F0FFF4;border-radius:9px;padding:9px;text-align:center;">
+        <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">💰 금액</div>
+        <div style="font-family:var(--font-display);font-size:13px;font-weight:800;color:var(--green-dark);">${amount}원</div>
       </div>
     </div>
-    ${isPending
-      ? `<button onclick="deliverDoneBtn(this,${b.id},'${oilKey}',${defaultQty})" style="background:#E8F5E9;border:1.5px solid #A5D6A7;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;color:#2E7D32;cursor:pointer;white-space:nowrap;">✅ 납품 완료</button>`
-      : `<button onclick="deliverNeedBtn(this,${b.id},'${oilKey}',${defaultQty})" style="background:var(--green-main);border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:800;color:#0D0D0D;cursor:pointer;white-space:nowrap;">📦 납품 필요</button>`
-    }
+    <div style="display:flex;gap:8px;">
+      ${isPending
+        ? `<button onclick="deliverDoneBtn(this,${b.id},'${oilKey}',${defaultQty})" style="flex:1;background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font-body);">✅ 납품 완료</button>`
+        : `<button onclick="deliverNeedBtn(this,${b.id},'${oilKey}',${defaultQty})" style="flex:1;background:var(--green-main);border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;color:#0D0D0D;cursor:pointer;font-family:var(--font-body);">🚛 납품 처리</button>`
+      }
+    </div>
   </div>`;
 }
 
