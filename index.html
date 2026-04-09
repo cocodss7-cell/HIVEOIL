@@ -520,14 +520,16 @@
       <div class="logo-sub">HIVE · 탄소배출을 줄이고</div>
     </div>
     <nav id="mainNav">
-      <!-- ══ 업주 메뉴 (기본 노출) ══ -->
+      <!-- ══ 공통 메뉴 (항상 노출) ══ -->
       <div class="nav-label">메뉴</div>
       <div class="nav-item active" onclick="showPanel('owner-dash',this)" id="navOwnerDash"><span class="icon">📊</span>대시보드</div>
-      <div class="nav-item" onclick="showPanel('qr',this)" id="navQr"><span class="icon">📱</span>재고 입력</div>
-      <div class="nav-item" onclick="showPanel('waste',this)" id="navWaste"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
-      <div class="nav-item" onclick="showPanel('order',this)" id="navOrder"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
 
-      <!-- ══ 관리자 전용 메뉴 (로그인 후 표시) ══ -->
+      <!-- ══ 업주/운반자 로그인 후 메뉴 ══ -->
+      <div class="nav-item logged-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
+      <div class="nav-item logged-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
+      <div class="nav-item logged-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
+
+      <!-- ══ 관리자 전용 메뉴 (관리자 로그인 후 표시) ══ -->
       <div class="nav-label admin-only" style="display:none;">관리자</div>
       <div class="nav-item admin-only" onclick="showPanel('dashboard',this)" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
       <div class="nav-item admin-only" onclick="showPanel('map',this)" style="display:none;"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
@@ -539,16 +541,23 @@
       <div class="nav-label admin-only" style="display:none;">급식소 ESG</div>
       <div class="nav-item admin-only" onclick="showPanel('apply',this)" style="display:none;"><span class="icon">🏫</span>수거 신청 관리<span class="nav-badge" id="sideApplyBadge" style="display:none;background:#185FA5;">0</span></div>
 
-      <!-- ══ 본사 관리 (항상 노출, 로그인 전/후 다르게) ══ -->
-      <div class="nav-label" style="margin-top:8px;">본사 관리</div>
-      <div class="nav-item" onclick="showPanel('hq-login',this)" id="navHqLogin">
-        <span class="icon">🏢</span>관리자 로그인<span class="nav-badge" id="navAdminBadge" style="background:#4A90E2;font-size:8px;padding:1px 5px">로그인</span>
+      <!-- ══ 로그인 버튼 (비로그인 상태에서만 표시) ══ -->
+      <div class="nav-label" style="margin-top:8px;" id="navLoginLabel">계정</div>
+      <div class="nav-item" onclick="showPanel('owner-login',this)" id="navOwnerLogin">
+        <span class="icon">🏪</span>업주 로그인
       </div>
-      <!-- 관리자 로그인 후 표시 -->
+      <div class="nav-item" onclick="showPanel('driver-login',this)" id="navDriverLogin">
+        <span class="icon">🚛</span>운반자 로그인
+      </div>
+      <div class="nav-item" onclick="showPanel('hq-login',this)" id="navHqLogin">
+        <span class="icon">🏢</span>관리자 로그인
+      </div>
+
+      <!-- ══ 관리자 로그인 후 메뉴 ══ -->
       <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;">
         <span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
       </div>
-      <div class="nav-item admin-only" onclick="showPanel('register',this)" style="display:none;">
+      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;">
         <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
       </div>
       <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;">
@@ -556,12 +565,12 @@
       </div>
     </nav>
     <div class="sidebar-footer">
-      <button id="adminLogoutBtn" onclick="hqAdminLogout()" style="display:none;width:100%;background:#FFF5F5;border:1.5px solid #FFB3B3;color:#C0392B;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:var(--font-body);">
-        🚪 관리자 로그아웃
+      <button id="logoutBtn" onclick="doLogout()" style="display:none;width:100%;background:#FFF5F5;border:1.5px solid #FFB3B3;color:#C0392B;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:var(--font-body);">
+        🚪 로그아웃
       </button>
       <div id="sidebarUserCard" class="user-card">
         <div class="user-avatar" id="sidebarAvatar">H</div>
-        <div><div class="user-name" id="sidebarName">HIVE 원주점</div><div class="user-role" id="sidebarRole">업주 모드</div></div>
+        <div><div class="user-name" id="sidebarName">식용유니버스</div><div class="user-role" id="sidebarRole">로그인 후 이용</div></div>
       </div>
     </div>
   </aside>
@@ -754,6 +763,65 @@
     </div>
 
     <!-- 관리자 로그인 패널 -->
+    <!-- 업주 로그인 패널 -->
+    <div class="panel" id="panel-owner-login" style="overflow-y:auto;width:100%;">
+      <div style="max-width:420px;margin:60px auto;padding:0 24px;">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="font-size:44px;margin-bottom:10px;">🏪</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:5px;">업주 로그인</div>
+          <div style="font-size:12px;color:var(--gray);">내 업체의 재고·수거·발주를 관리하세요</div>
+        </div>
+        <div class="card" style="padding:26px;">
+          <div class="form-group">
+            <label class="form-label">업체 아이디</label>
+            <input class="form-input" id="ownerLoginId" placeholder="예: WJ-001" style="font-size:14px;"
+              onkeydown="if(event.key==='Enter')document.getElementById('ownerLoginPw').focus()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">비밀번호</label>
+            <input class="form-input" id="ownerLoginPw" type="password" placeholder="핸드폰 번호 뒷 4자리" style="font-size:14px;"
+              onkeydown="if(event.key==='Enter')doOwnerLogin()">
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;" onclick="doOwnerLogin()">🔐 로그인</button>
+          <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--gray);">
+            등록 문의: <span style="color:var(--green-main);font-weight:700;cursor:pointer;" onclick="showToast('t1','📞 담당자 문의','원주 HIVE 010-9123-7042')">담당자에게 연락</span>
+          </div>
+        </div>
+        <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
+          <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 계정</div>
+          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">WJ-001</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">전화번호 뒤 4자리</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 운반자 로그인 패널 -->
+    <div class="panel" id="panel-driver-login" style="overflow-y:auto;width:100%;">
+      <div style="max-width:420px;margin:60px auto;padding:0 24px;">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="font-size:44px;margin-bottom:10px;">🚛</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:5px;">운반자 로그인</div>
+          <div style="font-size:12px;color:var(--gray);">수거·발주 업무를 처리하세요</div>
+        </div>
+        <div class="card" style="padding:26px;">
+          <div class="form-group">
+            <label class="form-label">운반자 아이디</label>
+            <input class="form-input" id="driverLoginId" placeholder="운반자 코드" style="font-size:14px;"
+              onkeydown="if(event.key==='Enter')document.getElementById('driverLoginPw').focus()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">비밀번호</label>
+            <input class="form-input" id="driverLoginPw" type="password" placeholder="비밀번호" style="font-size:14px;"
+              onkeydown="if(event.key==='Enter')doDriverLogin()">
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;" onclick="doDriverLogin()">🔐 로그인</button>
+        </div>
+        <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
+          <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 계정</div>
+          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">driver1</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">1234</strong></div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel" id="panel-hq-login" style="overflow-y:auto;width:100%;">
       <div style="max-width:420px;margin:60px auto;padding:0 24px;">
         <div style="text-align:center;margin-bottom:28px;">
@@ -2068,25 +2136,31 @@
 
   <!-- 모바일 하단 탭바 -->
   <nav class="bottom-tab-bar" id="bottomTabBar">
-    <!-- 업주 탭 (기본) -->
+    <!-- 대시보드: 항상 표시 -->
     <button class="tab-item active" id="tab-owner-dash" onclick="showPanelMobile('owner-dash', this)">
       <span class="tab-icon">📊</span>
       <span class="tab-label">대시보드</span>
     </button>
-    <button class="tab-item" id="tab-qr" onclick="showPanelMobile('qr', this)">
+    <!-- 재고/수거/발주: 로그인 후 표시 -->
+    <button class="tab-item tab-logged-only" id="tab-qr" onclick="showPanelMobile('qr', this)" style="display:none;">
       <span class="tab-icon">📱</span>
       <span class="tab-label">재고입력</span>
     </button>
-    <button class="tab-item" id="tab-waste" onclick="showPanelMobile('waste', this)">
+    <button class="tab-item tab-logged-only" id="tab-waste" onclick="showPanelMobile('waste', this)" style="display:none;">
       <div style="position:relative">
         <span class="tab-icon">♻️</span>
         <span class="tab-badge" id="tabBadgeWaste" style="display:none;">0</span>
       </div>
       <span class="tab-label">수거신청</span>
     </button>
-    <button class="tab-item" id="tab-order" onclick="showPanelMobile('order', this)">
+    <button class="tab-item tab-logged-only" id="tab-order" onclick="showPanelMobile('order', this)" style="display:none;">
       <span class="tab-icon">🫙</span>
       <span class="tab-label">발주신청</span>
+    </button>
+    <!-- 로그인 버튼: 비로그인 시 표시 -->
+    <button class="tab-item tab-login-btn" id="tab-login" onclick="showPanelMobile('owner-login', this)">
+      <span class="tab-icon">🔐</span>
+      <span class="tab-label">로그인</span>
     </button>
   </nav>
 
@@ -2509,8 +2583,12 @@ window.addEventListener('popstate', (e) => {
 
 // ===== WASTE =====
 function renderWasteTable() {
+  // 업주 로그인 시 자기 업체만, 아니면 전체
+  var allBiz = businesses;
+  var myBiz  = (ownerLoggedIn && ownerBizId) ? businesses.filter(function(b){ return String(b.id) === String(ownerBizId); }) : allBiz;
+
   // 상단 KPI 업데이트
-  const waitBiz = businesses.filter(b => b.wasteOil >= 1);
+  const waitBiz  = myBiz.filter(b => b.wasteOil >= 1);
   const waitEl  = document.getElementById('wasteWaitCount');
   const waitSub = document.getElementById('wasteWaitSub');
   if (waitEl)  waitEl.textContent = waitBiz.length;
@@ -2534,7 +2612,7 @@ function renderWasteTable() {
   const donePanel = document.getElementById('wasteDonePanel');
   if (donePanel && donePanel.style.display !== 'none') renderWasteDoneList();
 
-  const pendingBiz = businesses.filter(b => b.wasteOil >= 1).sort((a,b) => b.wasteOil - a.wasteOil);
+  const pendingBiz = myBiz.filter(b => b.wasteOil >= 1).sort((a,b) => b.wasteOil - a.wasteOil);
   if (pendingBiz.length === 0) {
     document.getElementById('wasteTableBody').innerHTML =
       '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray);">♻️ 수거 대기 중인 업체가 없어요</td></tr>';
@@ -2582,6 +2660,10 @@ function renderWasteTable() {
 // ===== HISTORY =====
 function renderHistory(filter = 'all') {
   let data = historyData;
+  // 업주 로그인 시 자기 업체 이력만
+  if (ownerLoggedIn && ownerBizId) {
+    data = data.filter(d => String(d.bizId) === String(ownerBizId));
+  }
   if (filter === 'waste') data = data.filter(d => d.type === '폐유수거');
   if (filter === 'order') data = data.filter(d => d.type === '식용유발주');
   if (filter === 'auto')  data = data.filter(d => d.type === '자동발주');
@@ -2773,54 +2855,14 @@ const ownerAccounts = {
 };
 let ownerLoggedIn = false;
 var ownerBizId = null;
-var isAdminMode = false; // 관리자 모드 여부
+var isAdminMode = false;
+var isDriverMode = false;
 var pendingBizData = JSON.parse(localStorage.getItem('hiveoil_pending_biz') || '[]');
 let ownerNewVal = 2, ownerWasteVal = 4;
 const alertStates = { 1:true, 2:false, 3:false };
 
-function ownerLogin() {
-  const id   = document.getElementById('ownerIdInput').value.trim().toUpperCase();
-  const pw   = document.getElementById('ownerPwInput').value.trim();
-  const acct = buildOwnerAccounts()[id];
-  if (!acct || acct.pw !== pw) {
-    showToast('t1','❌ 로그인 실패','아이디 또는 비밀번호를 확인해주세요');
-    document.getElementById('ownerPwInput').style.borderColor = 'var(--red-accent)';
-    setTimeout(() => document.getElementById('ownerPwInput').style.borderColor = '', 1500);
-    return;
-  }
-  ownerLoggedIn = true;
-  ownerBizId    = acct.bizId;
-  const biz = businesses.find(b => b.id === acct.bizId);
-  ownerNewVal   = biz.newOil;
-  ownerWasteVal = biz.wasteOil;
-
-  document.getElementById('ownerLoginState').style.display = 'none';
-  document.getElementById('ownerDashState').style.display  = 'block';
-  renderOwnerRecentHistory();
-  renderOwnerMonthlyStats();
-  document.getElementById('ownerBizName').textContent      = biz.name;
-  document.getElementById('ownerLastUpdate').textContent   = biz.lastUpdate || '—';
-  document.getElementById('sidebarName').textContent       = biz.name;
-  document.getElementById('sidebarRole').textContent       = '업주 로그인 중';
-  document.getElementById('sidebarAvatar').textContent     = biz.name[0];
-  document.getElementById('sidebarAvatar').style.background = '#FFD43B';
-
-  updateOwnerUI();
-  showToast('t1','✅ 로그인 성공', biz.name + ' — 재고를 입력해주세요');
-}
-
-function ownerLogout() {
-  ownerLoggedIn = false;
-  ownerBizId    = null;
-  document.getElementById('ownerLoginState').style.display = 'block';
-  document.getElementById('ownerDashState').style.display  = 'none';
-  document.getElementById('ownerIdInput').value = '';
-  document.getElementById('ownerPwInput').value = '';
-  document.getElementById('sidebarName').textContent  = 'HIVE 원주점';
-  document.getElementById('sidebarRole').textContent  = '관리자 계정';
-  document.getElementById('sidebarAvatar').textContent = 'H';
-  document.getElementById('sidebarAvatar').style.background = 'var(--green-main)';
-}
+function ownerLogin() { doOwnerLogin(); }
+function ownerLogout() { doLogout(); }
 
 function changeOwnerStock(type, delta) {
   if (type === 'new') {
@@ -5085,7 +5127,11 @@ function completeOrder(idx) {
 function renderOrderPendingList() {
   const el = document.getElementById('orderPendingList');
   if (!el) return;
-  const pending = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending');
+  let pending = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending');
+  // 업주 로그인 시 자기 업체만
+  if (ownerLoggedIn && ownerBizId) {
+    pending = pending.filter(h => String(h.bizId) === String(ownerBizId));
+  }
   if (pending.length === 0) {
     el.innerHTML = '<div style="font-size:11px;color:#555;text-align:center;padding:8px;">대기중인 발주 없음</div>';
     return;
@@ -5145,9 +5191,14 @@ function renderOrderDoneList() {
   const el = document.getElementById('orderDoneList');
   if (!el) return;
   const now = new Date();
-  const doneList = historyData.filter(h =>
+  let doneList = historyData.filter(h =>
     h.type === '식용유발주' && h.status === 'done' && isSameMonth(h, now.getFullYear(), now.getMonth())
-  ).sort((a,b) => new Date(b.rawDate||b.date) - new Date(a.rawDate||a.date));
+  );
+  // 업주 로그인 시 자기 업체만
+  if (ownerLoggedIn && ownerBizId) {
+    doneList = doneList.filter(h => String(h.bizId) === String(ownerBizId));
+  }
+  doneList = doneList.sort((a,b) => new Date(b.rawDate||b.date) - new Date(a.rawDate||a.date));
 
   if (doneList.length === 0) {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">이번 달 납품 완료 이력이 없어요</div>';
@@ -5678,35 +5729,116 @@ function hqAdminLogin() {
   }
 }
 
+// ===== 사이드바 메뉴 제어 =====
+function updateNavByMode() {
+  var isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
+
+  // 사이드바 logged-only 메뉴
+  document.querySelectorAll('.logged-only').forEach(el => {
+    el.style.display = isLogged ? '' : 'none';
+  });
+
+  // admin-only 메뉴
+  document.querySelectorAll('.admin-only').forEach(el => {
+    if (el.classList.contains('nav-badge')) return;
+    el.style.display = isAdminMode ? '' : 'none';
+  });
+
+  // 로그인 버튼들: 로그인 상태면 숨김
+  ['navOwnerLogin', 'navDriverLogin', 'navHqLogin', 'navLoginLabel'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = isLogged ? 'none' : '';
+  });
+
+  // 로그아웃 버튼
+  var logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) logoutBtn.style.display = isLogged ? '' : 'none';
+
+  // 사이드바 푸터 역할
+  var roleEl = document.getElementById('sidebarRole');
+  if (roleEl) {
+    if (isAdminMode)       roleEl.textContent = '관리자';
+    else if (isDriverMode) roleEl.textContent = '운반자';
+    else if (ownerLoggedIn) roleEl.textContent = '업주';
+    else roleEl.textContent = '로그인 후 이용';
+  }
+
+  // 모바일 하단 탭바
+  document.querySelectorAll('.tab-logged-only').forEach(el => {
+    el.style.display = isLogged ? '' : 'none';
+  });
+  var tabLoginBtn = document.getElementById('tab-login');
+  if (tabLoginBtn) tabLoginBtn.style.display = isLogged ? 'none' : '';
+}
+
+// ===== 업주 로그인 =====
+function doOwnerLogin() {
+  var id  = (document.getElementById('ownerLoginId') || {value:''}).value.trim().toUpperCase();
+  var pw  = (document.getElementById('ownerLoginPw') || {value:''}).value.trim();
+  var acct = buildOwnerAccounts()[id];
+  if (!acct || acct.pw !== pw) {
+    showToast('t1','❌ 로그인 실패','아이디 또는 비밀번호를 확인해주세요');
+    return;
+  }
+  ownerLoggedIn = true;
+  ownerBizId    = acct.bizId;
+  var biz = businesses.find(function(b){ return b.id === acct.bizId; });
+  ownerNewVal   = biz ? biz.newOil : 0;
+  ownerWasteVal = biz ? biz.wasteOil : 0;
+  document.getElementById('sidebarName').textContent = biz ? biz.name : id;
+  document.getElementById('sidebarAvatar').textContent = biz ? biz.name[0] : id[0];
+  document.getElementById('sidebarAvatar').style.background = '#FFD43B';
+  updateNavByMode();
+  showPanel('qr', null);
+  showToast('t1','✅ 로그인 성공', (biz ? biz.name : id) + ' — 재고를 입력해주세요');
+}
+
+// ===== 운반자 로그인 =====
+function doDriverLogin() {
+  var id = (document.getElementById('driverLoginId') || {value:''}).value.trim();
+  var pw = (document.getElementById('driverLoginPw') || {value:''}).value.trim();
+  // 데모: driver1 / 1234
+  if (id !== 'driver1' || pw !== '1234') {
+    showToast('t1','❌ 로그인 실패','운반자 계정을 확인해주세요');
+    return;
+  }
+  isDriverMode = true;
+  document.getElementById('sidebarName').textContent = '운반자';
+  document.getElementById('sidebarAvatar').textContent = '🚛';
+  document.getElementById('sidebarAvatar').style.background = '#185FA5';
+  updateNavByMode();
+  showPanel('waste', null);
+  showToast('t1','✅ 운반자 로그인','수거·발주 업무를 시작하세요');
+}
+
+// ===== 통합 로그아웃 =====
+function doLogout() {
+  ownerLoggedIn = false;
+  ownerBizId    = null;
+  isAdminMode   = false;
+  isDriverMode  = false;
+  document.getElementById('sidebarName').textContent = '식용유니버스';
+  document.getElementById('sidebarAvatar').textContent = 'H';
+  document.getElementById('sidebarAvatar').style.background = 'var(--green-main)';
+  updateNavByMode();
+  renderPendingBizList && renderPendingBizList();
+  updateRegisterBadge && updateRegisterBadge();
+  showPanel('owner-dash', null);
+  showToast('t1','👋 로그아웃됐어요','메인 화면으로 돌아갑니다');
+}
+
 function setAdminMode(on) {
   isAdminMode = on;
-  // 관리자 전용 메뉴 표시/숨김 (nav-badge 등 하위 요소 제외)
-  document.querySelectorAll('.admin-only').forEach(el => {
-    // nav-badge는 별도 관리 (숫자 뱃지는 항상 숨김 상태 유지)
-    if (el.classList.contains('nav-badge')) return;
-    el.style.display = on ? '' : 'none';
-  });
-  // 관리자 로그인 버튼 상태
-  const loginNav = document.getElementById('navHqLogin');
-  const badge    = document.getElementById('navAdminBadge');
-  if (loginNav) loginNav.style.display = on ? 'none' : '';
-  if (badge)    { badge.textContent = on ? '로그아웃' : '로그인'; badge.style.background = on ? '#C0392B' : '#4A90E2'; }
-  // 사이드바 푸터 역할 표시
-  const roleEl = document.getElementById('sidebarRole');
-  if (roleEl) roleEl.textContent = on ? '관리자 계정' : '업주 모드';
-  // 관리자 로그아웃 버튼 표시
-  const logoutBtn = document.getElementById('adminLogoutBtn');
-  if (logoutBtn) logoutBtn.style.display = on ? '' : 'none';
-  // 승인 대기 섹션 갱신
+  if (on) { ownerLoggedIn = false; ownerBizId = null; isDriverMode = false; }
+  document.getElementById('sidebarName').textContent = on ? 'HIVE 관리자' : '식용유니버스';
+  document.getElementById('sidebarAvatar').textContent = on ? 'A' : 'H';
+  document.getElementById('sidebarAvatar').style.background = on ? '#C0392B' : 'var(--green-main)';
+  updateNavByMode();
   renderPendingBizList && renderPendingBizList();
   updateRegisterBadge && updateRegisterBadge();
 }
 
-function hqAdminLogout() {
-  setAdminMode(false);
-  showPanel('owner-dash', null);
-  showToast('t1','👋 로그아웃됐어요','업주 화면으로 돌아갑니다');
-}
+function hqAdminLogout() { doLogout(); }
 
 // ===== 업주 대시보드 렌더 =====
 function renderOwnerDash() {
@@ -5883,6 +6015,7 @@ function updateApplyKpi() {
   setTimeout(renderOwnerDash, 0); // PRICES 로드 보장 후 실행
   renderPendingBizList();
   updateRegisterBadge();
+  updateNavByMode(); // 초기 메뉴 상태 설정
   // 기본 시작 패널: owner-dash (URL 해시 없을 때)
   const hash = location.hash.replace('#','');
   if (!hash) {
