@@ -520,25 +520,42 @@
       <div class="logo-sub">HIVE · 탄소배출을 줄이고</div>
     </div>
     <nav id="mainNav">
-      <!-- ══ 공통 메뉴 (항상 노출) ══ -->
+      <!-- ══ 공통 (항상 노출) ══ -->
       <div class="nav-label">메뉴</div>
       <div class="nav-item active" onclick="showPanel('owner-dash',this)" id="navOwnerDash"><span class="icon">📊</span>대시보드</div>
 
-      <!-- ══ 업주/운반자 로그인 후 메뉴 ══ -->
-      <div class="nav-item logged-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
-      <div class="nav-item logged-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
-      <div class="nav-item logged-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
+      <!-- ══ 업주 전용 ══ -->
+      <div class="nav-label owner-only" style="display:none;">🏪 업주 전용</div>
+      <div class="nav-item owner-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
+      <div class="nav-item owner-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
+      <div class="nav-item owner-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
 
-      <!-- ══ 관리자 전용 메뉴 (관리자 로그인 후 표시) ══ -->
+      <!-- ══ 운반자 전용 ══ -->
+      <div class="nav-label driver-only" style="display:none;">🚛 운반자 전용</div>
+      <div class="nav-item driver-only" onclick="showPanel('waste',this)" id="navWasteDriver" style="display:none;"><span class="icon">♻️</span>수거 신청</div>
+      <div class="nav-item driver-only" onclick="showPanel('order',this)" id="navOrderDriver" style="display:none;"><span class="icon">🫙</span>발주 신청</div>
+      <div class="nav-item driver-only" onclick="showPanel('map',this)" id="navMapDriver" style="display:none;"><span class="icon">🗺️</span>지도 현황</div>
+      <div class="nav-item driver-only" onclick="showPanel('dashboard',this)" id="navDashDriver" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
+
+      <!-- ══ 관리자 전용 ══ -->
       <div class="nav-label admin-only" style="display:none;">관리자</div>
       <div class="nav-item admin-only" onclick="showPanel('dashboard',this)" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
-      <div class="nav-item admin-only" onclick="showPanel('map',this)" style="display:none;"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
-      <div class="nav-label admin-only" style="display:none;">업무</div>
-      <div class="nav-item admin-only" onclick="showPanel('billing',this)" style="display:none;"><span class="icon">💰</span>정산 관리</div>
+      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;"><span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span></div>
+      <div class="nav-item admin-only" onclick="showPanel('qr',this)" style="display:none;"><span class="icon">📱</span>재고 입력</div>
+      <div class="nav-item admin-only" onclick="showPanel('waste',this)" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge2" style="display:none;">0</span></div>
+      <div class="nav-item admin-only" onclick="showPanel('order',this)" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge2" style="display:none;background:#FF9500;">0</span></div>
       <div class="nav-item admin-only" onclick="showPanel('history',this)" style="display:none;"><span class="icon">📋</span>진행 이력</div>
+      <div class="nav-item admin-only" onclick="showPanel('map',this)" style="display:none;"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
+      <div class="nav-item admin-only" onclick="showPanel('billing',this)" style="display:none;"><span class="icon">💰</span>정산 관리</div>
+
       <div class="nav-label admin-only" style="display:none;">정보</div>
       <div class="nav-item admin-only" onclick="showPanel('price',this)" style="display:none;"><span class="icon">💹</span>가격변동 이력</div>
       <div class="nav-item admin-only" onclick="showPanel('esg',this)" style="display:none;"><span class="icon">🌿</span>ESG 포인트</div>
+
+      <div class="nav-label admin-only" style="display:none;">등록 관리</div>
+      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;"><span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span></div>
+      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;"><span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span></div>
+
       <div class="nav-label admin-only" style="display:none;">급식소 ESG</div>
       <div class="nav-item admin-only" onclick="showPanel('apply',this)" style="display:none;"><span class="icon">🏫</span>수거 신청 관리<span class="nav-badge" id="sideApplyBadge" style="display:none;background:#185FA5;">0</span></div>
 
@@ -552,17 +569,6 @@
       </div>
       <div class="nav-item" onclick="showPanel('hq-login',this)" id="navHqLogin">
         <span class="icon">🏢</span>관리자 로그인
-      </div>
-
-      <!-- ══ 관리자 로그인 후 메뉴 ══ -->
-      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;">
-        <span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
-      </div>
-      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;">
-        <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
-      </div>
-      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;">
-        <span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span>
       </div>
     </nav>
     <div class="sidebar-footer">
