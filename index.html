@@ -2600,7 +2600,9 @@ function renderWasteTable() {
   const thisYear2  = now2.getFullYear();
   const doneHistory = historyData.filter(h => {
     if (h.type !== '폐유수거' || h.status !== 'done') return false;
-    return isSameMonth(h, thisYear2, thisMonth2);
+    if (!isSameMonth(h, thisYear2, thisMonth2)) return false;
+    if (ownerLoggedIn && ownerBizId && String(h.bizId) !== String(ownerBizId)) return false;
+    return true;
   });
   const doneEl  = document.getElementById('wasteDoneCount');
   const doneSub = document.getElementById('wasteDoneSub');
@@ -3438,7 +3440,11 @@ function initQRPanel() {
   if (!sel) return;
   const prev = sel.value;
   sel.innerHTML = '<option value="">— 업체를 선택하세요 —</option>';
-  businesses.forEach(b => {
+  // 업주 로그인 시 자기 업체만, 아니면 전체
+  const bizList = (ownerLoggedIn && ownerBizId)
+    ? businesses.filter(b => String(b.id) === String(ownerBizId))
+    : businesses;
+  bizList.forEach(b => {
     const opt = document.createElement('option');
     opt.value = b.id;
     opt.textContent = b.name + ' (재고 ' + b.newOil + '캔)';
@@ -5459,7 +5465,9 @@ function renderDeliveryPanel() {
 
       // pending 이력 있는데 재고가 이미 회복된 업체
       autoOrders.forEach(h => {
-        const b = businesses.find(x => x.id === h.bizId);
+        // 업주 로그인 시 자기 업체 이력만
+        if (ownerLoggedIn && ownerBizId && String(h.bizId) !== String(ownerBizId)) return;
+        const b = businesses.find(x => String(x.id) === String(h.bizId));
         if (b && !rendered.has(b.id)) {
           rendered.add(b.id);
           html += renderAutoOrderRow(b, 'pending');
