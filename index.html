@@ -3688,7 +3688,9 @@ function renderDeliveryPanel() {
   // 자동발주 필요 업체 목록
   const autoList = document.getElementById('autoOrderList');
   const waitCount = document.getElementById('deliveryWaitCount');
-  const autoBiz = businesses.filter(b => b.auto && b.newOil <= 2);
+  // 업주 로그인 시 자기 업체만
+  const myBizFilter = (ownerLoggedIn && ownerBizId) ? function(b){ return String(b.id) === String(ownerBizId); } : function(){ return true; };
+  const autoBiz = businesses.filter(b => b.auto && b.newOil <= 2).filter(myBizFilter);
 
   if (waitCount) waitCount.textContent = autoBiz.length;
 
@@ -3884,9 +3886,13 @@ function renderTodayDelivList() {
   const el = document.getElementById('todayDelivList');
   if (!el) return;
   const today = new Date().toISOString().slice(0,10).replaceAll('-','.');
-  const todayList = historyData.filter(h =>
+  let todayList = historyData.filter(h =>
     h.type === '식용유발주' && h.status === 'done' && h.date === today
   );
+  // 업주 로그인 시 자기 업체만
+  if (ownerLoggedIn && ownerBizId) {
+    todayList = todayList.filter(h => String(h.bizId) === String(ownerBizId));
+  }
   if (todayList.length === 0) {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:12px;">오늘 납품 이력 없음</div>';
     return;
@@ -4822,9 +4828,16 @@ function renderWastePendingList() {
   const el = document.getElementById('wastePendingList');
   if (!el) return;
 
+  // 업주 로그인 시 자기 업체만
+  let bizList = businesses;
+  if (ownerLoggedIn && ownerBizId) {
+    bizList = businesses.filter(b => String(b.id) === String(ownerBizId));
+  }
+
   // 폐유 있는 업체 + pending 이력 있는 업체 모두 포함
-  const waitBiz = businesses.filter(b => b.wasteOil >= 1);
-  const pendingOnly = historyData.filter(h => h.type === '폐유수거' && h.status === 'pending');
+  const waitBiz = bizList.filter(b => b.wasteOil >= 1);
+  const pendingOnly = historyData.filter(h => h.type === '폐유수거' && h.status === 'pending' &&
+    (!ownerLoggedIn || !ownerBizId || String(h.bizId) === String(ownerBizId)));
   
   // 중복 없이 합치기
   const allBizIds = new Set([
@@ -4886,7 +4899,11 @@ function renderWasteDoneList() {
   const el = document.getElementById('wasteDoneList');
   if (!el) return;
   const now = new Date();
-  const doneList = historyData.filter(h => h.type === '폐유수거' && h.status === 'done' && isSameMonth(h, now.getFullYear(), now.getMonth()));
+  let doneList = historyData.filter(h => h.type === '폐유수거' && h.status === 'done' && isSameMonth(h, now.getFullYear(), now.getMonth()));
+  // 업주 로그인 시 자기 업체만
+  if (ownerLoggedIn && ownerBizId) {
+    doneList = doneList.filter(h => String(h.bizId) === String(ownerBizId));
+  }
   if (doneList.length === 0) {
     el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray);font-size:12px;">이번 달 완료된 수거가 없어요</div>';
     return;
@@ -5154,7 +5171,11 @@ function updateOrderMonthStats() {
   const now = new Date();
   const thisMonth = now.getMonth();
   const thisYear  = now.getFullYear();
-  const oilH = historyData.filter(h => h.type === '식용유발주' && h.status === 'done' && isSameMonth(h, thisYear, thisMonth));
+  let oilH = historyData.filter(h => h.type === '식용유발주' && h.status === 'done' && isSameMonth(h, thisYear, thisMonth));
+  // 업주 로그인 시 자기 업체만
+  if (ownerLoggedIn && ownerBizId) {
+    oilH = oilH.filter(h => String(h.bizId) === String(ownerBizId));
+  }
   const totalCans = oilH.reduce((s,h) => s + (h.qty||0), 0);
   const el  = document.getElementById('orderMonthTotal');
   const sub = document.getElementById('orderMonthSub');
@@ -5396,15 +5417,19 @@ function renderOwnerRecentHistory() {
 
 // ===== 발주 페이지 렌더 =====
 function renderDeliveryPanel() {
+  // 업주 로그인 시 자기 업체만
+  const myBizFilter = (ownerLoggedIn && ownerBizId) ? function(b){ return String(b.id) === String(ownerBizId); } : function(){ return true; };
+  const myHistFilter = (ownerLoggedIn && ownerBizId) ? function(h){ return String(h.bizId) === String(ownerBizId); } : function(){ return true; };
+
   // 자동발주 업체 목록
   const autoList = document.getElementById('autoOrderList');
-  const autoBiz  = businesses.filter(b => b.auto && b.newOil <= 2);
+  const autoBiz  = businesses.filter(b => b.auto && b.newOil <= 2).filter(myBizFilter);
 
   // KPI 카운터
   const autoCountEl  = document.getElementById('orderAutoCount');
   const extraCountEl = document.getElementById('orderExtraCount');
-  const extraOrders  = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method === '추가발주');
-  const autoOrders   = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method !== '추가발주');
+  const extraOrders  = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method === '추가발주').filter(myHistFilter);
+  const autoOrders   = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method !== '추가발주').filter(myHistFilter);
   if (autoCountEl)  autoCountEl.textContent  = autoBiz.length;
   if (extraCountEl) extraCountEl.textContent = extraOrders.length;
 
@@ -5487,7 +5512,11 @@ function renderAutoOrderRow(b, state) {
 function renderExtraOrderList() {
   const el = document.getElementById('extraOrderList');
   if (!el) return;
-  const extraOrders = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method === '추가발주');
+  let extraOrders = historyData.filter(h => h.type === '식용유발주' && h.status === 'pending' && h.method === '추가발주');
+  // 업주 로그인 시 자기 업체만
+  if (ownerLoggedIn && ownerBizId) {
+    extraOrders = extraOrders.filter(h => String(h.bizId) === String(ownerBizId));
+  }
   if (extraOrders.length === 0) {
     el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">📭 추가발주 요청 없음</div>';
     return;
