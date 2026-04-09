@@ -2772,8 +2772,9 @@ const ownerAccounts = {
   'WJ-003': { pw:'0000', bizId:3 },
 };
 let ownerLoggedIn = false;
-let ownerBizId = null;
+var ownerBizId = null;
 var isAdminMode = false; // 관리자 모드 여부
+var pendingBizData = JSON.parse(localStorage.getItem('hiveoil_pending_biz') || '[]');
 let ownerNewVal = 2, ownerWasteVal = 4;
 const alertStates = { 1:true, 2:false, 3:false };
 
@@ -3944,7 +3945,6 @@ function checkAutoOrder(biz) {
 let nextBizId = 1;
 
 // ===== 승인 대기 큐 =====
-var pendingBizData = JSON.parse(localStorage.getItem('hiveoil_pending_biz') || '[]');
 function savePendingBiz() { localStorage.setItem('hiveoil_pending_biz', JSON.stringify(pendingBizData)); }
 
 function registerBizAndFeedback() {
