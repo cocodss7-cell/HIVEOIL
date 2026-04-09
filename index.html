@@ -520,34 +520,27 @@
       <div class="logo-sub">HIVE · 탄소배출을 줄이고</div>
     </div>
     <nav id="mainNav">
-      <!-- ══ 공통 (항상 노출) ══ -->
+      <!-- ══ 공통 메뉴 (항상 노출) ══ -->
       <div class="nav-label">메뉴</div>
       <div class="nav-item active" onclick="showPanel('owner-dash',this)" id="navOwnerDash"><span class="icon">📊</span>대시보드</div>
 
-      <!-- ══ 업주 전용 ══ -->
-      <div class="nav-label owner-only" style="display:none;">🏪 업주 전용</div>
-      <div class="nav-item owner-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
-      <div class="nav-item owner-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
-      <div class="nav-item owner-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
+      <!-- ══ 업주/운반자 로그인 후 메뉴 ══ -->
+      <div class="nav-item logged-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
+      <div class="nav-item logged-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
+      <div class="nav-item logged-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
 
-      <!-- ══ 운반자 전용 ══ -->
-      <div class="nav-label driver-only" style="display:none;">🚛 운반자 전용</div>
-      <div class="nav-item driver-only" onclick="showPanel('waste',this)" id="navWasteDriver" style="display:none;"><span class="icon">♻️</span>수거 신청</div>
-      <div class="nav-item driver-only" onclick="showPanel('order',this)" id="navOrderDriver" style="display:none;"><span class="icon">🫙</span>발주 신청</div>
-      <div class="nav-item driver-only" onclick="showPanel('map',this)" id="navMapDriver" style="display:none;"><span class="icon">🗺️</span>지도 현황</div>
-      <div class="nav-item driver-only" onclick="showPanel('dashboard',this)" id="navDashDriver" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
-
-      <!-- ══ 관리자 전용 ══ -->
-      <div class="nav-label admin-only" style="display:none;">🏢 관리자 전용</div>
+      <!-- ══ 관리자 전용 메뉴 (관리자 로그인 후 표시) ══ -->
+      <div class="nav-label admin-only" style="display:none;">관리자</div>
       <div class="nav-item admin-only" onclick="showPanel('dashboard',this)" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
       <div class="nav-item admin-only" onclick="showPanel('map',this)" style="display:none;"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
+      <div class="nav-label admin-only" style="display:none;">업무</div>
+      <div class="nav-item admin-only" onclick="showPanel('billing',this)" style="display:none;"><span class="icon">💰</span>정산 관리</div>
       <div class="nav-item admin-only" onclick="showPanel('history',this)" style="display:none;"><span class="icon">📋</span>진행 이력</div>
+      <div class="nav-label admin-only" style="display:none;">정보</div>
       <div class="nav-item admin-only" onclick="showPanel('price',this)" style="display:none;"><span class="icon">💹</span>가격변동 이력</div>
       <div class="nav-item admin-only" onclick="showPanel('esg',this)" style="display:none;"><span class="icon">🌿</span>ESG 포인트</div>
+      <div class="nav-label admin-only" style="display:none;">급식소 ESG</div>
       <div class="nav-item admin-only" onclick="showPanel('apply',this)" style="display:none;"><span class="icon">🏫</span>수거 신청 관리<span class="nav-badge" id="sideApplyBadge" style="display:none;background:#185FA5;">0</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;"><span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;"><span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;"><span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span></div>
 
       <!-- ══ 로그인 버튼 (비로그인 상태에서만 표시) ══ -->
       <div class="nav-label" style="margin-top:8px;" id="navLoginLabel">계정</div>
@@ -559,6 +552,17 @@
       </div>
       <div class="nav-item" onclick="showPanel('hq-login',this)" id="navHqLogin">
         <span class="icon">🏢</span>관리자 로그인
+      </div>
+
+      <!-- ══ 관리자 로그인 후 메뉴 ══ -->
+      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;">
+        <span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
+      </div>
+      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;">
+        <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
+      </div>
+      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;">
+        <span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -928,9 +932,16 @@
             <div class="filter-chip active" onclick="toggleFilter(this,'all')">전체</div>
             <div class="filter-chip" onclick="toggleFilter(this,'low')">⚠️ 재고부족</div>
             <div class="filter-chip" onclick="toggleFilter(this,'waste')">♻️ 폐유대기</div>
-            <div class="filter-chip" onclick="toggleFilter(this,'ok')">✅ 정상</div>
+            <div class="filter-chip" onclick="toggleFilter(this,'action')">🚨 조치필요</div>
           </div>
           <div class="business-list" id="bizList"></div>
+          <!-- 최적경로 버튼 -->
+          <div style="padding:10px 12px;border-top:1px solid var(--gray-light);flex-shrink:0;">
+            <button onclick="calcOptimalRoute()" style="width:100%;background:var(--green-main);border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:800;color:#000;cursor:pointer;font-family:var(--font-body);">
+              🗺️ 최적 경로 계산
+            </button>
+            <div id="routePanel" style="display:none;margin-top:10px;"></div>
+          </div>
         </div>
         <div class="map-wrap">
           <div id="naverMap"></div>
@@ -941,6 +952,30 @@
             <div class="li"><div class="ld" style="background:var(--red-accent)"></div>재고 부족</div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- BILLING PANEL (정산) -->
+    <div class="panel" id="panel-billing">
+      <div style="max-width:900px;margin:0 auto;padding:24px 20px 100px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-family:var(--font-display);font-size:20px;font-weight:800;">💰 자동 정산 시스템</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:3px;">납품·수거 이력 기반 자동 계산 · 상계처리 · 계산서 발행</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <select id="billingMonthSel" onchange="renderBilling()" style="height:34px;border:1px solid var(--gray-light);border-radius:8px;padding:0 10px;font-size:12px;font-family:var(--font-body);">
+            </select>
+            <button onclick="renderBilling()" style="background:var(--green-main);border:none;border-radius:8px;padding:0 14px;height:34px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">🔄 새로고침</button>
+          </div>
+        </div>
+
+        <!-- KPI 요약 -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;" id="billingKpi">
+        </div>
+
+        <!-- 정산 목록 -->
+        <div id="billingList"></div>
       </div>
     </div>
 
@@ -2447,9 +2482,10 @@ function openOrderFromMap(id) {
 
 function renderBizList(filter = currentFilter, query = '') {
   let data = businesses;
-  if (filter === 'low')   data = data.filter(b => b.newOil <= 2);
-  if (filter === 'waste') data = data.filter(b => b.wasteOil >= 1);
-  if (filter === 'ok')    data = data.filter(b => b.newOil > 2 && b.wasteOil === 0);
+  if (filter === 'low')    data = data.filter(b => b.newOil <= 2);
+  if (filter === 'waste')  data = data.filter(b => b.wasteOil >= 1);
+  if (filter === 'ok')     data = data.filter(b => b.newOil > 2 && b.wasteOil === 0);
+  if (filter === 'action') data = data.filter(b => b.newOil <= 2 || b.wasteOil >= 1);
   if (query) data = data.filter(b => b.name.includes(query));
 
   document.getElementById('bizList').innerHTML = data.map(b => `
@@ -2519,7 +2555,7 @@ function showPanel(id, navEl, pushState=true) {
   }
 
   // 페이지 타이틀
-  const titles = { 'owner-dash':'📊 대시보드', dashboard:'📊 관리자 대시보드', map:'🗺️ 원주 지도 현황', waste:'♻️ 수거 신청', order:'🫙 발주 신청', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', 'hq-login':'🏢 관리자 로그인', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 재고 입력', apply:'🏫 수거 신청 관리' };
+  const titles = { 'owner-dash':'📊 대시보드', dashboard:'📊 관리자 대시보드', map:'🗺️ 원주 지도 현황', waste:'♻️ 수거 신청', order:'🫙 발주 신청', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', 'hq-login':'🏢 관리자 로그인', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 재고 입력', apply:'🏫 수거 신청 관리', billing:'💰 정산 관리' };
   const title = titles[id] || '';
   const titleEl = document.getElementById('page-title-text');
   if (titleEl) titleEl.textContent = title;
@@ -2533,6 +2569,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'map')       { setTimeout(() => { if (!mapInitialized) initNaverMap(); else renderBizList(); if (kakaoMap) kakaoMap.relayout?.(); }, 80); }
   if (id === 'waste')     { renderWasteTable(); }
   if (id === 'order')     { renderDeliveryPanel && renderDeliveryPanel(); updateOrderMonthStats && updateOrderMonthStats(); }
+  if (id === 'billing')   { initBillingMonthSel(); renderBilling(); }
   if (id === 'history')   { renderHistory(); }
   if (id === 'price')     { renderPricePage(); }
   if (id === 'esg')       { renderEsgPanel(); }
@@ -2597,9 +2634,7 @@ function renderWasteTable() {
   const thisYear2  = now2.getFullYear();
   const doneHistory = historyData.filter(h => {
     if (h.type !== '폐유수거' || h.status !== 'done') return false;
-    if (!isSameMonth(h, thisYear2, thisMonth2)) return false;
-    if (ownerLoggedIn && ownerBizId && String(h.bizId) !== String(ownerBizId)) return false;
-    return true;
+    return isSameMonth(h, thisYear2, thisMonth2);
   });
   const doneEl  = document.getElementById('wasteDoneCount');
   const doneSub = document.getElementById('wasteDoneSub');
@@ -3437,11 +3472,7 @@ function initQRPanel() {
   if (!sel) return;
   const prev = sel.value;
   sel.innerHTML = '<option value="">— 업체를 선택하세요 —</option>';
-  // 업주 로그인 시 자기 업체만, 아니면 전체
-  const bizList = (ownerLoggedIn && ownerBizId)
-    ? businesses.filter(b => String(b.id) === String(ownerBizId))
-    : businesses;
-  bizList.forEach(b => {
+  businesses.forEach(b => {
     const opt = document.createElement('option');
     opt.value = b.id;
     opt.textContent = b.name + ' (재고 ' + b.newOil + '캔)';
@@ -5462,22 +5493,11 @@ function renderDeliveryPanel() {
 
       // pending 이력 있는데 재고가 이미 회복된 업체
       autoOrders.forEach(h => {
-        // 업주 로그인 시 자기 업체 이력만
-        if (ownerLoggedIn && ownerBizId && String(h.bizId) !== String(ownerBizId)) return;
-        const b = businesses.find(x => String(x.id) === String(h.bizId));
-        if (!b || rendered.has(b.id)) return;
-        // 재고가 이미 충분히 회복됐으면(>2캔) stale pending 이력 자동 완료 처리
-        if (b.newOil > 2) {
-          historyData.forEach(item => {
-            if (String(item.bizId) === String(b.id) && item.type === '식용유발주' && item.status === 'pending' && item.method !== '추가발주') {
-              item.status = 'done';
-            }
-          });
-          saveHistory();
-          return; // 목록에 표시 안 함
+        const b = businesses.find(x => x.id === h.bizId);
+        if (b && !rendered.has(b.id)) {
+          rendered.add(b.id);
+          html += renderAutoOrderRow(b, 'pending');
         }
-        rendered.add(b.id);
-        html += renderAutoOrderRow(b, 'pending');
       });
 
       autoList.innerHTML = html || '<div style="text-align:center;padding:24px;color:var(--gray);font-size:13px;">✅ 자동발주 필요 업체 없음</div>';
@@ -5776,17 +5796,12 @@ function hqAdminLogin() {
 function updateNavByMode() {
   var isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
 
-  // 업주 전용 메뉴
-  document.querySelectorAll('.owner-only').forEach(el => {
-    el.style.display = ownerLoggedIn ? '' : 'none';
+  // 사이드바 logged-only 메뉴
+  document.querySelectorAll('.logged-only').forEach(el => {
+    el.style.display = isLogged ? '' : 'none';
   });
 
-  // 운반자 전용 메뉴
-  document.querySelectorAll('.driver-only').forEach(el => {
-    el.style.display = isDriverMode ? '' : 'none';
-  });
-
-  // 관리자 전용 메뉴
+  // admin-only 메뉴
   document.querySelectorAll('.admin-only').forEach(el => {
     if (el.classList.contains('nav-badge')) return;
     el.style.display = isAdminMode ? '' : 'none';
@@ -5805,8 +5820,8 @@ function updateNavByMode() {
   // 사이드바 푸터 역할
   var roleEl = document.getElementById('sidebarRole');
   if (roleEl) {
-    if (isAdminMode)        roleEl.textContent = '관리자';
-    else if (isDriverMode)  roleEl.textContent = '운반자';
+    if (isAdminMode)       roleEl.textContent = '관리자';
+    else if (isDriverMode) roleEl.textContent = '운반자';
     else if (ownerLoggedIn) roleEl.textContent = '업주';
     else roleEl.textContent = '로그인 후 이용';
   }
@@ -6070,6 +6085,251 @@ function updateApplyKpi() {
     history.replaceState({ panel: 'owner-dash' }, '', '#owner-dash');
   }
 })();
+
+// ============================================================
+// ① 최적 경로 계산 시스템
+// ============================================================
+var routePolyline = null;
+var routeMarkerObjs = [];
+
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function nearestNeighbor(start, points) {
+  const visited = new Array(points.length).fill(false);
+  const order = []; let cur = start, totalDist = 0;
+  for (let i = 0; i < points.length; i++) {
+    let minDist=Infinity, minIdx=-1;
+    points.forEach((p,idx) => {
+      if (!visited[idx]) {
+        const d = haversine(cur.lat, cur.lng, p.lat, p.lng);
+        if (d < minDist) { minDist=d; minIdx=idx; }
+      }
+    });
+    if (minIdx===-1) break;
+    visited[minIdx]=true; totalDist+=minDist;
+    order.push({biz:points[minIdx], dist:minDist});
+    cur = points[minIdx];
+  }
+  return {order, totalDist};
+}
+
+var _skipRouteIds = new Set();
+
+function calcOptimalRoute() {
+  const targets = businesses.filter(b => !_skipRouteIds.has(b.id) && (b.newOil<=2 || b.wasteOil>=1));
+  if (targets.length===0) {
+    showToast('t1','✅ 조치 필요 업체 없음','모든 업체 정상 상태예요');
+    const panel=document.getElementById('routePanel');
+    if(panel) panel.style.display='none';
+    return;
+  }
+  const HIVE = {lat:37.3638, lng:127.9298, name:'HIVE 본사'};
+  const {order, totalDist} = nearestNeighbor(HIVE, targets);
+  const driveMin = Math.round((totalDist/30)*60);
+  const totalMin = driveMin + order.length*10;
+  const hh=Math.floor(totalMin/60), mm=totalMin%60;
+
+  if (kakaoMap) drawRouteOnMap(HIVE, order);
+
+  const panel = document.getElementById('routePanel');
+  panel.style.display='block';
+  panel.innerHTML = `
+    <div style="font-size:11px;font-weight:800;color:var(--green-dark);margin-bottom:8px;">
+      🗺️ 최적 경로 — ${order.length}개 업체
+      <span style="float:right;color:var(--gray);font-weight:400;">${totalDist.toFixed(1)}km · ${hh>0?hh+'h ':''}${mm}min</span>
+    </div>
+    <div style="font-size:10px;color:#888;margin-bottom:6px;">📍 HIVE 본사 출발</div>
+    ${order.map((item,i) => {
+      const b=item.biz;
+      const tags=[
+        b.newOil<=2?'<span style="background:#FFF0F0;color:var(--red-accent);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;">⚡납품</span>':'',
+        b.wasteOil>=1?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;">♻️수거</span>':''
+      ].filter(Boolean).join(' ');
+      return `<div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray-light);">
+        <div style="width:20px;height:20px;min-width:20px;background:var(--green-main);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;">${i+1}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:11px;font-weight:700;">${b.name}</div>
+          <div style="margin-top:2px;">${tags} <span style="font-size:9px;color:var(--gray);">+${item.dist.toFixed(1)}km</span></div>
+        </div>
+        <div onclick="skipRoute(${b.id})" title="이 업체 제외" style="cursor:pointer;font-size:10px;color:var(--gray);padding:2px 6px;border:1px solid var(--gray-light);border-radius:5px;">✕</div>
+      </div>`;
+    }).join('')}
+    <div style="margin-top:8px;padding:8px;background:#E8F5E9;border-radius:8px;font-size:10px;color:#2E7D32;font-weight:700;text-align:center;">
+      예상 소요 ${hh>0?hh+'시간 ':''}${mm}분 (이동+업체당 작업 10분)
+    </div>
+    <button onclick="clearRoute()" style="margin-top:6px;width:100%;background:#FFF5F5;border:1px solid #FFB3B3;color:#C0392B;border-radius:7px;padding:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">✕ 경로 지우기</button>`;
+}
+
+function drawRouteOnMap(start, order) {
+  if (!kakaoMap) return;
+  if (routePolyline) routePolyline.setMap(null);
+  routeMarkerObjs.forEach(m => m.setMap(null));
+  routeMarkerObjs = [];
+  const path = [new kakao.maps.LatLng(start.lat, start.lng)];
+  order.forEach(item => path.push(new kakao.maps.LatLng(item.biz.lat, item.biz.lng)));
+  routePolyline = new kakao.maps.Polyline({path, strokeWeight:4, strokeColor:'#05C46B', strokeOpacity:0.9, strokeStyle:'solid'});
+  routePolyline.setMap(kakaoMap);
+  order.forEach((item,i) => {
+    const el = document.createElement('div');
+    el.style.cssText = 'background:#05C46B;color:#000;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);';
+    el.textContent = i+1;
+    const overlay = new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(item.biz.lat,item.biz.lng), content:el, yAnchor:1.3});
+    overlay.setMap(kakaoMap);
+    routeMarkerObjs.push(overlay);
+  });
+  kakaoMap.setCenter(new kakao.maps.LatLng(order[0].biz.lat, order[0].biz.lng));
+}
+
+function skipRoute(bizId) {
+  _skipRouteIds.add(bizId);
+  calcOptimalRoute();
+}
+
+function clearRoute() {
+  if (routePolyline) routePolyline.setMap(null);
+  routeMarkerObjs.forEach(m => m.setMap(null));
+  routeMarkerObjs=[]; routePolyline=null; _skipRouteIds=new Set();
+  const panel=document.getElementById('routePanel');
+  if(panel) panel.style.display='none';
+}
+
+// ============================================================
+// ② 정산 시스템
+// ============================================================
+var billingData = JSON.parse(localStorage.getItem('hiveoil_billing')||'{}');
+function saveBillingData(){try{localStorage.setItem('hiveoil_billing',JSON.stringify(billingData));}catch(e){}}
+function getBillingKey(bizId,month){return bizId+'_'+month;}
+
+function initBillingMonthSel(){
+  const sel=document.getElementById('billingMonthSel');
+  if(!sel) return;
+  const now=new Date(); sel.innerHTML='';
+  for(let i=0;i<6;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const val=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0');
+    const opt=document.createElement('option');
+    opt.value=val; opt.textContent=val+(i===0?' (이번달)':' ('+i+'개월 전)');
+    sel.appendChild(opt);
+  }
+}
+
+function renderBilling(){
+  const sel=document.getElementById('billingMonthSel');
+  if(!sel) return;
+  const month=sel.value;
+  const [yr,mo]=month.split('.').map(Number);
+
+  const stats={};
+  businesses.forEach(b=>{stats[b.id]={biz:b,deliveryCnt:0,deliveryAmt:0,wasteCnt:0,wasteAmt:0};});
+  historyData.forEach(h=>{
+    if(!h.rawDate||h.status!=='done') return;
+    const d=new Date(h.rawDate);
+    if(d.getFullYear()!==yr||d.getMonth()+1!==mo) return;
+    const s=stats[h.bizId]; if(!s) return;
+    const amt=parseInt((h.amount||'0').replace(/[^0-9]/g,''))||0;
+    if(h.type==='식용유발주'){s.deliveryCnt+=h.qty||0; s.deliveryAmt+=amt;}
+    if(h.type==='폐유수거')  {s.wasteCnt  +=h.qty||0; s.wasteAmt  +=amt;}
+  });
+
+  const active=Object.values(stats).filter(s=>s.deliveryAmt>0||s.wasteAmt>0);
+  const totalD=active.reduce((a,x)=>a+x.deliveryAmt,0);
+  const totalW=active.reduce((a,x)=>a+x.wasteAmt,0);
+  const totalN=totalD-totalW;
+  const unpaid=active.filter(s=>!(billingData[getBillingKey(s.biz.id,month)]?.paid)).length;
+
+  const kpiEl=document.getElementById('billingKpi');
+  if(kpiEl) kpiEl.innerHTML=[
+    ['📦 총 납품액',totalD.toLocaleString()+'원','var(--green-dark)'],
+    ['♻️ 총 수거액',totalW.toLocaleString()+'원','#FF9500'],
+    ['💰 상계 후 청구액',totalN.toLocaleString()+'원','var(--red-accent)'],
+    ['⏳ 미수 업체',unpaid+'곳','#C0392B'],
+  ].map(([label,val,color])=>`
+    <div style="background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center;">
+      <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${label}</div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:${color};">${val}</div>
+    </div>`).join('');
+
+  const listEl=document.getElementById('billingList');
+  if(!listEl) return;
+  if(active.length===0){
+    listEl.innerHTML='<div style="text-align:center;padding:60px;color:var(--gray);"><div style="font-size:36px;margin-bottom:12px;">📭</div><div>'+month+' 정산 대상 거래가 없어요</div></div>';
+    return;
+  }
+
+  listEl.innerHTML=active.map(s=>{
+    const key=getBillingKey(s.biz.id,month);
+    const bd=billingData[key]||{};
+    const net=s.deliveryAmt-s.wasteAmt;
+    const taxIssued=bd.taxInvoice||false, paid=bd.paid||false;
+    const borderColor=paid?'var(--green-main)':net>0?'var(--red-accent)':'var(--gray-light)';
+    return `
+    <div style="background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);margin-bottom:12px;border-left:4px solid ${borderColor};">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="font-family:var(--font-display);font-size:15px;font-weight:800;">${s.biz.name}</div>
+        <div style="font-size:11px;color:var(--gray);">${s.biz.type}</div>
+        <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">
+          ${taxIssued
+            ?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">✅ 계산서발행</span>'
+            :'<span style="background:#FFF8F0;color:#D4621A;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">📄 미발행</span>'}
+          ${paid
+            ?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">✅ 입금완료</span>'
+            :'<span style="background:#FFEBEE;color:#C0392B;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">⏳ 미수</span>'}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div style="background:#F8FFF8;border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">📦 납품 (${s.deliveryCnt}캔)</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--green-dark);">+${s.deliveryAmt.toLocaleString()}원</div>
+        </div>
+        <div style="background:#FFF8F0;border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">♻️ 수거 (${s.wasteCnt}캔)</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:#FF9500;">-${s.wasteAmt.toLocaleString()}원</div>
+        </div>
+        <div style="background:${net>0?'#FFEBEE':'#E8F5E9'};border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:3px;">💰 상계 후 청구</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:${net>0?'var(--red-accent)':'var(--green-dark)'};">${net>=0?'+':''}${net.toLocaleString()}원</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${!taxIssued
+          ?`<button onclick="openHometax(${s.biz.id},'${month}')" style="background:var(--green-main);border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">📄 홈택스 계산서 발행</button>`
+          :`<button onclick="toggleTaxInvoice(${s.biz.id},'${month}',false)" style="background:#F5F5F5;border:1px solid var(--gray-light);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);color:var(--gray);">↩ 발행취소</button>`}
+        ${(taxIssued&&!paid)
+          ?`<button onclick="markPaid(${s.biz.id},'${month}',true)" style="background:#185FA5;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;font-family:var(--font-body);">✅ 입금완료</button>`:''}
+        ${paid
+          ?`<button onclick="markPaid(${s.biz.id},'${month}',false)" style="background:#F5F5F5;border:1px solid var(--gray-light);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);color:var(--gray);">↩ 미수로 변경</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openHometax(bizId,month){
+  window.open('https://www.hometax.go.kr/websquare/websquare.wss?w2xPath=/ui/pp/index_pp.xml&menuCd=SX0101','_blank');
+  showToast('t1','📄 홈택스로 이동','계산서 발행 후 아래에서 "발행완료" 처리해주세요');
+  // 홈택스에서 발행하고 돌아오면 직접 클릭하도록 상태 변경 안 함
+}
+
+function toggleTaxInvoice(bizId,month,issued){
+  const key=getBillingKey(bizId,month);
+  billingData[key]=billingData[key]||{};
+  billingData[key].taxInvoice=issued;
+  saveBillingData(); renderBilling();
+  showToast('t1',issued?'✅ 계산서 발행완료':'↩ 발행 취소','정산 현황 업데이트됐어요');
+}
+
+function markPaid(bizId,month,paid){
+  const key=getBillingKey(bizId,month);
+  billingData[key]=billingData[key]||{};
+  billingData[key].paid=paid;
+  if(paid) billingData[key].paidDate=new Date().toISOString().slice(0,10);
+  saveBillingData(); renderBilling();
+  showToast('t1',paid?'✅ 입금완료':'↩ 미수로 변경','정산 현황 업데이트됐어요');
+}
 
 </script>
 </body>
