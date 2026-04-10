@@ -862,10 +862,7 @@
             등록 문의: <span style="color:var(--green-main);font-weight:700;cursor:pointer;" onclick="showToast('t1','📞 담당자 문의','원주 HIVE 010-9123-7042')">담당자에게 연락</span>
           </div>
         </div>
-        <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
-          <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 계정</div>
-          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">WJ-001</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">1234</strong></div>
-        </div>
+        
       </div>
     </div>
 
@@ -890,10 +887,7 @@
           </div>
           <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;" onclick="doDriverLogin()">🔐 로그인</button>
         </div>
-        <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
-          <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 계정</div>
-          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">driver1</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">1234</strong></div>
-        </div>
+        
       </div>
     </div>
 
@@ -917,10 +911,7 @@
           </div>
           <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;" onclick="hqAdminLogin()">🔐 로그인</button>
         </div>
-        <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
-          <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 계정</div>
-          <div style="font-size:12px;color:#666;">ID: <strong style="color:var(--green-main)">hive</strong> &nbsp;/&nbsp; PW: <strong style="color:var(--green-main)">1234</strong></div>
-        </div>
+        
       </div>
     </div>
 
@@ -1298,8 +1289,7 @@
             </div>
           </div>
           <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
-            <div style="font-size:10px;color:#444;margin-bottom:4px;">🔑 데모 로그인</div>
-            <div style="font-size:12px;color:#666;" id="ownerLoginHint">ID: <strong style="color:var(--green-main)">WJ-001</strong> &nbsp;&nbsp;/&nbsp;&nbsp; PW: <strong style="color:var(--green-main)">1234</strong></div>
+
           </div>
         </div>
       </div>
@@ -2278,10 +2268,6 @@
             </div>
             <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;" onclick="adminLogin()">🔐 로그인</button>
           </div>
-          <div style="margin-top:12px;background:#111;border-radius:var(--radius-sm);padding:11px 16px;text-align:center;border:1px solid #222;">
-            <div style="font-size:10px;color:#444;margin-bottom:3px;">데모 비밀번호</div>
-            <div style="font-size:12px;color:#666;"><strong style="color:var(--green-main)">1234</strong></div>
-          </div>
         </div>
       </div>
       <div id="adminDashState" style="display:none;">
@@ -2326,6 +2312,32 @@
               <div style="font-size:11px;font-weight:700;color:var(--gray);letter-spacing:0.03em;margin-bottom:10px;">📋 최근 변경 이력</div>
               <div id="priceChangeLog" style="display:flex;flex-direction:column;gap:7px;">
                 <div style="font-size:11px;color:var(--gray);text-align:center;padding:10px 0;">저장 시 자동 기록돼요</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 비밀번호 설정 섹션 -->
+          <div class="card" style="margin-top:18px;">
+            <div class="card-header">
+              <div class="card-title">🔐 비밀번호 설정</div>
+              <div style="font-size:10px;color:var(--gray);">이 기기에만 저장됩니다</div>
+            </div>
+            <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div>
+                <div class="form-label" style="margin-bottom:6px;">관리자 비밀번호</div>
+                <div style="display:flex;gap:8px;">
+                  <input class="form-input" id="newAdminPw" type="password" placeholder="새 비밀번호" style="flex:1;font-size:14px;">
+                  <button class="btn btn-primary" style="padding:0 14px;font-size:12px;" onclick="changeAdminPw()">변경</button>
+                </div>
+                <div style="font-size:10px;color:var(--gray);margin-top:4px;" id="adminPwStatus"></div>
+              </div>
+              <div>
+                <div class="form-label" style="margin-bottom:6px;">운반자 비밀번호</div>
+                <div style="display:flex;gap:8px;">
+                  <input class="form-input" id="newDriverPw" type="password" placeholder="새 비밀번호" style="flex:1;font-size:14px;">
+                  <button class="btn btn-primary" style="padding:0 14px;font-size:12px;" onclick="changeDriverPw()">변경</button>
+                </div>
+                <div style="font-size:10px;color:var(--gray);margin-top:4px;" id="driverPwStatus"></div>
               </div>
             </div>
           </div>
@@ -3206,28 +3218,22 @@ function buildOwnerAccounts() {
   const overrides = JSON.parse(localStorage.getItem('hiveoil_biz_pw') || '{}');
   const accounts  = {};
   businesses.forEach((b, idx) => {
-    // DB id 대신 등록 순번(1,2,3...) 기반으로 코드 생성
     const seq  = idx + 1;
     const code = 'WJ-' + String(seq).padStart(3,'0');
     const phone = (b.phone || '').replace(/[^0-9]/g, '');
-    const defPw = '1234'; // 기본 비밀번호 1234
+    // 기본 비밀번호: 전화번호 뒷 4자리 (없으면 관리자가 설정한 값)
+    const defPw = phone.length >= 4 ? phone.slice(-4) : '';
     const pw    = overrides[String(b.id)] || defPw;
     accounts[code] = { pw, bizId: b.id, name: b.name, seq };
   });
   return accounts;
 }
-
 // 업체 ID → WJ 코드 변환
 function getBizCode(bizId) {
   const idx = businesses.findIndex(b => String(b.id) === String(bizId));
   return idx >= 0 ? 'WJ-' + String(idx + 1).padStart(3,'0') : '—';
 }
 
-const ownerAccounts = {
-  'WJ-001': { pw:'1234', bizId:1 },
-  'WJ-002': { pw:'5678', bizId:2 },
-  'WJ-003': { pw:'0000', bizId:3 },
-};
 var ownerLoggedIn = false;
 var ownerBizId = null;
 var isAdminMode = false;
@@ -3537,7 +3543,8 @@ const DEFAULT_PRICES = JSON.parse(JSON.stringify(PRICES));
 
 function adminLogin() {
   const pw = document.getElementById('adminPwInput').value;
-  if (pw !== '1234') {
+  const adminPw = localStorage.getItem('hiveoil_admin_pw') || 'HIVE2026!';
+  if (pw !== adminPw) {
     showToast('t1','❌ 비밀번호 오류','관리자 비밀번호를 확인해주세요');
     const pwEl = document.getElementById('adminPwInput');
     pwEl.style.borderColor = 'var(--red-accent)';
@@ -3747,6 +3754,23 @@ function adminSavePrices(btn) {
 
   showToast('t1', '💾 시세 저장 완료!',
     changes.length > 0 ? changes.join(' · ') : '현재 시세가 저장됐어요');
+}
+
+function changeAdminPw() {
+  const pw = document.getElementById('newAdminPw').value.trim();
+  if (!pw || pw.length < 4) { showToast('t1','⚠️ 비밀번호 오류','4자리 이상 입력해주세요'); return; }
+  localStorage.setItem('hiveoil_admin_pw', pw);
+  document.getElementById('newAdminPw').value = '';
+  document.getElementById('adminPwStatus').textContent = '✅ 변경 완료';
+  showToast('t1','✅ 관리자 비밀번호 변경','다음 로그인부터 새 비밀번호를 사용하세요');
+}
+function changeDriverPw() {
+  const pw = document.getElementById('newDriverPw').value.trim();
+  if (!pw || pw.length < 4) { showToast('t1','⚠️ 비밀번호 오류','4자리 이상 입력해주세요'); return; }
+  localStorage.setItem('hiveoil_driver_pw', pw);
+  document.getElementById('newDriverPw').value = '';
+  document.getElementById('driverPwStatus').textContent = '✅ 변경 완료';
+  showToast('t1','✅ 운반자 비밀번호 변경','다음 로그인부터 새 비밀번호를 사용하세요');
 }
 
 function adminResetPrices() {
@@ -6175,7 +6199,8 @@ function hqAdminLogin() {
     showToast('t1','⚠️ 입력 오류','아이디와 비밀번호를 입력해주세요');
     return;
   }
-  if (id !== 'hive' || pw !== '1234') {
+  const adminPw2 = localStorage.getItem('hiveoil_admin_pw') || 'HIVE2026!';
+  if (id !== 'hive' || pw !== adminPw2) {
     showToast('t1','⚠️ 로그인 실패','아이디 또는 비밀번호가 맞지 않아요');
     if (pwEl) { pwEl.style.borderColor='var(--red-accent)'; setTimeout(()=>pwEl.style.borderColor='',1500); }
     return;
@@ -6257,8 +6282,8 @@ function doOwnerLogin() {
 function doDriverLogin() {
   var id = (document.getElementById('driverLoginId') || {value:''}).value.trim();
   var pw = (document.getElementById('driverLoginPw') || {value:''}).value.trim();
-  // 데모: driver1 / 1234
-  if (id !== 'driver1' || pw !== '1234') {
+  const driverPw = localStorage.getItem('hiveoil_driver_pw') || 'DRIVER2026!';
+  if (id !== 'driver1' || pw !== driverPw) {
     showToast('t1','❌ 로그인 실패','운반자 계정을 확인해주세요');
     return;
   }
