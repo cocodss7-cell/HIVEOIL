@@ -2175,6 +2175,7 @@
             <!-- 미리보기 -->
             <div id="reg_cert_preview" style="display:none;margin-top:10px;text-align:center;">
               <img id="reg_cert_img" src="" style="max-height:120px;border-radius:8px;border:1px solid var(--gray-light);">
+              <div id="reg_cert_pdf_note" style="display:none;font-size:12px;font-weight:700;color:#185FA5;padding:8px 12px;background:#EEF4FF;border-radius:8px;margin-top:4px;"></div>
             </div>
           </div>
 
@@ -2294,8 +2295,8 @@
           </div>
         </div>
 
-        <!-- 등록된 업체 목록 -->
-        <div style="margin-top:20px;">
+        <!-- 등록된 업체 목록 — 관리자 전용 -->
+        <div id="adminBizManageSection" style="margin-top:20px;display:none;">
           <div style="font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
             등록된 업체 <span id="regCount" style="background:var(--green-main);color:#000;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700;">0</span>
           </div>
@@ -2303,6 +2304,14 @@
             <div style="text-align:center;padding:30px;color:var(--gray);font-size:13px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);">
               📭 등록된 업체가 없어요. 위 양식을 작성하고 등록해주세요!
             </div>
+          </div>
+
+          <!-- 삭제된 업체 복구 섹션 -->
+          <div id="deletedBizSection" style="display:none;margin-top:20px;">
+            <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:#888;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+              🗑️ 삭제된 업체 <span style="font-size:10px;color:#bbb;font-weight:400;">— 거래 이력 보존 · 복구 가능</span>
+            </div>
+            <div id="deletedBizList" style="display:flex;flex-direction:column;gap:7px;"></div>
           </div>
         </div>
       </div>
@@ -2321,6 +2330,9 @@
             <div class="form-group">
               <label class="form-label">관리자 비밀번호</label>
               <input class="form-input" id="adminPwInput" type="password" placeholder="관리자 비밀번호 입력" style="font-size:15px;letter-spacing:0.1em;">
+            </div>
+            <div id="adminPwHint" style="font-size:11px;color:var(--gray);margin-bottom:12px;display:none;">
+              ⚠️ 비밀번호가 설정되지 않았습니다. 원하는 비밀번호를 입력하면 최초 비밀번호로 등록됩니다.
             </div>
             <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;" onclick="adminLogin()">🔐 로그인</button>
           </div>
@@ -2982,7 +2994,11 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'price')     { renderPricePage(); }
   if (id === 'esg')       { renderEsgPanel(); }
   if (id === 'owner')     { renderOwnerPanel && renderOwnerPanel(); }
-  if (id === 'register')  { renderRegBizList(); loadPendingBizFromDB && loadPendingBizFromDB(); updateRegisterBadge(); }
+  if (id === 'register')  {
+    const adminSec = document.getElementById('adminBizManageSection');
+    if (adminSec) adminSec.style.display = isAdminMode ? '' : 'none';
+    if (isAdminMode) { renderRegBizList(); renderDeletedBizList(); loadPendingBizFromDB && loadPendingBizFromDB(); updateRegisterBadge(); }
+  }
   if (id === 'hq')        { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
   if (id === 'admin') {
     // 관리자 로그인 상태면 비번 화면 건너뛰고 바로 대시 표시
@@ -2991,6 +3007,10 @@ function showPanel(id, navEl, pushState=true) {
       const ds = document.getElementById('adminDashState');
       if (ls) ls.style.display = 'none';
       if (ds) ds.style.display = 'block';
+    } else {
+      // 비밀번호 미설정 시 힌트 표시
+      const hint = document.getElementById('adminPwHint');
+      if (hint) hint.style.display = localStorage.getItem('hiveoil_admin_pw') ? 'none' : 'block';
     }
     renderAdminPrices && renderAdminPrices();
   }
@@ -3544,9 +3564,11 @@ function calcWastePrice() {
 }
 
 function saveWeightRecord() {
+  if (!isAdminMode && !isDriverMode) { showToast('t1','🔒 권한 없음','관리자 또는 운반자 로그인 후 이용 가능합니다'); return; }
   const kg   = document.getElementById('wasteKgInput')?.value || '0';
   const date = document.getElementById('wasteDate')?.value;
-  const today = date ? date.replaceAll('-','.') : '2026.03.27';
+  const n = new Date();
+  const today = date ? date.replaceAll('-','.') : n.getFullYear()+'.'+String(n.getMonth()+1).padStart(2,'0')+'.'+String(n.getDate()).padStart(2,'0');
   const price = parseFloat(kg) <= 40 ? '10,000원' : parseFloat(kg) <= 80 ? '11,000원' : '12,000원';
   const list  = document.getElementById('weightRecordList');
   if (list) {
@@ -3599,7 +3621,15 @@ const DEFAULT_PRICES = JSON.parse(JSON.stringify(PRICES));
 
 function adminLogin() {
   const pw = document.getElementById('adminPwInput').value;
-  const adminPw = localStorage.getItem('hiveoil_admin_pw') || 'HIVE2026!';
+  const adminPw = localStorage.getItem('hiveoil_admin_pw');
+  if (!adminPw) {
+    // 비밀번호 미설정 시 — 입력값을 최초 비밀번호로 등록
+    if (!pw || pw.length < 4) { showToast('t1','⚠️ 초기 설정','비밀번호를 4자리 이상 입력해주세요 (첫 로그인 시 설정됩니다)'); return; }
+    localStorage.setItem('hiveoil_admin_pw', pw);
+    document.getElementById('adminPwInput').value = '';
+    showToast('t1','✅ 비밀번호 설정 완료','앞으로 이 비밀번호로 로그인하세요');
+    return;
+  }
   if (pw !== adminPw) {
     showToast('t1','❌ 비밀번호 오류','관리자 비밀번호를 확인해주세요');
     const pwEl = document.getElementById('adminPwInput');
@@ -3719,6 +3749,7 @@ function previewWastePrice(key, val) {
 }
 
 function adminSavePrices(btn) {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   if (!btn) btn = document.getElementById('adminSaveBtn');
 
   // ① 버튼 즉시 완료 (가장 먼저)
@@ -3819,6 +3850,7 @@ function toggleCertImage(id) {
 }
 
 function changeAdminPw() {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   const pw = document.getElementById('newAdminPw').value.trim();
   if (!pw || pw.length < 4) { showToast('t1','⚠️ 비밀번호 오류','4자리 이상 입력해주세요'); return; }
   localStorage.setItem('hiveoil_admin_pw', pw);
@@ -3827,6 +3859,7 @@ function changeAdminPw() {
   showToast('t1','✅ 관리자 비밀번호 변경','다음 로그인부터 새 비밀번호를 사용하세요');
 }
 function changeDriverPw() {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   const pw = document.getElementById('newDriverPw').value.trim();
   if (!pw || pw.length < 4) { showToast('t1','⚠️ 비밀번호 오류','4자리 이상 입력해주세요'); return; }
   localStorage.setItem('hiveoil_driver_pw', pw);
@@ -3836,11 +3869,11 @@ function changeDriverPw() {
 }
 
 function adminResetPrices() {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   Object.keys(PRICES.oils).forEach(k => { PRICES.oils[k].price = PRICES_DEFAULT.oils[k].price; });
   Object.keys(PRICES.waste).forEach(k => { PRICES.waste[k].price = PRICES_DEFAULT.waste[k].price; });
   PRICES.esgRate = PRICES_DEFAULT.esgRate;
   PRICES.carbonRate = PRICES_DEFAULT.carbonRate;
-  // localStorage도 초기화
   try { localStorage.removeItem('hiveoil_prices'); } catch(e) {}
   applyPrices();
   renderAdminPrices();
@@ -3849,6 +3882,7 @@ function adminResetPrices() {
 
 // ===== 데이터 초기화 함수 =====
 async function adminClearHistory() {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   if (!confirm('진행 이력을 전체 삭제할까요? 되돌릴 수 없어요.')) return;
   try {
     // DB 삭제
@@ -3866,9 +3900,18 @@ async function adminClearHistory() {
 }
 
 async function adminClearBusinesses() {
-  if (!confirm('등록 업체를 전체 삭제할까요? 되돌릴 수 없어요.')) return;
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
+  if (!confirm('등록 업체를 전체 삭제할까요?\n거래 이력은 보존되며 복구 가능합니다.')) return;
+  // 소프트 삭제: 전체 업체를 deletedBusinesses로 이동
+  const deletedList = JSON.parse(localStorage.getItem('hiveoil_deleted_biz') || '[]');
+  const now = new Date().toISOString().slice(0,10);
+  businesses.forEach(b => {
+    b.deleted = true; b.deletedAt = now;
+    if (!deletedList.find(d => d.id === b.id)) deletedList.unshift(b);
+  });
+  localStorage.setItem('hiveoil_deleted_biz', JSON.stringify(deletedList));
   try {
-    const { error } = await db.from('businesses').delete().neq('id', 0);
+    const { error } = await db.from('businesses').update({ deleted: true, deleted_at: new Date().toISOString() }).neq('id', 0);
     if (error) throw error;
   } catch(e) {
     console.warn('DB 업체 삭제 실패:', e.message);
@@ -3878,11 +3921,13 @@ async function adminClearBusinesses() {
   updateDashboard();
   updateHqRealStats();
   renderRegBizList && renderRegBizList();
-  showToast('t1','🗑️ 업체 삭제 완료','등록 업체가 모두 삭제됐어요');
+  renderDeletedBizList && renderDeletedBizList();
+  showToast('t1','🗑️ 업체 삭제 완료','등록 업체가 모두 삭제됐어요 (복구 가능)');
 }
 
 async function adminClearAll() {
-  if (!confirm('업체와 이력을 모두 삭제할까요? 절대 되돌릴 수 없어요!')) return;
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
+  if (!confirm('업체와 이력을 모두 삭제할까요? 업체는 복구 가능, 이력은 영구 삭제예요!')) return;
   await adminClearHistory();
   await adminClearBusinesses();
   showToast('t1','⚠️ 전체 초기화 완료','업체와 이력이 모두 삭제됐어요');
@@ -3987,6 +4032,7 @@ function changeQRStock(type, delta) {
 }
 
 function saveQRStock() {
+  if (!isAdminMode && !isDriverMode) { showToast('t1','🔒 권한 없음','관리자 또는 운반자 로그인 후 이용 가능합니다'); return; }
   // 버튼 먼저 찾기
   const btn = document.getElementById('qrSaveBtn');
 
@@ -4264,6 +4310,7 @@ function quickDeliver(bizId) {
 }
 
 async function confirmDelivery() {
+  if (!isAdminMode && !isDriverMode) { showToast('t1','🔒 권한 없음','관리자 또는 운반자 로그인 후 이용 가능합니다'); return; }
   // 중복 방지
   const btn = document.querySelector('[onclick="confirmDelivery()"]');
   if (btn) {
@@ -4558,6 +4605,7 @@ function registerBiz() {
 }
 
 function approvePendingBiz(id) {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   const idx = pendingBizData.findIndex(p => p.id === id);
   if (idx === -1) return;
   const p = pendingBizData[idx];
@@ -4596,6 +4644,7 @@ function approvePendingBiz(id) {
 }
 
 function rejectPendingBiz(id) {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   if (!confirm('이 업체 신청을 반려할까요?')) return;
   // Supabase에서도 삭제
   db.from('pending_biz').delete().eq('id', id).then(() => {});
@@ -4653,8 +4702,10 @@ function renderPendingBizList() {
           <div style="margin-top:8px;">
             <button onclick="toggleCertImage(${p.id})" style="background:#EEF4FF;border:none;border-radius:6px;padding:4px 10px;font-size:11px;color:#185FA5;cursor:pointer;font-family:var(--font-body);">📄 사업자등록증 보기</button>
             <div id="cert_${p.id}" style="display:none;margin-top:8px;">
-              <img src="${p.cert_image}" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid var(--gray-light);cursor:pointer;" onclick="window.open('${p.cert_image}','_blank')">
-              <div style="font-size:10px;color:var(--gray);margin-top:4px;">클릭하면 크게 볼 수 있어요</div>
+              ${p.cert_image && p.cert_image.startsWith('data:application/pdf')
+                ? `<a href="${p.cert_image}" target="_blank" style="display:inline-block;background:#EEF4FF;color:#185FA5;font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;text-decoration:none;">📄 PDF 열기</a>`
+                : `<img src="${p.cert_image}" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid var(--gray-light);cursor:pointer;" onclick="window.open('${p.cert_image}','_blank')"><div style="font-size:10px;color:var(--gray);margin-top:4px;">클릭하면 크게 볼 수 있어요</div>`
+              }
             </div>
           </div>` : '<div style="font-size:10px;color:#aaa;margin-top:6px;">📄 사업자등록증 미첨부</div>'}
         </div>
@@ -4701,19 +4752,21 @@ function handleCertUpload(input) {
   const preview = document.getElementById('reg_cert_preview');
   const img = document.getElementById('reg_cert_img');
   if (label) label.textContent = file.name;
-  if (file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      regCertBase64 = e.target.result;
-      if (img) img.src = e.target.result;
+  const reader = new FileReader();
+  reader.onload = e => {
+    regCertBase64 = e.target.result;
+    if (file.type.startsWith('image/')) {
+      if (img) { img.src = e.target.result; img.style.display = 'block'; }
       if (preview) preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  } else {
-    regCertBase64 = null;
-    if (preview) preview.style.display = 'none';
-    showToast('t1','📄 파일 첨부됨', file.name + ' — PDF는 미리보기 불가');
-  }
+    } else {
+      // PDF: base64 저장은 하되, img 대신 텍스트 안내
+      if (img) img.style.display = 'none';
+      if (preview) preview.style.display = 'block';
+      const pdfNote = document.getElementById('reg_cert_pdf_note');
+      if (pdfNote) { pdfNote.style.display = 'block'; pdfNote.textContent = '📄 ' + file.name + ' 첨부 완료'; }
+    }
+  };
+  reader.readAsDataURL(file);
 }
 
 function clearRegForm() {
@@ -4774,21 +4827,72 @@ function renderRegBizList() {
 }
 
 function deleteBiz(id) {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   const idx = businesses.findIndex(b => b.id === id);
   if (idx === -1) return;
-  const name = businesses[idx].name;
-  deleteBizFromDB(businesses[idx].id);
+  if (!confirm('업체를 삭제할까요?\n거래 이력은 보존되며 복구 가능합니다.')) return;
+  const biz = businesses[idx];
+  const name = biz.name;
+
+  // 소프트 삭제: deleted 플래그 세우고 deletedAt 기록
+  biz.deleted = true;
+  biz.deletedAt = new Date().toISOString().slice(0,10);
+  softDeleteBizInDB(biz.id);
+
+  // 활성 목록에서만 제거 (데이터는 deletedBusinesses에 보관)
   businesses.splice(idx, 1);
+  const deletedList = JSON.parse(localStorage.getItem('hiveoil_deleted_biz') || '[]');
+  deletedList.unshift(biz);
+  localStorage.setItem('hiveoil_deleted_biz', JSON.stringify(deletedList));
+
   saveBusinesses();
   renderRegBizList();
+  renderDeletedBizList();
   updateDashboardStats();
   updateDashboard();
-  showToast('t1','🗑️ 업체 삭제됨', name + ' — 목록에서 제거됐어요');
-  // 지도 마커도 제거
+  showToast('t1','🗑️ 업체 삭제됨', name + ' — 복구 가능');
   markers.forEach(({overlay}) => overlay.setMap(null));
   infoWindows.forEach(iw => iw.setMap(null));
   markers = []; infoWindows = [];
   if (kakaoMap) renderBizList();
+}
+
+function restoreBiz(id) {
+  if (!isAdminMode) return;
+  const deletedList = JSON.parse(localStorage.getItem('hiveoil_deleted_biz') || '[]');
+  const idx = deletedList.findIndex(b => b.id === id);
+  if (idx === -1) return;
+  const biz = deletedList[idx];
+  delete biz.deleted;
+  delete biz.deletedAt;
+  businesses.push(biz);
+  deletedList.splice(idx, 1);
+  localStorage.setItem('hiveoil_deleted_biz', JSON.stringify(deletedList));
+  restoreBizInDB(biz.id);
+  saveBusinesses();
+  renderRegBizList();
+  renderDeletedBizList();
+  updateDashboard();
+  showToast('t1','✅ 업체 복구됨', biz.name + ' — 목록에 다시 추가됐어요');
+}
+
+function renderDeletedBizList() {
+  const section = document.getElementById('deletedBizSection');
+  if (!section) return;
+  const deletedList = JSON.parse(localStorage.getItem('hiveoil_deleted_biz') || '[]');
+  if (deletedList.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  const listEl = document.getElementById('deletedBizList');
+  if (!listEl) return;
+  listEl.innerHTML = deletedList.map(b => `
+    <div style="background:var(--white);border-radius:var(--radius-sm);padding:11px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;border-left:3px solid #aaa;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:13px;color:#888;">${b.name} <span style="font-size:10px;color:#bbb;">(삭제: ${b.deletedAt || '—'})</span></div>
+        <div style="font-size:10px;color:#bbb;margin-top:1px;">${b.type || ''} · ${(b.addr||'').substring(0,25)}</div>
+      </div>
+      <button onclick="restoreBiz(${b.id})" style="background:#E8F5E9;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;color:#2E7D32;cursor:pointer;white-space:nowrap;">↩ 복구</button>
+    </div>
+  `).join('');
 }
 
 function addMarker(biz) {
@@ -5410,6 +5514,24 @@ async function deleteBizFromDB(bizId) {
   }
 }
 
+async function softDeleteBizInDB(bizId) {
+  try {
+    const { error } = await db.from('businesses').update({ deleted: true, deleted_at: new Date().toISOString() }).eq('id', bizId);
+    if (error) throw error;
+  } catch(e) {
+    console.warn('소프트 삭제 실패 (로컬엔 반영됨):', e.message);
+  }
+}
+
+async function restoreBizInDB(bizId) {
+  try {
+    const { error } = await db.from('businesses').update({ deleted: false, deleted_at: null }).eq('id', bizId);
+    if (error) throw error;
+  } catch(e) {
+    console.warn('복구 DB 반영 실패 (로컬엔 반영됨):', e.message);
+  }
+}
+
 // ─── 앱 시작 시 DB 로드 ───
 window.addEventListener('load', async () => {
   // localStorage로 즉시 1차 렌더
@@ -5639,6 +5761,7 @@ function doRequestCollect(bizId) {
 
 // 수거 완료 버튼 클릭 → 즉시 목록에서 제거
 async function doCompleteCollect(bizId) {
+  if (!isAdminMode && !isDriverMode) { showToast('t1','🔒 권한 없음','관리자 또는 운반자 로그인 후 이용 가능합니다'); return; }
   const btn = document.getElementById('collectBtn_' + bizId);
   if (btn) { btn.disabled = true; btn.textContent = '⏳ 처리 중...'; btn.style.opacity = '0.6'; }
 
@@ -5706,6 +5829,7 @@ function requestCollect(bizId) { doRequestCollect(bizId); }
 
 
 function completeCollect(bizId) {
+  if (!isAdminMode && !isDriverMode) { showToast('t1','🔒 권한 없음','관리자 또는 운반자 로그인 후 이용 가능합니다'); return; }
   const b = businesses.find(x => String(x.id) === String(bizId));
   if (!b) return;
 
@@ -5782,6 +5906,7 @@ function completeCollect(bizId) {
 
 
 function completeOrder(idx) {
+  if (!isAdminMode && !isDriverMode) { showToast('t1','🔒 권한 없음','관리자 또는 운반자 로그인 후 이용 가능합니다'); return; }
   const item = historyData[idx];
   if (!item || item.type !== '식용유발주') return;
   item.status = 'done';
@@ -5925,13 +6050,15 @@ function saveBizPwOverrides() {
 function getBizCredentials(bizId) {
   const b = businesses.find(x => x.id === bizId);
   if (!b) return null;
-  const code  = 'WJ-' + String(bizId).padStart(3,'0');
+  const code  = getBizCode(bizId);   // 배열 순서 기반 — buildOwnerAccounts와 동일 로직
   const accts = buildOwnerAccounts();
-  const pw    = accts[code]?.pw || '1234';
+  const pw    = accts[code]?.pw || '';
+  if (!pw) return null;  // 비밀번호 미설정 업체는 자격증명 없음
   return { code, pw, name: b.name, phone: b.phone || '—' };
 }
 
 function showBizCredentials(bizId) {
+  if (!isAdminMode) { showToast('t1','🔒 권한 없음','관리자 로그인 후 이용 가능합니다'); return; }
   const cred = getBizCredentials(bizId);
   if (!cred) return;
   const newPw = prompt(
@@ -6420,7 +6547,12 @@ function hqAdminLogin() {
     showToast('t1','⚠️ 입력 오류','아이디와 비밀번호를 입력해주세요');
     return;
   }
-  const adminPw2 = localStorage.getItem('hiveoil_admin_pw') || 'HIVE2026!';
+  const adminPw2 = localStorage.getItem('hiveoil_admin_pw');
+  if (!adminPw2) {
+    showToast('t1','⚠️ 초기 설정 필요','시세 관리 탭에서 관리자 비밀번호를 먼저 설정해주세요');
+    showPanel('admin', null);
+    return;
+  }
   if (id !== 'hive' || pw !== adminPw2) {
     showToast('t1','⚠️ 로그인 실패','아이디 또는 비밀번호가 맞지 않아요');
     if (pwEl) { pwEl.style.borderColor='var(--red-accent)'; setTimeout(()=>pwEl.style.borderColor='',1500); }
@@ -6475,6 +6607,9 @@ function updateNavByMode() {
   });
   var tabLoginBtn = document.getElementById('tab-login');
   if (tabLoginBtn) tabLoginBtn.style.display = isLogged ? 'none' : '';
+  // 관리자 로그아웃 시 업체 목록 섹션 즉시 숨기기
+  var adminBizSec = document.getElementById('adminBizManageSection');
+  if (adminBizSec) adminBizSec.style.display = isAdminMode ? '' : 'none';
 }
 
 // ===== 업주 로그인 =====
@@ -6515,7 +6650,11 @@ function doOwnerLogin() {
 function doDriverLogin() {
   var id = (document.getElementById('driverLoginId') || {value:''}).value.trim();
   var pw = (document.getElementById('driverLoginPw') || {value:''}).value.trim();
-  const driverPw = localStorage.getItem('hiveoil_driver_pw') || 'DRIVER2026!';
+  const driverPw = localStorage.getItem('hiveoil_driver_pw');
+  if (!driverPw) {
+    showToast('t1','⚠️ 설정 필요','관리자가 먼저 운반자 비밀번호를 설정해야 해요');
+    return;
+  }
   if (id !== 'driver1' || pw !== driverPw) {
     showToast('t1','❌ 로그인 실패','운반자 계정을 확인해주세요');
     return;
@@ -6766,6 +6905,10 @@ function updateNavByMode() {
     else if (ownerLoggedIn) roleEl.textContent = '업주';
     else roleEl.textContent = '로그인 후 이용';
   }
+  // 관리자 로그아웃 시 업체 목록 섹션 즉시 숨기기
+  const adminBizSec = document.getElementById('adminBizManageSection');
+  if (adminBizSec) adminBizSec.style.display = isAdminMode ? '' : 'none';
+
   updateBottomTab();
 }
 
