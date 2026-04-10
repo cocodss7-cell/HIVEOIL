@@ -293,137 +293,104 @@
   @media (max-width: 768px) {
 
     /* 사이드바 */
-    .sidebar {
-      position: fixed; left: 0; top: 0; height: 100vh;
-      transform: translateX(-100%);
-      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
-      box-shadow: 4px 0 24px rgba(0,0,0,0.12); z-index: 200;
-    }
-    .sidebar.open { transform: translateX(0); }
+    .sidebar { position:fixed;left:0;top:0;height:100vh;transform:translateX(-100%);transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);box-shadow:4px 0 24px rgba(0,0,0,0.12);z-index:200; }
+    .sidebar.open { transform:translateX(0); }
 
     /* 앱 레이아웃 */
-    .app-shell { flex-direction: row; height: 100vh; overflow: hidden; }
-    .main { height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .app-shell { flex-direction:row;height:100vh;overflow:hidden; }
+    .main { height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch; }
 
     /* 상단바 */
-    .topbar { padding: 0 14px; height: 52px; }
-    .topbar-price-chips { display: none; }
-    .page-title { font-size: 14px; }
-    .topbar-right .btn-outline { display: none; }
-    .hamburger-btn { display: none; }
+    .topbar { padding:0 14px;height:52px; }
+    .topbar-price-chips { display:none; }
+    .page-title { font-size:14px; }
+    .topbar-right .btn-outline { display:none; }
+    .hamburger-btn { display:none; } /* 하단 메뉴 버튼으로 대체 */
 
-    /* 터치 최적화 */
-    .btn, button { min-height: 44px; }
-    input, select, textarea { font-size: 16px !important; }
+    /* 터치 */
+    .btn, button { min-height:44px; }
+    input, select, textarea { font-size:16px !important; }
 
     /* 대시보드 */
-    .dashboard-grid { padding: 12px 12px 80px; gap: 10px; }
-    .stat-row { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .stat-card { padding: 12px 10px !important; }
-    .stat-value { font-size: 22px; }
-    .stat-label { font-size: 10px; }
-    .stat-sub { font-size: 10px; }
-    .two-col { grid-template-columns: 1fr; }
-    .quick-actions { grid-template-columns: 1fr 1fr; }
+    .dashboard-grid { padding:12px 12px 80px;gap:10px; }
+    .stat-row { grid-template-columns:1fr 1fr;gap:8px; }
+    .stat-card { padding:12px 10px !important; }
+    .stat-value { font-size:22px; }
+    .two-col { grid-template-columns:1fr; }
+    .quick-actions { grid-template-columns:1fr 1fr; }
 
-    /* ━━━ 사진1: 발주 KPI 한 줄 3개 ━━━ */
-    #panel-order > div { padding: 12px 12px 80px !important; }
-    #panel-order > div > div:first-child { gap: 6px !important; }
-    #panel-order > div > div:first-child > div {
-      padding: 10px 8px !important; border-radius: 10px !important;
-    }
-    #panel-order > div > div:first-child > div > div:first-child { font-size: 9px !important; }
-    #orderAutoCount, #orderExtraCount, #orderMonthTotal { font-size: 20px !important; }
-    #panel-order > div > div:first-child > div > div:last-child { font-size: 9px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* 지도 - 모바일에서 업체리스트 숨기고 사이드바 최소화 */
+    .map-layout { flex-direction:column;height:calc(100vh - 52px - 60px); }
+    .map-sidebar { width:100%;min-width:unset;height:auto;border-right:none;border-bottom:1px solid var(--gray-light);flex-shrink:0; }
+    .map-wrap { flex:1;min-height:0; }
+    .map-search { padding:8px 12px; }
+    .map-filters { display:flex;gap:6px;padding:8px 12px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch; }
+    .filter-chip { white-space:nowrap;flex-shrink:0;font-size:12px;padding:7px 12px; }
+    .desktop-only { display:none !important; } /* 모바일에서 업체리스트 숨김 */
 
-    /* ━━━ 사진2: 본사 대시보드 KPI 2열 ━━━ */
-    #panel-hq > div { padding: 12px 12px 80px !important; max-width: 100% !important; }
-    #panel-hq > div > div:first-child {
-      grid-template-columns: 1fr 1fr !important; gap: 8px !important;
-    }
-    #panel-hq > div > div:first-child .stat-card { padding: 10px 8px !important; }
-    #panel-hq > div > div:first-child .stat-icon { font-size: 16px !important; margin-bottom: 4px !important; }
-    #panel-hq > div > div:first-child .stat-value { font-size: 20px !important; }
-    #panel-hq > div > div:first-child .stat-label { font-size: 10px !important; }
-    #panel-hq > div > div:first-child .stat-sub { font-size: 9px !important; }
-    /* HQ 레이아웃 1열 */
-    #panel-hq > div > div:nth-child(2) { grid-template-columns: 1fr !important; }
+    /* 발주 신청 */
+    #panel-order > div { padding:12px 12px 80px !important; }
+    #panel-order > div > div:first-child { gap:6px !important; }
+    #orderAutoCount, #orderExtraCount, #orderMonthTotal { font-size:20px !important; }
 
-    /* ━━━ 사진3: 본사 대시보드 테이블 스크롤 개선 ━━━ */
-    #hqTable { min-width: 0 !important; }
-    #hqTable th, #hqTable td { padding: 8px 6px !important; font-size: 11px !important; }
-    #hqTable th:nth-child(2), #hqTable td:nth-child(2) { display: none; } /* 업종 숨김 */
-    #hqTable th:nth-child(5), #hqTable td:nth-child(5) { display: none; } /* 이번달수거 숨김 */
+    /* 수거/이력 */
+    .waste-layout, .history-layout { padding:12px 12px 80px; }
+    .order-layout { grid-template-columns:1fr;padding:12px 12px 80px; }
+    .order-summary { position:static; }
 
-    /* ━━━ 사진4,5: 진행 이력 테이블 최적화 ━━━ */
-    .waste-layout, .history-layout { padding: 12px 12px 80px; }
-    .history-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .history-table { min-width: 0 !important; width: 100%; table-layout: fixed; }
-    .history-table th, .history-table td { padding: 8px 6px !important; font-size: 11px !important; word-break: keep-all; }
-    /* 날짜열 좁게 */
-    .history-table th:first-child, .history-table td:first-child { width: 72px; font-size: 10px !important; }
-    /* 업체명 줄임 */
-    .history-table th:nth-child(2), .history-table td:nth-child(2) { max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    /* 내용 줄임 */
-    .history-table th:nth-child(4), .history-table td:nth-child(4) { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* 진행이력 테이블 - 가로 스크롤 */
+    .history-table-wrap { overflow-x:auto;-webkit-overflow-scrolling:touch; }
+    .history-table { min-width:600px; }
 
-    /* ━━━ 사진6,7: 정산/가격변동 이력 ━━━ */
-    #panel-billing > div { padding: 12px 12px 80px !important; }
-    #billingKpi { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-    #billingKpi > div { padding: 10px 8px !important; }
-    #billingKpi > div > div:last-child { font-size: 14px !important; white-space: nowrap; }
-    #panel-price > div { padding: 12px 12px 80px !important; max-width: 100% !important; }
-    /* 가격 카드 가로 스크롤 */
-    #panel-price .price-cards-wrap { display: flex; overflow-x: auto; gap: 10px; -webkit-overflow-scrolling: touch; }
-    #panel-price .price-cards-wrap > div { min-width: 120px; flex-shrink: 0; }
+    /* ESG 패널 */
+    #panel-esg > div { padding:12px 12px 80px !important;max-width:100% !important; }
+    #panel-esg > div > div:first-child { grid-template-columns:1fr !important; }
 
-    /* ━━━ 사진8,9: 시세 관리 ━━━ */
-    #adminDashState > div:last-child { padding: 12px 12px 80px !important; max-width: 100% !important; }
-    #oilPriceCards { grid-template-columns: 1fr !important; gap: 10px !important; }
-    #oilPriceCards > div { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; padding: 12px !important; }
-    #oilPriceCards > div > div:first-child { flex-shrink: 0; }
-    #wastePriceCards { grid-template-columns: 1fr !important; }
-    /* 저장버튼+이력 1열 */
-    #adminDashState .two-col, #adminDashState [style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+    /* 가격변동 이력 */
+    #panel-price > div { padding:12px 12px 80px !important;max-width:100% !important; }
 
-    /* ━━━ 사진10: 수거 신청 관리 padding ━━━ */
-    #panel-apply > div { padding: 12px 12px 80px !important; }
+    /* 업체 등록 - 1열 */
+    #panel-register > div { padding:12px 12px 80px !important;max-width:100% !important; }
+    #panel-register .register-grid { grid-template-columns:1fr !important; }
+    #panel-register [style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
 
-    /* ━━━ 사진11: apply 빈공간 ━━━ */
-    #panel-apply { overflow-y: auto; }
+    /* 시세 관리 - 카드 1열 수평형 */
+    #panel-admin > div { padding:12px 12px 80px !important;max-width:100% !important; }
+    #adminDashState > div:last-child { padding:12px 12px 80px !important; }
+    #oilPriceCards { grid-template-columns:1fr !important; }
+    #oilPriceCards > div { display:flex !important;flex-direction:row !important;align-items:center !important;gap:14px !important;padding:12px 14px !important; }
+    #oilPriceCards > div > div:first-child { flex-shrink:0; }
+    #wastePriceCards { grid-template-columns:1fr !important; }
+    #adminDashState [style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
 
-    /* 지도 */
-    .map-layout { flex-direction: column; height: calc(100vh - 52px - 60px); }
-    .map-sidebar { width: 100%; min-width: unset; height: 220px; border-right: none; border-bottom: 1px solid var(--gray-light); overflow-y: auto; }
-    .map-wrap { flex: 1; min-height: 0; }
-    .business-list { max-height: 110px; overflow-y: auto; }
-    .map-filters { overflow-x: auto; flex-wrap: nowrap; }
-    .filter-chip { white-space: nowrap; flex-shrink: 0; font-size: 11px; padding: 5px 10px; }
+    /* HQ */
+    #panel-hq > div { padding:12px 12px 80px !important;max-width:100% !important; }
+    #panel-hq > div > div:first-child { grid-template-columns:1fr 1fr !important;gap:8px !important; }
+    #panel-hq > div > div:nth-child(2) { grid-template-columns:1fr !important; }
+    #panel-hq .stat-card { padding:10px 8px !important; }
+    #hqTable { min-width:0 !important; }
+    #hqTable th, #hqTable td { padding:8px 5px !important;font-size:10px !important; }
+    #hqTable th:nth-child(2), #hqTable td:nth-child(2) { display:none; }
 
-    /* 패널 여백 */
-    .order-layout { grid-template-columns: 1fr; padding: 12px 12px 80px; }
-    .order-summary { position: static; }
-    #panel-esg > div { padding: 12px 12px 80px !important; max-width: 100% !important; }
-    #panel-owner .owner-inner, #panel-qr > div > div, #panel-register > div { padding: 12px 12px 80px !important; max-width: 100% !important; }
+    /* 정산 */
+    #panel-billing > div { padding:12px 12px 80px !important; }
+    #billingKpi { grid-template-columns:1fr 1fr !important;gap:8px !important; }
+    #billingList [style*="grid-template-columns:1fr 1fr 1fr"] { gap:6px !important; }
 
-    /* 정산 카드 3열→1열 */
-    #billingList [style*="grid-template-columns:1fr 1fr 1fr"] { grid-template-columns: 1fr 1fr 1fr !important; }
+    /* 수거신청관리 */
+    #panel-apply > div { padding:12px 12px 80px !important; }
+    #panel-apply [style*="grid-template-columns:1fr 380px"] { grid-template-columns:1fr !important; }
+    #panel-apply [style*="grid-template-columns:repeat(3"] { grid-template-columns:1fr 1fr 1fr !important; }
+
+    /* QR/업주 */
+    #panel-owner .owner-inner, #panel-qr > div > div { padding:12px 12px 80px !important;max-width:100% !important; }
 
     /* 알림 배너 */
-    .alert-banner { font-size: 10px; padding: 7px 14px; gap: 6px; }
-
-    /* ━━━ apply 패널 모바일 ━━━ */
-    #panel-apply > div { padding: 12px 12px 80px !important; }
-    #panel-apply > div > div:last-child { grid-template-columns: 1fr !important; }
-    #panel-apply [style*="grid-template-columns:1fr 380px"] { grid-template-columns: 1fr !important; }
-
-    /* ━━━ 가격변동 이력 카드 가로스크롤 ━━━ */
-    #panel-price > div [style*="display:grid"] { display: flex !important; overflow-x: auto !important; gap: 10px !important; -webkit-overflow-scrolling: touch !important; }
-    #panel-price > div [style*="display:grid"] > div { min-width: 130px !important; flex-shrink: 0 !important; }
+    .alert-banner { font-size:10px;padding:7px 14px;gap:6px; }
 
     /* Safe Area */
-    .topbar { padding-top: env(safe-area-inset-top); }
-    .bottom-tab-bar { padding-bottom: env(safe-area-inset-bottom); }
+    .topbar { padding-top:env(safe-area-inset-top); }
+    .bottom-tab-bar { padding-bottom:env(safe-area-inset-bottom); }
   }
 
   /* ===== 하단 탭바 ===== */
@@ -497,6 +464,38 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+<!-- 지도 필터 바텀시트 -->
+<div id="filterSheetBackdrop" onclick="closeFilterSheet()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;"></div>
+<div id="filterSheet" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;z-index:501;max-height:75vh;overflow:hidden;flex-direction:column;box-shadow:0 -8px 32px rgba(0,0,0,0.18);transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);">
+  <div style="padding:12px;text-align:center;flex-shrink:0;"><div style="width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto;"></div></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 18px 12px;flex-shrink:0;">
+    <div>
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:800;" id="filterSheetTitle">업체 목록</div>
+      <div style="font-size:11px;color:var(--gray);margin-top:2px;" id="filterSheetSub"></div>
+    </div>
+    <button onclick="closeFilterSheet()" style="background:#f5f5f5;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;">✕</button>
+  </div>
+  <div id="filterSheetList" style="overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 24px;flex:1;"></div>
+</div>
+
+<!-- BILLING PANEL -->
+<div class="panel" id="panel-billing" style="display:none;">
+  <div style="max-width:900px;margin:0 auto;padding:24px 20px 100px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-family:var(--font-display);font-size:20px;font-weight:800;">💰 자동 정산 시스템</div>
+        <div style="font-size:12px;color:var(--gray);margin-top:3px;">납품·수거 이력 기반 자동 계산 · 상계처리 · 계산서 발행</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <select id="billingMonthSel" onchange="renderBilling()" style="height:44px;border:1px solid var(--gray-light);border-radius:8px;padding:0 10px;font-size:14px;font-family:var(--font-body);"></select>
+        <button onclick="renderBilling()" style="background:var(--green-main);border:none;border-radius:8px;padding:0 14px;height:44px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);">🔄 새로고침</button>
+      </div>
+    </div>
+    <div id="billingKpi" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
+    <div id="billingList"></div>
+  </div>
+</div>
 
 <!-- Toasts -->
 <div class="notify-toast" id="toast1">
@@ -595,50 +594,49 @@
       <div class="logo-sub">HIVE · 탄소배출을 줄이고</div>
     </div>
     <nav id="mainNav">
-      <!-- ══ 공통 ══ -->
+      <!-- ══ 공통 메뉴 (항상 노출) ══ -->
       <div class="nav-label">메뉴</div>
       <div class="nav-item active" onclick="showPanel('owner-dash',this)" id="navOwnerDash"><span class="icon">📊</span>대시보드</div>
 
-      <!-- ══ 업주 전용 ══ -->
-      <div class="nav-label owner-only" style="display:none;">🏪 업주 전용</div>
-      <div class="nav-item owner-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
-      <div class="nav-item owner-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
-      <div class="nav-item owner-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
+      <!-- ══ 업주/운반자 로그인 후 메뉴 ══ -->
+      <div class="nav-item logged-only" onclick="showPanel('qr',this)" id="navQr" style="display:none;"><span class="icon">📱</span>재고 입력</div>
+      <div class="nav-item logged-only" onclick="showPanel('waste',this)" id="navWaste" style="display:none;"><span class="icon">♻️</span>수거 신청<span class="nav-badge" id="sideWasteBadge" style="display:none;">0</span></div>
+      <div class="nav-item logged-only" onclick="showPanel('order',this)" id="navOrder" style="display:none;"><span class="icon">🫙</span>발주 신청<span class="nav-badge" id="sideDeliveryBadge" style="display:none;background:#FF9500;">0</span></div>
 
-      <!-- ══ 운반자 전용 ══ -->
-      <div class="nav-label driver-only" style="display:none;">🚛 운반자 전용</div>
-      <div class="nav-item driver-only" onclick="showPanel('waste',this)" style="display:none;"><span class="icon">♻️</span>수거 신청</div>
-      <div class="nav-item driver-only" onclick="showPanel('order',this)" style="display:none;"><span class="icon">🫙</span>발주 신청</div>
-      <div class="nav-item driver-only" onclick="showPanel('map',this)" style="display:none;"><span class="icon">🗺️</span>지도 현황</div>
-      <div class="nav-item driver-only" onclick="showPanel('dashboard',this)" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
-
-      <!-- ══ 관리자 전용 ══ -->
+      <!-- ══ 관리자 전용 메뉴 (관리자 로그인 후 표시) ══ -->
       <div class="nav-label admin-only" style="display:none;">관리자</div>
       <div class="nav-item admin-only" onclick="showPanel('dashboard',this)" style="display:none;"><span class="icon">📊</span>관리자 대시보드</div>
-      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;"><span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('qr',this)" style="display:none;"><span class="icon">📱</span>재고 입력</div>
-      <div class="nav-item admin-only" onclick="showPanel('waste',this)" style="display:none;"><span class="icon">♻️</span>수거 신청</div>
-      <div class="nav-item admin-only" onclick="showPanel('order',this)" style="display:none;"><span class="icon">🫙</span>발주 신청</div>
-      <div class="nav-item admin-only" onclick="showPanel('history',this)" style="display:none;"><span class="icon">📋</span>진행 이력</div>
       <div class="nav-item admin-only" onclick="showPanel('map',this)" style="display:none;"><span class="icon">🗺️</span>지도 현황<span class="nav-badge green" id="sideMapBadge" style="display:none;">0</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('billing',this)" style="display:none;"><span class="icon">💰</span>정산 관리</div>
-
+      <div class="nav-label admin-only" style="display:none;">업무</div>
+      <div class="nav-item admin-only" onclick="showPanel('history',this)" style="display:none;"><span class="icon">📋</span>진행 이력</div>
       <div class="nav-label admin-only" style="display:none;">정보</div>
       <div class="nav-item admin-only" onclick="showPanel('price',this)" style="display:none;"><span class="icon">💹</span>가격변동 이력</div>
       <div class="nav-item admin-only" onclick="showPanel('esg',this)" style="display:none;"><span class="icon">🌿</span>ESG 포인트</div>
-
-      <div class="nav-label admin-only" style="display:none;">등록 관리</div>
-      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;"><span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span></div>
-      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;"><span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span></div>
-
       <div class="nav-label admin-only" style="display:none;">급식소 ESG</div>
       <div class="nav-item admin-only" onclick="showPanel('apply',this)" style="display:none;"><span class="icon">🏫</span>수거 신청 관리<span class="nav-badge" id="sideApplyBadge" style="display:none;background:#185FA5;">0</span></div>
 
-      <!-- ══ 로그인 버튼 (비로그인시만) ══ -->
+      <!-- ══ 로그인 버튼 (비로그인 상태에서만 표시) ══ -->
       <div class="nav-label" style="margin-top:8px;" id="navLoginLabel">계정</div>
-      <div class="nav-item" onclick="showPanel('owner-login',this)" id="navOwnerLogin"><span class="icon">🏪</span>업주 로그인</div>
-      <div class="nav-item" onclick="showPanel('driver-login',this)" id="navDriverLogin"><span class="icon">🚛</span>운반자 로그인</div>
-      <div class="nav-item" onclick="showPanel('hq-login',this)" id="navHqLogin"><span class="icon">🏢</span>관리자 로그인</div>
+      <div class="nav-item" onclick="showPanel('owner-login',this)" id="navOwnerLogin">
+        <span class="icon">🏪</span>업주 로그인
+      </div>
+      <div class="nav-item" onclick="showPanel('driver-login',this)" id="navDriverLogin">
+        <span class="icon">🚛</span>운반자 로그인
+      </div>
+      <div class="nav-item" onclick="showPanel('hq-login',this)" id="navHqLogin">
+        <span class="icon">🏢</span>관리자 로그인
+      </div>
+
+      <!-- ══ 관리자 로그인 후 메뉴 ══ -->
+      <div class="nav-item admin-only" onclick="showPanel('hq',this)" style="display:none;">
+        <span class="icon">📈</span>본사 대시보드<span class="nav-badge" style="background:#4A90E2;font-size:8px;padding:1px 5px">HQ</span>
+      </div>
+      <div class="nav-item admin-only" onclick="showPanel('register',this)" id="navRegister" style="display:none;">
+        <span class="icon">➕</span>업체 등록<span class="nav-badge" style="background:#05C46B;color:#000;font-size:8px;padding:1px 5px">NEW</span>
+      </div>
+      <div class="nav-item admin-only" onclick="showPanel('admin',this)" style="display:none;">
+        <span class="icon">⚙️</span>시세 관리<span class="nav-badge" style="background:#9B59B6;font-size:8px;padding:1px 5px">관리자</span>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <button id="logoutBtn" onclick="doLogout()" style="display:none;width:100%;background:#FFF5F5;border:1.5px solid #FFB3B3;color:#C0392B;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:var(--font-body);">
@@ -1005,11 +1003,12 @@
           </div>
           <div class="map-filters">
             <div class="filter-chip active" onclick="toggleFilter(this,'all')">전체</div>
-            <div class="filter-chip" onclick="toggleFilter(this,'low')">⚠️ 재고부족</div>
-            <div class="filter-chip" onclick="toggleFilter(this,'waste')">♻️ 폐유대기</div>
-            <div class="filter-chip" onclick="toggleFilter(this,'ok')">✅ 정상</div>
+            <div class="filter-chip" onclick="openFilterSheet('low')">⚠️ 재고부족</div>
+            <div class="filter-chip" onclick="openFilterSheet('waste')">♻️ 폐유대기</div>
+            <div class="filter-chip" onclick="openFilterSheet('action')">🚨 조치필요</div>
           </div>
-          <div class="business-list" id="bizList"></div>
+          <!-- 데스크탑 업체 리스트 (모바일에서는 숨김) -->
+          <div class="business-list desktop-only" id="bizList"></div>
         </div>
         <div class="map-wrap">
           <div id="naverMap"></div>
@@ -2598,7 +2597,7 @@ function showPanel(id, navEl, pushState=true) {
   }
 
   // 페이지 타이틀
-  const titles = { 'owner-dash':'📊 대시보드', dashboard:'📊 관리자 대시보드', map:'🗺️ 원주 지도 현황', waste:'♻️ 수거 신청', order:'🫙 발주 신청', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', 'hq-login':'🏢 관리자 로그인', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 재고 입력', apply:'🏫 수거 신청 관리' };
+  const titles = { 'owner-dash':'📊 대시보드', dashboard:'📊 관리자 대시보드', map:'🗺️ 원주 지도 현황', waste:'♻️ 수거 신청', order:'🫙 발주 신청', history:'📋 진행 이력', price:'💹 가격변동 이력', esg:'🌿 ESG 포인트', owner:'🏪 업주 전용', hq:'🏢 본사 통합 대시보드', 'hq-login':'🏢 관리자 로그인', admin:'⚙️ 시세 관리', register:'➕ 업체 등록', delivery:'🚛 납품 처리', qr:'📱 재고 입력', apply:'🏫 수거 신청 관리', billing:'💰 정산 관리' };
   const title = titles[id] || '';
   const titleEl = document.getElementById('page-title-text');
   if (titleEl) titleEl.textContent = title;
@@ -2611,6 +2610,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'dashboard') { updateDashboard(); }
   if (id === 'map')       { setTimeout(() => { if (!mapInitialized) initNaverMap(); else renderBizList(); if (kakaoMap) kakaoMap.relayout?.(); }, 80); }
   if (id === 'waste')     { renderWasteTable(); }
+  if (id === 'billing')   { initBillingMonthSel && initBillingMonthSel(); renderBilling && renderBilling(); }
   if (id === 'order')     { renderDeliveryPanel && renderDeliveryPanel(); updateOrderMonthStats && updateOrderMonthStats(); }
   if (id === 'history')   { renderHistory(); }
   if (id === 'price')     { renderPricePage(); }
@@ -4246,17 +4246,17 @@ function renderRegBizList() {
     return;
   }
   container.innerHTML = businesses.map(b => `
-    <div style="background:var(--white);border-radius:var(--radius-sm);padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;">
-      <div style="width:36px;height:36px;background:${b.newOil<=2?'var(--red-accent)':b.wasteOil>=5?'#FF8C00':'var(--green-main)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏪</div>
+    <div style="background:var(--white);border-radius:var(--radius-sm);padding:12px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div style="width:34px;height:34px;background:${b.newOil<=2?'var(--red-accent)':b.wasteOil>=5?'#FF8C00':'var(--green-main)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🏪</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:13px;letter-spacing:-0.01em;">${b.name}</div>
-        <div style="font-size:11px;color:var(--gray);margin-top:1px;">${b.type} · ${b.addr || b.lat.toFixed(4)+', '+b.lng.toFixed(4)}</div>
+        <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.name}</div>
+        <div style="font-size:10px;color:var(--gray);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.type} · ${b.addr ? b.addr.substring(0,20) : b.lat.toFixed(3)+','+b.lng.toFixed(3)}</div>
       </div>
-      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
-        <div style="font-size:10px;background:var(--green-pale);color:var(--green-dark);padding:3px 8px;border-radius:6px;font-weight:700;">새유 ${b.newOil}캔</div>
-        <div style="font-size:10px;background:#FFF8F0;color:#D4621A;padding:3px 8px;border-radius:6px;font-weight:700;">폐유 ${b.wasteOil}캔</div>
-        <div style="font-size:10px;padding:3px 8px;border-radius:6px;font-weight:700;${b.auto ? 'background:#E8F5E9;color:#2E7D32;' : 'background:#f5f5f5;color:#999;'}">${b.auto ? '⚡자동발주' : '수동'}</div>
-        <button onclick="showBizCredentials(${b.id})" style="background:#EEF4FF;border:none;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11px;color:#185FA5;">🔑 ID/PW</button>
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+        <span style="font-size:10px;background:var(--green-pale);color:var(--green-dark);padding:3px 7px;border-radius:5px;font-weight:700;white-space:nowrap;">새유 ${b.newOil}캔</span>
+        <span style="font-size:10px;background:#FFF8F0;color:#D4621A;padding:3px 7px;border-radius:5px;font-weight:700;white-space:nowrap;">폐유 ${b.wasteOil}캔</span>
+        <span style="font-size:10px;padding:3px 7px;border-radius:5px;font-weight:700;white-space:nowrap;${b.auto?'background:#E8F5E9;color:#2E7D32;':'background:#f5f5f5;color:#999;'}">${b.auto?'⚡자동':'수동'}</span>
+        <button onclick="showBizCredentials(${b.id})" style="background:#EEF4FF;border:none;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11px;color:#185FA5;white-space:nowrap;">🔑 ID/PW</button>
         <button onclick="deleteBiz(${b.id})" style="background:#f5f5f5;border:none;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11px;color:var(--gray);">삭제</button>
       </div>
     </div>
@@ -5839,101 +5839,42 @@ function hqAdminLogin() {
 function updateNavByMode() {
   var isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
 
-  // 업주 전용
-  document.querySelectorAll('.owner-only').forEach(el => { el.style.display = ownerLoggedIn ? '' : 'none'; });
-  // 운반자 전용
-  document.querySelectorAll('.driver-only').forEach(el => { el.style.display = isDriverMode ? '' : 'none'; });
-  // 관리자 전용
+  // 사이드바 logged-only 메뉴
+  document.querySelectorAll('.logged-only').forEach(el => {
+    el.style.display = isLogged ? '' : 'none';
+  });
+
+  // admin-only 메뉴
   document.querySelectorAll('.admin-only').forEach(el => {
     if (el.classList.contains('nav-badge')) return;
     el.style.display = isAdminMode ? '' : 'none';
   });
 
-  // 로그인 버튼들
-  ['navOwnerLogin','navDriverLogin','navHqLogin','navLoginLabel'].forEach(function(id) {
+  // 로그인 버튼들: 로그인 상태면 숨김
+  ['navOwnerLogin', 'navDriverLogin', 'navHqLogin', 'navLoginLabel'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.display = isLogged ? 'none' : '';
   });
 
+  // 로그아웃 버튼
   var logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) logoutBtn.style.display = isLogged ? '' : 'none';
 
+  // 사이드바 푸터 역할
   var roleEl = document.getElementById('sidebarRole');
   if (roleEl) {
-    if (isAdminMode)        roleEl.textContent = '관리자';
-    else if (isDriverMode)  roleEl.textContent = '운반자';
+    if (isAdminMode)       roleEl.textContent = '관리자';
+    else if (isDriverMode) roleEl.textContent = '운반자';
     else if (ownerLoggedIn) roleEl.textContent = '업주';
     else roleEl.textContent = '로그인 후 이용';
   }
 
-  updateBottomTab();
-}
-
-function updateBottomTab() {
-  const bar = document.getElementById('bottomTabBar');
-  if (!bar) return;
-  const isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
-
-  if (!isLogged) {
-    bar.innerHTML = `
-      <button class="tab-item active" onclick="showPanelMobile('owner-dash',this)">
-        <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('owner-login',this)">
-        <span class="tab-icon">🏪</span><span class="tab-label">업주</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('driver-login',this)">
-        <span class="tab-icon">🚛</span><span class="tab-label">운반자</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('hq-login',this)">
-        <span class="tab-icon">🏢</span><span class="tab-label">관리자</span>
-      </button>`;
-  } else if (ownerLoggedIn) {
-    bar.innerHTML = `
-      <button class="tab-item" onclick="showPanelMobile('qr',this)">
-        <span class="tab-icon">📱</span><span class="tab-label">재고입력</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('waste',this)">
-        <span class="tab-icon">♻️</span><span class="tab-label">수거신청</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('order',this)">
-        <span class="tab-icon">🫙</span><span class="tab-label">발주신청</span>
-      </button>
-      <button class="tab-item" onclick="toggleSidebar()">
-        <span class="tab-icon">☰</span><span class="tab-label">메뉴</span>
-      </button>`;
-  } else if (isDriverMode) {
-    bar.innerHTML = `
-      <button class="tab-item" onclick="showPanelMobile('waste',this)">
-        <span class="tab-icon">♻️</span><span class="tab-label">수거</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('order',this)">
-        <span class="tab-icon">🫙</span><span class="tab-label">납품</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('map',this)">
-        <span class="tab-icon">🗺️</span><span class="tab-label">지도</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('dashboard',this)">
-        <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
-      </button>`;
-  } else if (isAdminMode) {
-    bar.innerHTML = `
-      <button class="tab-item" onclick="showPanelMobile('dashboard',this)">
-        <span class="tab-icon">📊</span><span class="tab-label">대시보드</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('map',this)">
-        <span class="tab-icon">🗺️</span><span class="tab-label">지도</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('order',this)">
-        <span class="tab-icon">🫙</span><span class="tab-label">납품</span>
-      </button>
-      <button class="tab-item" onclick="showPanelMobile('waste',this)">
-        <span class="tab-icon">♻️</span><span class="tab-label">수거</span>
-      </button>
-      <button class="tab-item" onclick="toggleSidebar()">
-        <span class="tab-icon">☰</span><span class="tab-label">메뉴</span>
-      </button>`;
-  }
+  // 모바일 하단 탭바
+  document.querySelectorAll('.tab-logged-only').forEach(el => {
+    el.style.display = isLogged ? '' : 'none';
+  });
+  var tabLoginBtn = document.getElementById('tab-login');
+  if (tabLoginBtn) tabLoginBtn.style.display = isLogged ? 'none' : '';
 }
 
 // ===== 업주 로그인 =====
@@ -6187,6 +6128,203 @@ function updateApplyKpi() {
     history.replaceState({ panel: 'owner-dash' }, '', '#owner-dash');
   }
 })();
+
+// ============================================================
+// 사이드바 메뉴 & 탭바 제어
+// ============================================================
+function updateNavByMode() {
+  var isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
+  document.querySelectorAll('.owner-only').forEach(el => { el.style.display = ownerLoggedIn ? '' : 'none'; });
+  document.querySelectorAll('.driver-only').forEach(el => { el.style.display = isDriverMode ? '' : 'none'; });
+  document.querySelectorAll('.admin-only').forEach(el => {
+    if (el.classList.contains('nav-badge')) return;
+    el.style.display = isAdminMode ? '' : 'none';
+  });
+  ['navOwnerLogin','navDriverLogin','navHqLogin','navLoginLabel'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = isLogged ? 'none' : '';
+  });
+  var logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) logoutBtn.style.display = isLogged ? '' : 'none';
+  var roleEl = document.getElementById('sidebarRole');
+  if (roleEl) {
+    if (isAdminMode)        roleEl.textContent = '관리자';
+    else if (isDriverMode)  roleEl.textContent = '운반자';
+    else if (ownerLoggedIn) roleEl.textContent = '업주';
+    else roleEl.textContent = '로그인 후 이용';
+  }
+  updateBottomTab();
+}
+
+function updateBottomTab() {
+  const bar = document.getElementById('bottomTabBar');
+  if (!bar) return;
+  const isLogged = ownerLoggedIn || isAdminMode || isDriverMode;
+  if (!isLogged) {
+    bar.innerHTML = `
+      <button class="tab-item active" onclick="showPanelMobile('owner-dash',this)"><span class="tab-icon">📊</span><span class="tab-label">대시보드</span></button>
+      <button class="tab-item" onclick="showPanelMobile('owner-login',this)"><span class="tab-icon">🏪</span><span class="tab-label">업주</span></button>
+      <button class="tab-item" onclick="showPanelMobile('driver-login',this)"><span class="tab-icon">🚛</span><span class="tab-label">운반자</span></button>
+      <button class="tab-item" onclick="showPanelMobile('hq-login',this)"><span class="tab-icon">🏢</span><span class="tab-label">관리자</span></button>`;
+  } else if (ownerLoggedIn) {
+    bar.innerHTML = `
+      <button class="tab-item" onclick="showPanelMobile('qr',this)"><span class="tab-icon">📱</span><span class="tab-label">재고입력</span></button>
+      <button class="tab-item" onclick="showPanelMobile('waste',this)"><span class="tab-icon">♻️</span><span class="tab-label">수거신청</span></button>
+      <button class="tab-item" onclick="showPanelMobile('order',this)"><span class="tab-icon">🫙</span><span class="tab-label">발주신청</span></button>
+      <button class="tab-item" onclick="toggleSidebar()"><span class="tab-icon">☰</span><span class="tab-label">메뉴</span></button>`;
+  } else if (isDriverMode) {
+    bar.innerHTML = `
+      <button class="tab-item" onclick="showPanelMobile('waste',this)"><span class="tab-icon">♻️</span><span class="tab-label">수거</span></button>
+      <button class="tab-item" onclick="showPanelMobile('order',this)"><span class="tab-icon">🫙</span><span class="tab-label">납품</span></button>
+      <button class="tab-item" onclick="showPanelMobile('map',this)"><span class="tab-icon">🗺️</span><span class="tab-label">지도</span></button>
+      <button class="tab-item" onclick="showPanelMobile('dashboard',this)"><span class="tab-icon">📊</span><span class="tab-label">대시보드</span></button>`;
+  } else if (isAdminMode) {
+    bar.innerHTML = `
+      <button class="tab-item" onclick="showPanelMobile('dashboard',this)"><span class="tab-icon">📊</span><span class="tab-label">대시보드</span></button>
+      <button class="tab-item" onclick="showPanelMobile('map',this)"><span class="tab-icon">🗺️</span><span class="tab-label">지도</span></button>
+      <button class="tab-item" onclick="showPanelMobile('order',this)"><span class="tab-icon">🫙</span><span class="tab-label">납품</span></button>
+      <button class="tab-item" onclick="showPanelMobile('waste',this)"><span class="tab-icon">♻️</span><span class="tab-label">수거</span></button>
+      <button class="tab-item" onclick="toggleSidebar()"><span class="tab-icon">☰</span><span class="tab-label">메뉴</span></button>`;
+  }
+}
+
+// ============================================================
+// 지도 필터 바텀시트
+// ============================================================
+function openFilterSheet(filter) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  currentFilter = filter;
+  renderBizList(filter);
+
+  const labels = { low:'⚠️ 재고부족', waste:'♻️ 폐유대기', action:'🚨 조치필요', all:'전체' };
+  let data = businesses;
+  if (filter === 'low')    data = data.filter(b => b.newOil <= 2);
+  if (filter === 'waste')  data = data.filter(b => b.wasteOil >= 1);
+  if (filter === 'action') data = data.filter(b => b.newOil <= 2 || b.wasteOil >= 1);
+
+  const title = document.getElementById('filterSheetTitle');
+  const sub   = document.getElementById('filterSheetSub');
+  const list  = document.getElementById('filterSheetList');
+  if (title) title.textContent = labels[filter] || '업체 목록';
+  if (sub)   sub.textContent   = `총 ${data.length}개 업체`;
+
+  if (list) {
+    if (data.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);"><div style="font-size:32px;margin-bottom:10px;">✅</div>해당 조건 업체 없음</div>';
+    } else {
+      list.innerHTML = data.map(b => {
+        const needD = b.newOil <= 2, needW = b.wasteOil >= 1;
+        return `<div onclick="closeFilterSheet();selectBizFromList(${b.id});" style="display:flex;align-items:center;gap:12px;padding:13px 6px;border-bottom:1px solid var(--gray-light);cursor:pointer;">
+          <div style="width:40px;height:40px;min-width:40px;border-radius:12px;background:${needD?'#FFEBEE':'#FFF8F0'};display:flex;align-items:center;justify-content:center;font-size:20px;">${needD?'⚠️':'♻️'}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:14px;">${b.name}</div>
+            <div style="font-size:11px;color:var(--gray);margin-top:2px;">${b.type}</div>
+            <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;">
+              ${needD?`<span style="background:#FFEBEE;color:var(--red-accent);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">⚡재고 ${b.newOil}캔</span>`:''}
+              ${needW?`<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">♻️폐유 ${b.wasteOil}캔</span>`:''}
+            </div>
+          </div>
+          <div style="font-size:18px;color:var(--gray);">›</div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  const sheet = document.getElementById('filterSheet');
+  const backdrop = document.getElementById('filterSheetBackdrop');
+  sheet.style.display = 'flex';
+  backdrop.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => { sheet.style.transform = 'translateY(0)'; }));
+}
+
+function closeFilterSheet() {
+  const sheet = document.getElementById('filterSheet');
+  const backdrop = document.getElementById('filterSheetBackdrop');
+  if (sheet) sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => {
+    if (sheet) sheet.style.display = 'none';
+    if (backdrop) backdrop.style.display = 'none';
+  }, 300);
+}
+
+// ============================================================
+// 정산 시스템
+// ============================================================
+var billingData = JSON.parse(localStorage.getItem('hiveoil_billing')||'{}');
+function saveBillingData(){try{localStorage.setItem('hiveoil_billing',JSON.stringify(billingData));}catch(e){}}
+function getBillingKey(bizId,month){return bizId+'_'+month;}
+
+function initBillingMonthSel(){
+  const sel=document.getElementById('billingMonthSel');if(!sel)return;
+  const now=new Date();sel.innerHTML='';
+  for(let i=0;i<6;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const val=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0');
+    const opt=document.createElement('option');opt.value=val;opt.textContent=val+(i===0?' (이번달)':' ('+i+'개월 전)');sel.appendChild(opt);
+  }
+}
+
+function renderBilling(){
+  const sel=document.getElementById('billingMonthSel');if(!sel)return;
+  const month=sel.value;const[yr,mo]=month.split('.').map(Number);
+  const stats={};
+  businesses.forEach(b=>{stats[b.id]={biz:b,deliveryCnt:0,deliveryAmt:0,wasteCnt:0,wasteAmt:0};});
+  historyData.forEach(h=>{
+    if(!h.rawDate||h.status!=='done')return;
+    const d=new Date(h.rawDate);
+    if(d.getFullYear()!==yr||d.getMonth()+1!==mo)return;
+    const s=stats[h.bizId];if(!s)return;
+    const amt=parseInt((h.amount||'0').replace(/[^0-9]/g,''))||0;
+    if(h.type==='식용유발주'){s.deliveryCnt+=h.qty||0;s.deliveryAmt+=amt;}
+    if(h.type==='폐유수거'){s.wasteCnt+=h.qty||0;s.wasteAmt+=amt;}
+  });
+  const active=Object.values(stats).filter(s=>s.deliveryAmt>0||s.wasteAmt>0);
+  const totalD=active.reduce((a,x)=>a+x.deliveryAmt,0);
+  const totalW=active.reduce((a,x)=>a+x.wasteAmt,0);
+  const totalN=totalD-totalW;
+  const unpaid=active.filter(s=>!(billingData[getBillingKey(s.biz.id,month)]?.paid)).length;
+  const kpi=document.getElementById('billingKpi');
+  if(kpi)kpi.innerHTML=[['📦 총 납품액',totalD.toLocaleString()+'원','var(--green-dark)'],['♻️ 총 수거액',totalW.toLocaleString()+'원','#FF9500'],['💰 상계 후 청구',totalN.toLocaleString()+'원','var(--red-accent)'],['⏳ 미수 업체',unpaid+'곳','#C0392B']].map(([l,v,c])=>`<div style="background:var(--white);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);text-align:center;"><div style="font-size:11px;color:var(--gray);margin-bottom:4px;">${l}</div><div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:${c};">${v}</div></div>`).join('');
+  const listEl=document.getElementById('billingList');if(!listEl)return;
+  if(active.length===0){listEl.innerHTML='<div style="text-align:center;padding:60px;color:var(--gray);"><div style="font-size:36px;margin-bottom:12px;">📭</div><div>'+month+' 정산 대상 거래가 없어요</div></div>';return;}
+  listEl.innerHTML=active.map(s=>{
+    const key=getBillingKey(s.biz.id,month);const bd=billingData[key]||{};
+    const net=s.deliveryAmt-s.wasteAmt;const taxIssued=bd.taxInvoice||false,paid=bd.paid||false;
+    return`<div style="background:var(--white);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px;border-left:4px solid ${paid?'var(--green-main)':net>0?'var(--red-accent)':'var(--gray-light)'};">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="font-family:var(--font-display);font-size:15px;font-weight:800;">${s.biz.name}</div>
+        <div style="font-size:11px;color:var(--gray);">${s.biz.type}</div>
+        <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">
+          ${taxIssued?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">✅ 계산서발행</span>':'<span style="background:#FFF8F0;color:#D4621A;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">📄 미발행</span>'}
+          ${paid?'<span style="background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">✅ 입금완료</span>':'<span style="background:#FFEBEE;color:#C0392B;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">⏳ 미수</span>'}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+        <div style="background:#F8FFF8;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--gray);margin-bottom:3px;">📦 납품(${s.deliveryCnt}캔)</div><div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--green-dark);">+${s.deliveryAmt.toLocaleString()}원</div></div>
+        <div style="background:#FFF8F0;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--gray);margin-bottom:3px;">♻️ 수거(${s.wasteCnt}캔)</div><div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:#FF9500;">-${s.wasteAmt.toLocaleString()}원</div></div>
+        <div style="background:${net>0?'#FFEBEE':'#E8F5E9'};border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--gray);margin-bottom:3px;">💰 상계후</div><div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:${net>0?'var(--red-accent)':'var(--green-dark)'};">${net>=0?'+':''}${net.toLocaleString()}원</div></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${!taxIssued?`<button onclick="openHometax(${s.biz.id},'${month}')" style="background:var(--green-main);border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">📄 홈택스 계산서 발행</button>`:`<button onclick="toggleTaxInvoice(${s.biz.id},'${month}',false)" style="background:#F5F5F5;border:1px solid var(--gray-light);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--gray);font-family:var(--font-body);">↩ 발행취소</button>`}
+        ${(taxIssued&&!paid)?`<button onclick="markPaid(${s.biz.id},'${month}',true)" style="background:#185FA5;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;font-family:var(--font-body);">✅ 입금완료</button>`:''}
+        ${paid?`<button onclick="markPaid(${s.biz.id},'${month}',false)" style="background:#F5F5F5;border:1px solid var(--gray-light);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--gray);font-family:var(--font-body);">↩ 미수로 변경</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function openHometax(bizId,month){
+  window.open('https://www.hometax.go.kr/websquare/websquare.wss?w2xPath=/ui/pp/index_pp.xml&menuCd=SX0101','_blank');
+  showToast('t1','📄 홈택스로 이동','발행 후 아래에서 완료 처리해주세요');
+}
+function toggleTaxInvoice(bizId,month,issued){
+  const key=getBillingKey(bizId,month);billingData[key]=billingData[key]||{};billingData[key].taxInvoice=issued;
+  saveBillingData();renderBilling();showToast('t1',issued?'✅ 계산서 발행완료':'↩ 발행취소','정산 현황 업데이트');
+}
+function markPaid(bizId,month,paid){
+  const key=getBillingKey(bizId,month);billingData[key]=billingData[key]||{};billingData[key].paid=paid;
+  if(paid)billingData[key].paidDate=new Date().toISOString().slice(0,10);
+  saveBillingData();renderBilling();showToast('t1',paid?'✅ 입금완료':'↩ 미수로 변경','정산 현황 업데이트');
+}
 
 </script>
 </body>
