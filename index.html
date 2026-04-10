@@ -2059,8 +2059,8 @@
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
           <div style="width:44px;height:44px;background:var(--green-main);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">➕</div>
           <div>
-            <div style="font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:-0.03em;">업체 등록</div>
-            <div style="font-size:12px;color:var(--gray);margin-top:2px;">등록하면 지도에 핀이 생기고 재고 관리가 시작돼요</div>
+            <div style="font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:-0.03em;">🌿 회원가입</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:2px;">가입 후 관리자 승인이 완료되면 서비스를 이용할 수 있어요</div>
           </div>
         </div>
 
@@ -2168,6 +2168,27 @@
             <!-- 미리보기 -->
             <div id="reg_cert_preview" style="display:none;margin-top:10px;text-align:center;">
               <img id="reg_cert_img" src="" style="max-height:120px;border-radius:8px;border:1px solid var(--gray-light);">
+            </div>
+          </div>
+
+          <!-- 로그인 ID / PW 직접 설정 -->
+          <div style="background:#EEF4FF;border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:14px;border:1.5px solid #93C5FD;">
+            <div style="font-size:12px;font-weight:700;color:#185FA5;margin-bottom:12px;">🔐 로그인 계정 설정</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">아이디 <span style="color:var(--red-accent);">*</span></label>
+                <input class="form-input" id="reg_login_id" placeholder="예: 진미통닭01" style="font-size:14px;"
+                  oninput="this.value=this.value.replace(/\s/g,'')">
+                <div style="font-size:10px;color:var(--gray);margin-top:3px;">영문·숫자·한글 가능, 공백 불가</div>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">비밀번호 <span style="color:var(--red-accent);">*</span></label>
+                <input class="form-input" id="reg_login_pw" type="password" placeholder="4자리 이상" style="font-size:14px;">
+                <div style="font-size:10px;color:var(--gray);margin-top:3px;">본인만 아는 비밀번호로 설정하세요</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;padding:8px 12px;background:#DBEAFE;border-radius:7px;font-size:11px;color:#185FA5;">
+              💡 승인 완료 후 이 아이디/비밀번호로 로그인하시면 돼요
             </div>
           </div>
 
@@ -3784,6 +3805,12 @@ function adminSavePrices(btn) {
     changes.length > 0 ? changes.join(' · ') : '현재 시세가 저장됐어요');
 }
 
+// 사업자등록증 이미지 토글
+function toggleCertImage(id) {
+  const el = document.getElementById('cert_' + id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
 function changeAdminPw() {
   const pw = document.getElementById('newAdminPw').value.trim();
   if (!pw || pw.length < 4) { showToast('t1','⚠️ 비밀번호 오류','4자리 이상 입력해주세요'); return; }
@@ -4460,7 +4487,7 @@ function registerBiz() {
   const name     = document.getElementById('reg_name').value.trim();
   const type     = document.getElementById('reg_type').value;
   const owner    = document.getElementById('reg_owner').value.trim();
-  const phone    = document.getElementById('reg_phone').value.trim();
+  const phone    = document.getElementById('reg_phone').value.trim() || (document.getElementById('reg_phone_input')||{value:''}).value.trim();
   const addr     = document.getElementById('reg_addr').value.trim();
   const lat      = parseFloat(document.getElementById('reg_lat').value);
   const lng      = parseFloat(document.getElementById('reg_lng').value);
@@ -4468,6 +4495,14 @@ function registerBiz() {
   const wasteOil = parseInt(document.getElementById('reg_wasteOil').value) || 0;
   const autoOn   = !document.getElementById('regAutoToggle').classList.contains('off');
   const oiltype  = document.getElementById('reg_oiltype').value;
+  const loginId  = (document.getElementById('reg_login_id') || {value:''}).value.trim();
+  const loginPw  = (document.getElementById('reg_login_pw') || {value:''}).value.trim();
+
+  // 업주가 신청할 때 ID/PW 필수
+  if (!isAdminMode) {
+    if (!loginId) { showToast('t1','⚠️ 아이디 필요','로그인 아이디를 입력해주세요'); return; }
+    if (!loginPw || loginPw.length < 4) { showToast('t1','⚠️ 비밀번호 필요','비밀번호를 4자리 이상 입력해주세요'); return; }
+  }
 
   if (!name) { showToast('t1','⚠️ 업체를 검색해서 선택해주세요','위 검색창에서 상호명으로 검색하세요'); return; }
   if (!addr) { showToast('t1','⚠️ 업체를 검색해서 선택해주세요','위 검색창에서 상호명으로 검색하세요'); return; }
@@ -4496,7 +4531,10 @@ function registerBiz() {
       name, type, owner, phone, addr, lat, lng,
       new_oil: newOil, waste_oil: wasteOil,
       oil_type: oiltype, auto: autoOn,
-      status: 'pending', request_date: dateStr
+      status: 'pending', request_date: dateStr,
+      cert_image: regCertBase64 || null,
+      login_id: loginId || null,
+      login_pw: loginPw || null
     };
     // Supabase에 저장 (관리자가 다른 기기에서도 볼 수 있도록)
     db.from('pending_biz').insert(pendingRow).then(({ error }) => {
@@ -4525,6 +4563,17 @@ function approvePendingBiz(id) {
   saveBizToDB(newBiz).then(() => {
     businesses.push(newBiz);
     saveBusinesses();
+    // 업주 계정 저장 (login_id / login_pw)
+    if (p.login_id && p.login_pw) {
+      const customAccounts = JSON.parse(localStorage.getItem('hiveoil_custom_accounts') || '{}');
+      customAccounts[p.login_id] = { pw: p.login_pw, bizId: newBiz.id, name: newBiz.name };
+      localStorage.setItem('hiveoil_custom_accounts', JSON.stringify(customAccounts));
+    } else {
+      // login_id 없으면 기존 방식 (전화번호 뒷 4자리)
+      const overrides = JSON.parse(localStorage.getItem('hiveoil_biz_pw') || '{}');
+      if (p.phone) overrides[String(newBiz.id)] = p.phone.replace(/[^0-9]/g,'').slice(-4);
+      localStorage.setItem('hiveoil_biz_pw', JSON.stringify(overrides));
+    }
     // Supabase에서도 삭제
     db.from('pending_biz').delete().eq('id', id).then(() => {});
     pendingBizData.splice(idx, 1);
@@ -4582,19 +4631,33 @@ function renderPendingBizList() {
     list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:13px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);">✅ 승인 대기 중인 업체가 없어요</div>';
     return;
   }
-  list.innerHTML = pendingBizData.map(p => `
-    <div style="background:var(--white);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid #E65100;display:flex;align-items:center;gap:14px;">
-      <div style="width:38px;height:38px;background:#FFF3E0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏪</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:800;color:var(--black);">${p.name}</div>
-        <div style="font-size:11px;color:var(--gray);margin-top:2px;">${p.type} · ${p.addr}</div>
-        <div style="font-size:10px;color:var(--gray);margin-top:2px;">담당자: ${p.owner||'—'} · ${p.phone||'—'} · 신청일 ${p.requestDate}</div>
+  list.innerHTML = pendingBizData.map(p => {
+    const dateStr = p.request_date || p.requestDate || (p.created_at ? p.created_at.slice(0,10) : '—');
+    const hasCert = p.cert_image && p.cert_image.length > 0;
+    return `
+    <div style="background:var(--white);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid #E65100;">
+      <div style="display:flex;align-items:flex-start;gap:14px;">
+        <div style="width:38px;height:38px;background:#FFF3E0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏪</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:800;color:var(--black);">${p.name}</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:2px;">${p.type} · ${p.addr}</div>
+          <div style="font-size:10px;color:var(--gray);margin-top:2px;">담당자: ${p.owner||'—'} · ${p.phone||'—'} · 신청일 ${dateStr}</div>
+          ${hasCert ? `
+          <div style="margin-top:8px;">
+            <button onclick="toggleCertImage(${p.id})" style="background:#EEF4FF;border:none;border-radius:6px;padding:4px 10px;font-size:11px;color:#185FA5;cursor:pointer;font-family:var(--font-body);">📄 사업자등록증 보기</button>
+            <div id="cert_${p.id}" style="display:none;margin-top:8px;">
+              <img src="${p.cert_image}" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid var(--gray-light);cursor:pointer;" onclick="window.open('${p.cert_image}','_blank')">
+              <div style="font-size:10px;color:var(--gray);margin-top:4px;">클릭하면 크게 볼 수 있어요</div>
+            </div>
+          </div>` : '<div style="font-size:10px;color:#aaa;margin-top:6px;">📄 사업자등록증 미첨부</div>'}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <button onclick="approvePendingBiz(${p.id})" style="background:var(--green-main);border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:800;color:#0D0D0D;cursor:pointer;">✅ 승인</button>
+          <button onclick="rejectPendingBiz(${p.id})" style="background:#FFF5F5;border:1.5px solid #FFB3B3;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;color:#C0392B;cursor:pointer;">❌ 반려</button>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-        <button onclick="approvePendingBiz(${p.id})" style="background:var(--green-main);border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:800;color:#0D0D0D;cursor:pointer;">✅ 승인</button>
-        <button onclick="rejectPendingBiz(${p.id})" style="background:#FFF5F5;border:1.5px solid #FFB3B3;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;color:#C0392B;cursor:pointer;">❌ 반려</button>
-      </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function updateRegisterBadge() {
@@ -4652,6 +4715,10 @@ function clearRegForm() {
   });
   const phoneInput = document.getElementById('reg_phone_input');
   if (phoneInput) phoneInput.value = '';
+  const loginId = document.getElementById('reg_login_id');
+  if (loginId) loginId.value = '';
+  const loginPw = document.getElementById('reg_login_pw');
+  if (loginPw) loginPw.value = '';
   const searchInput = document.getElementById('kakao_search_input');
   if (searchInput) searchInput.value = '';
   const results = document.getElementById('kakaoResults');
@@ -6404,13 +6471,25 @@ function updateNavByMode() {
 
 // ===== 업주 로그인 =====
 function doOwnerLogin() {
-  var id  = (document.getElementById('ownerLoginId') || {value:''}).value.trim().toUpperCase();
+  var id  = (document.getElementById('ownerLoginId') || {value:''}).value.trim();
   var pw  = (document.getElementById('ownerLoginPw') || {value:''}).value.trim();
-  var acct = buildOwnerAccounts()[id];
-  if (!acct || acct.pw !== pw) {
-    showToast('t1','❌ 로그인 실패','아이디 또는 비밀번호를 확인해주세요');
-    return;
+
+  // 1. 직접 설정한 ID/PW 먼저 체크
+  var customAccounts = JSON.parse(localStorage.getItem('hiveoil_custom_accounts') || '{}');
+  var customAcct = customAccounts[id];
+  var acct = null;
+
+  if (customAcct && customAcct.pw === pw) {
+    acct = { bizId: customAcct.bizId, name: customAcct.name };
+  } else {
+    // 2. 기존 WJ 코드 방식 (대문자)
+    acct = buildOwnerAccounts()[id.toUpperCase()];
+    if (!acct || acct.pw !== pw) {
+      showToast('t1','❌ 로그인 실패','아이디 또는 비밀번호를 확인해주세요');
+      return;
+    }
   }
+
   ownerLoggedIn = true;
   ownerBizId    = acct.bizId;
   var biz = businesses.find(function(b){ return b.id === acct.bizId; });
