@@ -4614,20 +4614,19 @@ function approvePendingBiz(id) {
     newOil: p.new_oil !== undefined ? p.new_oil : (p.newOil || 5), maxNew: 10,
     wasteOil: p.new_oil !== undefined ? p.waste_oil : (p.wasteOil || 0),
     oiltype: p.oil_type || p.oiltype || '대두유',
-    auto: p.auto, lastUpdate: '방금 승인됨' };
+    auto: p.auto, lastUpdate: '방금 승인됨',
+    // 로그인 계정 정보를 업체 객체에 포함 → DB에 함께 저장
+    loginId: p.login_id || null,
+    loginPw: p.login_pw || (p.phone ? p.phone.replace(/[^0-9]/g,'').slice(-4) : null),
+  };
   saveBizToDB(newBiz).then(() => {
     businesses.push(newBiz);
     saveBusinesses();
-    // 업주 계정 저장 (login_id / login_pw)
-    if (p.login_id && p.login_pw) {
+    // localStorage에도 보조 저장 (같은 기기에서 빠른 접근용)
+    if (newBiz.loginId && newBiz.loginPw) {
       const customAccounts = JSON.parse(localStorage.getItem('hiveoil_custom_accounts') || '{}');
-      customAccounts[p.login_id] = { pw: p.login_pw, bizId: newBiz.id, name: newBiz.name };
+      customAccounts[newBiz.loginId] = { pw: newBiz.loginPw, bizId: newBiz.id, name: newBiz.name };
       localStorage.setItem('hiveoil_custom_accounts', JSON.stringify(customAccounts));
-    } else {
-      // login_id 없으면 기존 방식 (전화번호 뒷 4자리)
-      const overrides = JSON.parse(localStorage.getItem('hiveoil_biz_pw') || '{}');
-      if (p.phone) overrides[String(newBiz.id)] = p.phone.replace(/[^0-9]/g,'').slice(-4);
-      localStorage.setItem('hiveoil_biz_pw', JSON.stringify(overrides));
     }
     // Supabase에서도 삭제
     db.from('pending_biz').delete().eq('id', id).then(() => {});
@@ -5423,6 +5422,8 @@ function dbRowToBiz(row) {
     oiltype: row.oil_type || '대두유',
     auto: row.auto_order !== false,
     lastUpdate: row.last_update || '—',
+    loginId: row.login_id || null,
+    loginPw: row.login_pw || null,
   };
 }
 
@@ -5458,6 +5459,8 @@ async function saveBizToDB(biz) {
     oil_type: biz.oiltype || '대두유',
     auto_order: biz.auto !== false,
     last_update: biz.lastUpdate || '방금 등록',
+    login_id: biz.loginId || null,
+    login_pw: biz.loginPw || null,
   };
   try {
     const { data, error } = await db.from('businesses').insert([row]).select().single();
@@ -6617,7 +6620,7 @@ function doOwnerLogin() {
   var id  = (document.getElementById('ownerLoginId') || {value:''}).value.trim();
   var pw  = (document.getElementById('ownerLoginPw') || {value:''}).value.trim();
 
-  // 1. 직접 설정한 ID/PW 먼저 체크
+  // 1. 직접 설정한 ID/PW 먼저 체크 (localStorage 캐시)
   var customAccounts = JSON.parse(localStorage.getItem('hiveoil_custom_accounts') || '{}');
   var customAcct = customAccounts[id];
   var acct = null;
@@ -6625,11 +6628,20 @@ function doOwnerLogin() {
   if (customAcct && customAcct.pw === pw) {
     acct = { bizId: customAcct.bizId, name: customAcct.name };
   } else {
-    // 2. 기존 WJ 코드 방식 (대문자)
-    acct = buildOwnerAccounts()[id.toUpperCase()];
-    if (!acct || acct.pw !== pw) {
-      showToast('t1','❌ 로그인 실패','아이디 또는 비밀번호를 확인해주세요');
-      return;
+    // 2. DB에서 로드된 businesses 배열의 loginId/loginPw 체크 (크로스 디바이스)
+    var dbAcct = businesses.find(function(b) { return b.loginId && b.loginId === id && b.loginPw === pw; });
+    if (dbAcct) {
+      acct = { bizId: dbAcct.id, name: dbAcct.name };
+      // 이 기기 localStorage에도 캐싱 (다음 로그인 빠르게)
+      customAccounts[id] = { pw: pw, bizId: dbAcct.id, name: dbAcct.name };
+      localStorage.setItem('hiveoil_custom_accounts', JSON.stringify(customAccounts));
+    } else {
+      // 3. 기존 WJ 코드 방식 (대문자)
+      acct = buildOwnerAccounts()[id.toUpperCase()];
+      if (!acct || acct.pw !== pw) {
+        showToast('t1','❌ 로그인 실패','아이디 또는 비밀번호를 확인해주세요');
+        return;
+      }
     }
   }
 
