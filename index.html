@@ -2,7 +2,17 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="식용유니버스">
+<meta name="application-name" content="식용유니버스">
+<meta name="theme-color" content="#05C46B">
+<meta name="description" content="HIVE 식용유니버스 — 원주시 식용유 납품·폐유 수거 ESG 플랫폼">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 <title>식용유니버스 HIVE — 원주 베타</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -4963,6 +4973,46 @@ const SUPABASE_URL = 'https://ucryeuylztknvoggidix.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjcnlldXlsenRrbnZvZ2dpZGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzYzMDgsImV4cCI6MjA5MDUxMjMwOH0.yx-jOKTkeRSh5JIMP0JClMEBJGY16mbQ6uw4Eb_PVyw';
 var db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ── DB 접근 권한 게이트 (비인가 접근 차단) ──────────────
+// anon key는 공개 가능하지만, 쓰기 작업은 반드시 로그인 상태에서만 허용
+function isAuthorizedForWrite() {
+  return isAdminMode || isDriverMode || ownerLoggedIn;
+}
+function isAuthorizedForAdminWrite() {
+  return isAdminMode;
+}
+
+// DB 쓰기 래퍼 — 권한 없으면 차단
+async function dbSafeInsert(table, data) {
+  if (!isAuthorizedForWrite()) {
+    console.warn('[SECURITY] 비인가 DB 쓰기 시도 차단:', table);
+    return { error: { message: '로그인이 필요합니다.' } };
+  }
+  return await db.from(table).insert(data);
+}
+async function dbSafeUpdate(table, data, match) {
+  if (!isAuthorizedForWrite()) {
+    console.warn('[SECURITY] 비인가 DB 수정 시도 차단:', table);
+    return { error: { message: '로그인이 필요합니다.' } };
+  }
+  return await db.from(table).update(data).match(match);
+}
+async function dbSafeDelete(table, match) {
+  if (!isAuthorizedForAdminWrite()) {
+    console.warn('[SECURITY] 관리자 권한 필요 — DB 삭제 차단:', table);
+    return { error: { message: '관리자 권한이 필요합니다.' } };
+  }
+  return await db.from(table).delete().match(match);
+}
+async function dbSafeUpsert(table, data) {
+  if (!isAuthorizedForWrite()) {
+    console.warn('[SECURITY] 비인가 DB upsert 시도 차단:', table);
+    return { error: { message: '로그인이 필요합니다.' } };
+  }
+  return await db.from(table).upsert(data);
+}
+// ────────────────────────────────────────────────────────
+
 // ─── 업체 데이터 로드 (DB 우선, 실패 시 localStorage) ───
 async function loadBusinessesFromDB() {
   try {
@@ -6630,6 +6680,63 @@ function markPaid(bizId,month,paid){
   saveBillingData();renderBilling();showToast('t1',paid?'✅ 입금완료':'↩ 미수로 변경','정산 현황 업데이트');
 }
 
+// ============================================================
+// PWA — Service Worker 등록
+// ============================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/HIVEOIL/sw.js')
+      .then(reg => console.log('[PWA] Service Worker 등록 완료:', reg.scope))
+      .catch(err => console.warn('[PWA] Service Worker 등록 실패:', err));
+  });
+}
+
+// PWA 설치 배너 (홈화면 추가 유도)
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // 3초 후 설치 안내 토스트
+  setTimeout(() => {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.style.display = 'flex';
+  }, 3000);
+});
+window.addEventListener('appinstalled', () => {
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.style.display = 'none';
+  deferredPrompt = null;
+  showToast('t1','📱 앱 설치 완료!','홈 화면에서 바로 실행하세요');
+});
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(result => {
+    if (result.outcome === 'accepted') {
+      showToast('t1','📱 설치 중...','잠시 후 홈 화면에 추가돼요');
+    }
+    deferredPrompt = null;
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.style.display = 'none';
+  });
+}
+function dismissInstallBanner() {
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.style.display = 'none';
+}
+
 </script>
+
+<!-- PWA 설치 배너 (Android Chrome) -->
+<div id="pwa-install-banner" style="display:none;position:fixed;bottom:70px;left:12px;right:12px;background:#1F4D30;color:#fff;border-radius:14px;padding:12px 16px;z-index:9999;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+  <div style="font-size:24px;flex-shrink:0;">📱</div>
+  <div style="flex:1;">
+    <div style="font-weight:700;font-size:13px;">앱으로 설치하기</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">홈 화면에 추가하면 더 빠르게 접속해요</div>
+  </div>
+  <button onclick="installPWA()" style="background:#05C46B;border:none;border-radius:8px;padding:8px 14px;color:#000;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);flex-shrink:0;">설치</button>
+  <button onclick="dismissInstallBanner()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:18px;cursor:pointer;padding:0;line-height:1;">✕</button>
+</div>
+
 </body>
 </html>
