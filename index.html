@@ -822,7 +822,7 @@
               </button>
             </a>
             <button style="background:#0D0D0D;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font-body);" onclick="window.location.hash='register';showPanel('register',null);">
-              ➕ 업체 등록
+              🌿 회원가입
             </button>
           </div>
           <!-- 푸터 링크 -->
@@ -848,21 +848,28 @@
         </div>
         <div class="card" style="padding:26px;">
           <div class="form-group">
-            <label class="form-label">업체 아이디</label>
-            <input class="form-input" id="ownerLoginId" placeholder="예: WJ-001" style="font-size:14px;"
+            <label class="form-label">아이디</label>
+            <input class="form-input" id="ownerLoginId" placeholder="가입 시 설정한 아이디" style="font-size:14px;"
               onkeydown="if(event.key==='Enter')document.getElementById('ownerLoginPw').focus()">
           </div>
           <div class="form-group">
             <label class="form-label">비밀번호</label>
-            <input class="form-input" id="ownerLoginPw" type="password" placeholder="핸드폰 번호 뒷 4자리" style="font-size:14px;"
+            <input class="form-input" id="ownerLoginPw" type="password" placeholder="가입 시 설정한 비밀번호" style="font-size:14px;"
               onkeydown="if(event.key==='Enter')doOwnerLogin()">
           </div>
           <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px;" onclick="doOwnerLogin()">🔐 로그인</button>
-          <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--gray);">
-            등록 문의: <span style="color:var(--green-main);font-weight:700;cursor:pointer;" onclick="showToast('t1','📞 담당자 문의','원주 HIVE 010-9123-7042')">담당자에게 연락</span>
+
+          <!-- 회원가입 링크 -->
+          <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--gray-light);">
+            <span style="font-size:12px;color:var(--gray);">아직 회원이 아니신가요?</span>
+            <button onclick="showPanel('register',null)" style="background:none;border:none;color:var(--green-dark);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);margin-left:6px;text-decoration:underline;">
+              🌿 회원가입 →
+            </button>
+          </div>
+          <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--gray);">
+            문의: <span style="color:var(--green-main);font-weight:700;cursor:pointer;" onclick="showToast('t1','📞 담당자 문의','원주 HIVE 010-9123-7042')">010-9123-7042</span>
           </div>
         </div>
-        
       </div>
     </div>
 
