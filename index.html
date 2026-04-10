@@ -2143,6 +2143,34 @@
             </div>
           </div>
 
+          <!-- 전화번호 + 사업자등록증 -->
+          <div style="background:var(--cream);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:14px;border:1px solid var(--gray-light);">
+            <div style="font-size:12px;font-weight:700;margin-bottom:12px;">📋 인증 정보</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">대표자 연락처 <span style="color:var(--red-accent);">*</span></label>
+                <input class="form-input" id="reg_phone_input" type="tel" placeholder="010-0000-0000"
+                  oninput="document.getElementById('reg_phone').value=this.value"
+                  style="font-size:14px;">
+                <div style="font-size:10px;color:var(--gray);margin-top:3px;">로그인 비밀번호(뒷 4자리)로 사용돼요</div>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">사업자등록증 <span style="color:var(--gray);">(선택)</span></label>
+                <label for="reg_biz_cert" style="display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px dashed var(--gray-light);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all 0.2s;"
+                  onmouseover="this.style.borderColor='var(--green-main)'" onmouseout="this.style.borderColor='var(--gray-light)'" id="reg_cert_label">
+                  <span style="font-size:18px;">📄</span>
+                  <span id="reg_cert_name" style="font-size:11px;color:var(--gray);">파일 선택 (JPG/PNG/PDF)</span>
+                </label>
+                <input type="file" id="reg_biz_cert" accept="image/*,.pdf" style="display:none;"
+                  onchange="handleCertUpload(this)">
+              </div>
+            </div>
+            <!-- 미리보기 -->
+            <div id="reg_cert_preview" style="display:none;margin-top:10px;text-align:center;">
+              <img id="reg_cert_img" src="" style="max-height:120px;border-radius:8px;border:1px solid var(--gray-light);">
+            </div>
+          </div>
+
           <!-- 식용유 초기 재고 -->
           <div style="background:var(--cream);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:14px;border:1px solid var(--gray-light);">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -2926,7 +2954,7 @@ function showPanel(id, navEl, pushState=true) {
   if (id === 'price')     { renderPricePage(); }
   if (id === 'esg')       { renderEsgPanel(); }
   if (id === 'owner')     { renderOwnerPanel && renderOwnerPanel(); }
-  if (id === 'register')  { renderRegBizList(); renderPendingBizList(); updateRegisterBadge(); }
+  if (id === 'register')  { renderRegBizList(); loadPendingBizFromDB && loadPendingBizFromDB(); updateRegisterBadge(); }
   if (id === 'hq')        { renderHqTable(); initHqBars(); renderHqAlerts(); updateHqRealStats(); }
   if (id === 'admin') {
     // 관리자 로그인 상태면 비번 화면 건너뛰고 바로 대시 표시
@@ -4460,13 +4488,25 @@ function registerBiz() {
     });
     showToast('t1','✅ 업체 등록 완료!', name + ' — 지도에 핀이 추가됐어요');
   } else {
-    // 승인 대기 큐에 저장
+    // 승인 대기 큐 — Supabase에 저장
     const now = new Date();
     const dateStr = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
-    pendingBizData.unshift({ id: Date.now(), ...bizData, requestDate: dateStr, status: 'pending' });
-    savePendingBiz();
-    renderPendingBizList();
-    updateRegisterBadge();
+    const pendingRow = {
+      id: Date.now(),
+      name, type, owner, phone, addr, lat, lng,
+      new_oil: newOil, waste_oil: wasteOil,
+      oil_type: oiltype, auto: autoOn,
+      status: 'pending', request_date: dateStr
+    };
+    // Supabase에 저장 (관리자가 다른 기기에서도 볼 수 있도록)
+    db.from('pending_biz').insert(pendingRow).then(({ error }) => {
+      if (error) {
+        // DB 실패 시 로컬에 백업
+        pendingBizData.unshift({ ...pendingRow, requestDate: dateStr });
+        savePendingBiz();
+        console.warn('pending_biz DB 저장 실패, 로컬 백업:', error.message);
+      }
+    });
     showToast('t1','📋 등록 신청 완료!', name + ' — 관리자 승인 후 서비스가 시작돼요');
   }
   clearRegForm();
@@ -4477,11 +4517,16 @@ function approvePendingBiz(id) {
   if (idx === -1) return;
   const p = pendingBizData[idx];
   const newBiz = { id: nextBizId++, name: p.name, type: p.type, owner: p.owner, phone: p.phone,
-    addr: p.addr, lat: p.lat, lng: p.lng, newOil: p.newOil, maxNew: 10,
-    wasteOil: p.wasteOil, oiltype: p.oiltype, auto: p.auto, lastUpdate: '방금 승인됨' };
+    addr: p.addr, lat: p.lat, lng: p.lng,
+    newOil: p.new_oil !== undefined ? p.new_oil : (p.newOil || 5), maxNew: 10,
+    wasteOil: p.new_oil !== undefined ? p.waste_oil : (p.wasteOil || 0),
+    oiltype: p.oil_type || p.oiltype || '대두유',
+    auto: p.auto, lastUpdate: '방금 승인됨' };
   saveBizToDB(newBiz).then(() => {
     businesses.push(newBiz);
     saveBusinesses();
+    // Supabase에서도 삭제
+    db.from('pending_biz').delete().eq('id', id).then(() => {});
     pendingBizData.splice(idx, 1);
     savePendingBiz();
     renderRegBizList();
@@ -4496,11 +4541,30 @@ function approvePendingBiz(id) {
 
 function rejectPendingBiz(id) {
   if (!confirm('이 업체 신청을 반려할까요?')) return;
+  // Supabase에서도 삭제
+  db.from('pending_biz').delete().eq('id', id).then(() => {});
   pendingBizData = pendingBizData.filter(p => p.id !== id);
   savePendingBiz();
   renderPendingBizList();
   updateRegisterBadge();
   showToast('t1','❌ 반려됨','신청이 반려 처리됐어요');
+}
+
+// Supabase에서 pending_biz 로드
+async function loadPendingBizFromDB() {
+  try {
+    const { data, error } = await db.from('pending_biz').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (data && data.length > 0) {
+      pendingBizData = data;
+      savePendingBiz();
+    }
+    renderPendingBizList();
+    updateRegisterBadge();
+  } catch(e) {
+    console.warn('pending_biz 로드 실패:', e.message);
+    renderPendingBizList();
+  }
 }
 
 function renderPendingBizList() {
@@ -4557,17 +4621,50 @@ function updateRegisterBadge() {
   });
 }
 
+// 사업자등록증 업로드 핸들러
+var regCertBase64 = null;
+function handleCertUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const label = document.getElementById('reg_cert_name');
+  const preview = document.getElementById('reg_cert_preview');
+  const img = document.getElementById('reg_cert_img');
+  if (label) label.textContent = file.name;
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      regCertBase64 = e.target.result;
+      if (img) img.src = e.target.result;
+      if (preview) preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    regCertBase64 = null;
+    if (preview) preview.style.display = 'none';
+    showToast('t1','📄 파일 첨부됨', file.name + ' — PDF는 미리보기 불가');
+  }
+}
+
 function clearRegForm() {
   ['reg_name','reg_owner','reg_phone','reg_addr','reg_lat','reg_lng'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  const phoneInput = document.getElementById('reg_phone_input');
+  if (phoneInput) phoneInput.value = '';
   const searchInput = document.getElementById('kakao_search_input');
   if (searchInput) searchInput.value = '';
   const results = document.getElementById('kakaoResults');
   if (results) results.innerHTML = '';
   const preview = document.getElementById('selectedBizPreview');
   if (preview) preview.style.display = 'none';
+  const certPreview = document.getElementById('reg_cert_preview');
+  if (certPreview) certPreview.style.display = 'none';
+  const certName = document.getElementById('reg_cert_name');
+  if (certName) certName.textContent = '파일 선택 (JPG/PNG/PDF)';
+  const certInput = document.getElementById('reg_biz_cert');
+  if (certInput) certInput.value = '';
+  regCertBase64 = null;
   document.getElementById('reg_newOil').value  = '5';
   document.getElementById('reg_wasteOil').value = '0';
   const tog = document.getElementById('regAutoToggle');
@@ -6319,7 +6416,8 @@ function setAdminMode(on) {
   document.getElementById('sidebarAvatar').textContent = on ? 'A' : 'H';
   document.getElementById('sidebarAvatar').style.background = on ? '#C0392B' : 'var(--green-main)';
   updateNavByMode();
-  renderPendingBizList && renderPendingBizList();
+  if (on) { loadPendingBizFromDB && loadPendingBizFromDB(); }
+  else { renderPendingBizList && renderPendingBizList(); }
   updateRegisterBadge && updateRegisterBadge();
 }
 
